@@ -21,3 +21,7 @@ class SimTimeManager:
 
     def sim_elapsed_time(self) -> int:
         return int(time.time_ns() // 1000000) - SimTimeManager.__sim_start_time_ms
+
+    def reset_sim(self):
+        SimTimeManager.__sim_start_time_ms = 0
+        SimTimeManager.__time_step_ms = 0
