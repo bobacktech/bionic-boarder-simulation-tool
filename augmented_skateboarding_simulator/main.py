@@ -1,6 +1,7 @@
 from sim_time_manager import SimTimeManager
 import argparse
 import re
+import threading
 
 
 if __name__ == "__main__":
@@ -17,6 +18,11 @@ if __name__ == "__main__":
     """
         Instantiate execution flow semaphore that allows to main thread to sleep while simulation is running.
     """
+    flowSem = threading.Semaphore(0)
+
+    """
+        Instantiate electric skateboard description object.
+    """
 
     """
         Launch VESC command processor on a separate thread.
@@ -32,3 +38,4 @@ if __name__ == "__main__":
         Use the semaphore above to block main thread.  This semaphore will wake up or release in another thread to allow 
         the main thread to finish.
     """
+    flowSem.acquire()
