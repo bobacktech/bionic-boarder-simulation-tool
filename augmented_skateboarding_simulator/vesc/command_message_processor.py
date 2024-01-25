@@ -16,23 +16,6 @@ class CommandMessageProcessor(ABC):
 
     @property
     @abstractmethod
-    def __state_change_command_ids(self):
-        """
-        Returns a dictionary of the state change command ids associated with a lambda to change the particular
-        value in the state message.
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def __message_request_commands(self):
-        """
-        Returns a dictionary of the message request command id associated with an instance of the message type.
-        """
-        pass
-
-    @property
-    @abstractmethod
     def __command_id_names(self):
         """
         Returns a dictionary of the command id associated to the name of the command.
@@ -49,11 +32,50 @@ class CommandMessageProcessor(ABC):
         )
         self.__command_byte_size = command_byte_size
 
-    def receive_command(self):
+    def handle_command(self):
+        handler = {
+            CommandMessageProcessor.STATE: self.__publish_state(),
+            CommandMessageProcessor.IMU_STATE: self.__publish_imu_state(),
+            CommandMessageProcessor.FIRMWARE: self.__publish_firmware(),
+            CommandMessageProcessor.DUTY_CYCLE: self.__update_duty(command_bytes),
+            CommandMessageProcessor.CURRENT: self.__update_current(command_bytes),
+            CommandMessageProcessor.RPM: self.__update_rpm(command_bytes),
+            CommandMessageProcessor.HEARTBEAT: self.__heartbeat(),
+        }
         while True:
-            command = self.__serial.read(self.__command_byte_size)
-            self._handle_command(command)
+            command_bytes = self.__serial.read(self.__command_byte_size)
+            command_id = self.__get_command_id(command_bytes)
+            command_name = self.__command_id_names[command_id]
+            handler[command_name]
 
     @abstractmethod
-    def _handle_command(self, command: bytes):
+    def __get_command_id(self, command: bytes) -> int:
+        pass
+
+    @abstractmethod
+    def __publish_state(self):
+        pass
+
+    @abstractmethod
+    def __publish_imu_state(self):
+        pass
+
+    @abstractmethod
+    def __publish_firmware(self):
+        pass
+
+    @abstractmethod
+    def __update_duty(self, command):
+        pass
+
+    @abstractmethod
+    def __update_current(self, command):
+        pass
+
+    @abstractmethod
+    def __update_rpm(self, command):
+        pass
+
+    @abstractmethod
+    def __heartbeat(self):
         pass
