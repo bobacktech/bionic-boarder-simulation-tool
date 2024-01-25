@@ -16,7 +16,7 @@ class CommandMessageProcessor(ABC):
 
     @property
     @abstractmethod
-    def __command_id_names(self):
+    def _command_id_names(self):
         """
         Returns a dictionary of the command id associated to the name of the command.
         """
@@ -49,33 +49,33 @@ class CommandMessageProcessor(ABC):
             handler[command_name]
 
     @abstractmethod
-    def __get_command_id(self, command: bytes) -> int:
+    def _get_command_id(self, command: bytes) -> int:
         pass
 
     @abstractmethod
-    def __publish_state(self):
+    def _publish_state(self):
         pass
 
     @abstractmethod
-    def __publish_imu_state(self):
+    def _publish_imu_state(self):
         pass
 
     @abstractmethod
-    def __publish_firmware(self):
+    def _publish_firmware(self):
         pass
 
     @abstractmethod
-    def __update_duty(self, command):
+    def _update_duty(self, command):
         pass
 
     @abstractmethod
-    def __update_current(self, command):
+    def _update_current(self, command):
         pass
 
     @abstractmethod
-    def __update_rpm(self, command):
+    def _update_rpm(self, command):
         pass
 
     @abstractmethod
-    def __heartbeat(self):
+    def _heartbeat(self):
         pass
