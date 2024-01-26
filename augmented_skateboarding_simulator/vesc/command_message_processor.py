@@ -16,7 +16,7 @@ class CommandMessageProcessor(ABC):
 
     @property
     @abstractmethod
-    def _command_id_names(self):
+    def _command_id_name(self):
         """
         Returns a dictionary of the command id associated to the name of the command.
         """
@@ -33,19 +33,20 @@ class CommandMessageProcessor(ABC):
         self.__command_byte_size = command_byte_size
 
     def handle_command(self):
+        command_bytes = None
         handler = {
-            CommandMessageProcessor.STATE: self.__publish_state(),
-            CommandMessageProcessor.IMU_STATE: self.__publish_imu_state(),
-            CommandMessageProcessor.FIRMWARE: self.__publish_firmware(),
-            CommandMessageProcessor.DUTY_CYCLE: self.__update_duty(command_bytes),
-            CommandMessageProcessor.CURRENT: self.__update_current(command_bytes),
-            CommandMessageProcessor.RPM: self.__update_rpm(command_bytes),
-            CommandMessageProcessor.HEARTBEAT: self.__heartbeat(),
+            CommandMessageProcessor.STATE: self._publish_state(),
+            CommandMessageProcessor.IMU_STATE: self._publish_imu_state(),
+            CommandMessageProcessor.FIRMWARE: self._publish_firmware(),
+            CommandMessageProcessor.DUTY_CYCLE: self._update_duty_cycle(command_bytes),
+            CommandMessageProcessor.CURRENT: self._update_current(command_bytes),
+            CommandMessageProcessor.RPM: self._update_rpm(command_bytes),
+            CommandMessageProcessor.HEARTBEAT: self._heartbeat(),
         }
         while True:
             command_bytes = self.__serial.read(self.__command_byte_size)
-            command_id = self.__get_command_id(command_bytes)
-            command_name = self.__command_id_names[command_id]
+            command_id = self._get_command_id(command_bytes)
+            command_name = self._command_id_name[command_id]
             handler[command_name]
 
     @abstractmethod
@@ -65,7 +66,7 @@ class CommandMessageProcessor(ABC):
         pass
 
     @abstractmethod
-    def _update_duty(self, command):
+    def _update_duty_cycle(self, command):
         pass
 
     @abstractmethod
