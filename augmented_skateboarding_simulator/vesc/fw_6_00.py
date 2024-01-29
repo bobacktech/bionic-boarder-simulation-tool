@@ -2,7 +2,6 @@ class FirmwareMessage:
     """
     See the message specification in [commands.c](https://github.com/vedderb/bldc/blob/6.00/comm/commands.c)
     in VESC bldc-6.00 source code on Github.
-
     """
 
     BYTE_LENGTH = 65
