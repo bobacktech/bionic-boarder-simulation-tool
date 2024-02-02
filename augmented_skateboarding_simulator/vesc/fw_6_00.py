@@ -34,7 +34,10 @@ class FirmwareMessage:
 
 
 class StateMessage:
-    BYTE_LENGTH: int = 76
+    """
+    See the "COMM_GET_VALUES" message specification in [commands.c](https://github.com/vedderb/bldc/blob/6.00/comm/commands.c)
+    in VESC bldc-6.00 source code on Github.
+    """
 
     def __init__(self) -> None:
         self.__duty_cycle: float = 0
@@ -44,9 +47,16 @@ class StateMessage:
 
     @property
     def buffer(self) -> bytearray:
-        buffer = bytearray(StateMessage.BYTE_LENGTH)
-        # TBD - serialize data items to byte buffer
-        return buffer
+        """State message size is 76 bytes."""
+        buffer = bytearray(76)
+        dc = int(self.duty_cycle * 1000)
+        iv = int(self.__input_voltage * 10.0)
+        mc = int(self.__motor_current * 100.0)
+        buffer[9:13] = struct.pack(">H", mc)
+        buffer[25:27] = struct.pack(">H", dc)
+        buffer[27:31] = struct.pack(">H", self.__rpm)
+        buffer[31:33] = struct.pack(">H", iv)
+        return bytes(buffer)
 
     @property
     def duty_cycle(self) -> float:
