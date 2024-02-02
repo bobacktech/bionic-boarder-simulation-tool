@@ -46,7 +46,7 @@ class StateMessage:
         self.__input_voltage: float = 0
 
     @property
-    def buffer(self) -> bytearray:
+    def buffer(self) -> bytes:
         """State message size is 76 bytes."""
         buffer = bytearray(76)
         dc = int(self.duty_cycle * 1000)
