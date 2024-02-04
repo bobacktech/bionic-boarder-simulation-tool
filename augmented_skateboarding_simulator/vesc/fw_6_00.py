@@ -47,14 +47,29 @@ class StateMessage:
 
     @property
     def buffer(self) -> bytes:
-        """State message size is 76 bytes."""
+        """
+        Generates a byte representation of the state message based on the current properties of the object.
+
+        The state message is structured as a 76-byte array, with specific portions of the array dedicated to
+        representing the duty cycle, input voltage, motor current, and RPM, encoded in specific formats.
+
+        The encoding is as follows:
+        - Motor current (mc) is stored from bytes 9 to 12, represented as an unsigned int (">I"), scaled by 100.
+        - Duty cycle (dc) is stored from bytes 25 to 26, represented as an unsigned short (">H"), scaled by 1000.
+        - RPM is stored from bytes 27 to 30, represented directly as an unsigned int (">I") without scaling.
+        - Input voltage (iv) is stored from bytes 31 to 32, represented as an unsigned short (">H"), scaled by 10.
+
+        Returns:
+            bytes: A bytes object representing the encoded state message, suitable for transmission or processing
+                in accordance with the "COMM_GET_VALUES" message specification of the VESC firmware.
+        """
         buffer = bytearray(76)
         dc = int(self.duty_cycle * 1000)
         iv = int(self.__input_voltage * 10.0)
         mc = int(self.__motor_current * 100.0)
-        buffer[9:13] = struct.pack(">H", mc)
+        buffer[9:13] = struct.pack(">I", mc)
         buffer[25:27] = struct.pack(">H", dc)
-        buffer[27:31] = struct.pack(">H", self.__rpm)
+        buffer[27:31] = struct.pack(">I", self.__rpm)
         buffer[31:33] = struct.pack(">H", iv)
         return bytes(buffer)
 
