@@ -104,3 +104,41 @@ class StateMessage:
     @input_voltage.setter
     def input_voltage(self, value: float) -> None:
         self.__input_voltage = value
+
+
+class IMUStateMessage:
+    """
+    See the "COMM_GET_IMU_DATA" message specification in [commands.c](https://github.com/vedderb/bldc/blob/6.00/comm/commands.c)
+    in VESC bldc-6.00 source code on Github.
+    """
+
+    def __init__(self) -> None:
+        self.__rpy = [0.0, 0.0, 0.0]  # Roll, pitch, yaw
+        self.__acc = [0.0, 0.0, 0.0]  # Accelerometer data
+        self.__gyro = [0.0, 0.0, 0.0]  # Gyroscope data
+        self.__mag = [0.0, 0.0, 0.0]  # Magnetometer data
+        self.__q = [0.0, 0.0, 0.0, 0.0]  # Quaternion data
+
+    @property
+    def buffer(self) -> bytes:
+        buffer = bytearray(68)
+
+    @property
+    def rpy(self):
+        return self.__rpy
+
+    @property
+    def acc(self):
+        return self.__acc
+
+    @property
+    def gyro(self):
+        return self.__gyro
+
+    @property
+    def mag(self):
+        return self.__mag
+
+    @property
+    def q(self):
+        return self.__q
