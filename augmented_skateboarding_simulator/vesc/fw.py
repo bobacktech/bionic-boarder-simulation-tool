@@ -6,10 +6,10 @@ The following methods are utilities that are available to all implemented firmwa
 """
 
 
-def float32_to_bytes(number):
+def float32_to_bytes(number) -> bytes:
     """
     See [buffer.c](https://github.com/vedderb/bldc/blob/master/util/buffer.c)
-    in VESC bldc-6.00 source code on Github.
+    in VESC bldc source code on Github for an explanation of this method.
     """
     # Handle subnormal numbers
     if abs(number) < 1.5e-38:
