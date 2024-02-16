@@ -1,3 +1,4 @@
+from . import fw
 import struct
 
 
@@ -104,3 +105,76 @@ class StateMessage:
     @input_voltage.setter
     def input_voltage(self, value: float) -> None:
         self.__input_voltage = value
+
+
+class IMUStateMessage:
+    """
+    See the "COMM_GET_IMU_DATA" message specification in [commands.c](https://github.com/vedderb/bldc/blob/6.00/comm/commands.c)
+    in VESC bldc-6.00 source code on Github.
+    """
+
+    def __init__(self) -> None:
+        self.__rpy = [0.0, 0.0, 0.0]  # Roll, pitch, yaw
+        self.__acc = [0.0, 0.0, 0.0]  # Accelerometer data
+        self.__gyro = [0.0, 0.0, 0.0]  # Gyroscope data
+        self.__mag = [0.0, 0.0, 0.0]  # Magnetometer data
+        self.__q = [0.0, 0.0, 0.0, 0.0]  # Quaternion data
+
+    @property
+    def buffer(self) -> bytes:
+        """
+        Serializes the IMU state into a bytes object.
+
+        The serialization format includes roll, pitch, yaw, accelerometer data,
+        gyroscope data, magnetometer data, and quaternion data, each converted
+        to bytes using the floating-point to bytes conversion method provided
+        by the `fw` module. This format is compliant with the "COMM_GET_IMU_DATA"
+        message specification in the VESC bldc-6.00 source code.
+
+        Returns:
+            bytes: A bytes object containing the serialized IMU state data.
+        """
+        buffer = bytearray(68)
+
+        buffer[1:5] = fw.float32_to_bytes(self.__rpy[0])
+        buffer[5:9] = fw.float32_to_bytes(self.__rpy[1])
+        buffer[9:13] = fw.float32_to_bytes(self.__rpy[2])
+
+        buffer[13:17] = fw.float32_to_bytes(self.__acc[0])
+        buffer[17:21] = fw.float32_to_bytes(self.__acc[1])
+        buffer[21:25] = fw.float32_to_bytes(self.__acc[2])
+
+        buffer[25:29] = fw.float32_to_bytes(self.__gyro[0])
+        buffer[29:33] = fw.float32_to_bytes(self.__gyro[1])
+        buffer[33:37] = fw.float32_to_bytes(self.__gyro[2])
+
+        buffer[37:41] = fw.float32_to_bytes(self.__mag[0])
+        buffer[41:45] = fw.float32_to_bytes(self.__mag[1])
+        buffer[45:49] = fw.float32_to_bytes(self.__mag[2])
+
+        buffer[49:53] = fw.float32_to_bytes(self.__q[0])
+        buffer[53:57] = fw.float32_to_bytes(self.__q[1])
+        buffer[57:61] = fw.float32_to_bytes(self.__q[2])
+        buffer[61:65] = fw.float32_to_bytes(self.__q[3])
+
+        return bytes(buffer)
+
+    @property
+    def rpy(self):
+        return self.__rpy
+
+    @property
+    def acc(self):
+        return self.__acc
+
+    @property
+    def gyro(self):
+        return self.__gyro
+
+    @property
+    def mag(self):
+        return self.__mag
+
+    @property
+    def q(self):
+        return self.__q
