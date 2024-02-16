@@ -1,4 +1,4 @@
-import fw
+from . import fw
 import struct
 
 

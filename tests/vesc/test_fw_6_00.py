@@ -1,6 +1,13 @@
 import pytest
 import struct
-from augmented_skateboarding_simulator.vesc.fw_6_00 import FirmwareMessage, StateMessage
+from augmented_skateboarding_simulator.vesc.fw_6_00 import (
+    FirmwareMessage,
+    StateMessage,
+    IMUStateMessage,
+)
+from math import ldexp
+import struct
+import math
 
 
 def test_firmware_message_initialization():
@@ -69,3 +76,51 @@ class TestStateMessage:
         assert unpacked_dc == int(0.5 * 1000)
         assert unpacked_rpm == 1200
         assert unpacked_iv == int(12.5 * 10)
+
+
+def bytes_to_float32(res: int) -> float:
+    e = (res >> 23) & 0xFF
+    sig_i = res & 0x7FFFFF
+    neg = res & (1 << 31) != 0
+
+    sig = 0.0
+    if e != 0 or sig_i != 0:
+        sig = sig_i / (8388608.0 * 2.0) + 0.5
+        e -= 126
+
+    if neg:
+        sig = -sig
+
+    return ldexp(sig, e)
+
+
+class TestIMUStateMessage:
+    def test_buffer_property(self):
+        # Create an instance of IMUStateMessage with some sample data
+        message = IMUStateMessage()
+        # Assuming setter methods or direct attribute access is possible to simulate real data
+        message.rpy[0] = 1.0
+        message.rpy[1] = 2.0
+        message.rpy[2] = 3.0
+        message.acc[0] = 0.1
+        message.acc[1] = 0.2
+        message.acc[2] = 0.3
+        message.gyro[0] = 0.01
+        message.gyro[1] = 0.02
+        message.gyro[2] = 0.03
+        message.mag[0] = 0.4
+        message.mag[1] = 0.5
+        message.mag[2] = 0.6
+        message.q[0] = 1.25
+        message.q[1] = 0
+        message.q[2] = 0
+        message.q[3] = 0
+
+        # Fetch the buffer
+        buf = message.buffer
+        yaw = bytes_to_float32(struct.unpack(">I", buf[9:13])[0])
+        assert yaw == message.rpy[2]
+        acc_z = bytes_to_float32(struct.unpack(">I", buf[21:25])[0])
+        assert math.isclose(acc_z, message.acc[2], rel_tol=1e-6)
+        q1 = bytes_to_float32(struct.unpack(">I", buf[49:53])[0])
+        assert math.isclose(q1, message.q[0], rel_tol=1e-6)
