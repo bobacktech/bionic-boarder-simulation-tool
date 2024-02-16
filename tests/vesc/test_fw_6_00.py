@@ -96,9 +96,9 @@ def bytes_to_float32(res: int) -> float:
 
 class TestIMUStateMessage:
     def test_buffer_property(self):
-        # Create an instance of IMUStateMessage with some sample data
+        """Test the buffer property to ensure correct byte structure."""
         message = IMUStateMessage()
-        # Assuming setter methods or direct attribute access is possible to simulate real data
+
         message.rpy[0] = 1.0
         message.rpy[1] = 2.0
         message.rpy[2] = 3.0

@@ -122,6 +122,18 @@ class IMUStateMessage:
 
     @property
     def buffer(self) -> bytes:
+        """
+        Serializes the IMU state into a bytes object.
+
+        The serialization format includes roll, pitch, yaw, accelerometer data,
+        gyroscope data, magnetometer data, and quaternion data, each converted
+        to bytes using the floating-point to bytes conversion method provided
+        by the `fw` module. This format is compliant with the "COMM_GET_IMU_DATA"
+        message specification in the VESC bldc-6.00 source code.
+
+        Returns:
+            bytes: A bytes object containing the serialized IMU state data.
+        """
         buffer = bytearray(68)
 
         buffer[1:5] = fw.float32_to_bytes(self.__rpy[0])
