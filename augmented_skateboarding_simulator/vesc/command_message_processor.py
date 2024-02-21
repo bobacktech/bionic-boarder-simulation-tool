@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from threading import Lock
 import serial
 
 
@@ -32,7 +33,9 @@ class CommandMessageProcessor(ABC):
         """
         pass
 
-    def __init__(self, com_port, command_byte_size):
+    def __init__(
+        self, com_port, command_byte_size, state_lock: Lock, imu_state_lock: Lock
+    ):
         """
         Initializes a new instance of CommandMessageProcessor.
 
@@ -48,6 +51,8 @@ class CommandMessageProcessor(ABC):
             bytesize=serial.EIGHTBITS,
         )
         self.__command_byte_size = command_byte_size
+        self.__sl = state_lock
+        self.__isl = imu_state_lock
 
     def handle_command(self):
         """
@@ -56,19 +61,39 @@ class CommandMessageProcessor(ABC):
         """
         command_bytes = None
         handler = {
-            CommandMessageProcessor.STATE: self._publish_state(),
-            CommandMessageProcessor.IMU_STATE: self._publish_imu_state(),
-            CommandMessageProcessor.FIRMWARE: self._publish_firmware(),
-            CommandMessageProcessor.DUTY_CYCLE: self._update_duty_cycle(command_bytes),
-            CommandMessageProcessor.CURRENT: self._update_current(command_bytes),
-            CommandMessageProcessor.RPM: self._update_rpm(command_bytes),
-            CommandMessageProcessor.HEARTBEAT: self._heartbeat(),
+            CommandMessageProcessor.STATE: lambda: (
+                self.__sl.acquire(),
+                self._publish_state(),
+                self.__sl.release(),
+            ),
+            CommandMessageProcessor.IMU_STATE: lambda: (
+                self.__isl.acquire(),
+                self._publish_imu_state(),
+                self.__isl.release(),
+            ),
+            CommandMessageProcessor.FIRMWARE: lambda: self._publish_firmware(),
+            CommandMessageProcessor.DUTY_CYCLE: lambda: (
+                self.__sl.acquire(),
+                self._update_duty_cycle(command_bytes),
+                self.__sl.release(),
+            ),
+            CommandMessageProcessor.CURRENT: lambda: (
+                self.__sl.acquire(),
+                self._update_current(command_bytes),
+                self.__sl.release(),
+            ),
+            CommandMessageProcessor.RPM: lambda: (
+                self.__sl.acquire(),
+                self._update_rpm(command_bytes),
+                self.__sl.release(),
+            ),
+            CommandMessageProcessor.HEARTBEAT: lambda: self._heartbeat(),
         }
         while True:
             command_bytes = self.__serial.read(self.__command_byte_size)
             command_id = self._get_command_id(command_bytes)
             command_name = self._command_id_name[command_id]
-            handler[command_name]
+            handler[command_name]()
 
     @abstractmethod
     def _get_command_id(self, command: bytes) -> int:
