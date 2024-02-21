@@ -2,11 +2,12 @@ import pytest
 from augmented_skateboarding_simulator.vesc.command_message_processor import (
     CommandMessageProcessor,
 )
+from threading import Lock
 
 
 class TestCommandMessageProcessor(CommandMessageProcessor):
     def __init__(self, com_port, command_byte_size):
-        super().__init__(com_port, command_byte_size)
+        super().__init__(com_port, command_byte_size, Lock(), Lock())
         self.__cmd_id_name = {
             1: CommandMessageProcessor.DUTY_CYCLE,
             2: CommandMessageProcessor.CURRENT,
