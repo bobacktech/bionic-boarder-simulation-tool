@@ -1,5 +1,7 @@
 from . import fw
+from .command_message_processor import CommandMessageProcessor
 import struct
+from threading import Lock
 
 
 class FirmwareMessage:
@@ -178,3 +180,50 @@ class IMUStateMessage:
     @property
     def q(self):
         return self.__q
+
+
+class FW6_00CMP(CommandMessageProcessor):
+    def __init__(
+        self, com_port, command_byte_size, state_lock: Lock, imu_state_lock: Lock
+    ):
+        super().__init__(com_port, command_byte_size, state_lock, imu_state_lock)
+        self.__cmd_id_name = {
+            5: CommandMessageProcessor.DUTY_CYCLE,
+            6: CommandMessageProcessor.CURRENT,
+            8: CommandMessageProcessor.RPM,
+            30: CommandMessageProcessor.HEARTBEAT,
+            0: CommandMessageProcessor.FIRMWARE,
+            4: CommandMessageProcessor.STATE,
+            65: CommandMessageProcessor.IMU_STATE,
+        }
+
+    @property
+    def _command_id_name(self):
+        """
+        Returns a dictionary of the command id associated to the name of the command.
+        """
+        return self.__cmd_id_name
+
+    def _get_command_id(self, command: bytes) -> int:
+        pass
+
+    def _publish_state(self):
+        pass
+
+    def _publish_imu_state(self):
+        pass
+
+    def _publish_firmware(self):
+        pass
+
+    def _update_duty_cycle(self, command):
+        pass
+
+    def _update_current(self, command):
+        pass
+
+    def _update_rpm(self, command):
+        pass
+
+    def _heartbeat(self):
+        pass
