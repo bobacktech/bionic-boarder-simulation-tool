@@ -43,7 +43,7 @@ class CommandMessageProcessor(ABC):
             com_port (str): The COM port to use for serial communication.
             command_byte_size (int): The size of the command byte.
         """
-        self.__serial = serial.Serial(
+        self.serial = serial.Serial(
             port=com_port,
             baudrate=230400,
             parity=serial.PARITY_NONE,
@@ -90,7 +90,7 @@ class CommandMessageProcessor(ABC):
             CommandMessageProcessor.HEARTBEAT: lambda: self._heartbeat(),
         }
         while True:
-            command_bytes = self.__serial.read(self.__command_byte_size)
+            command_bytes = self.serial.read(self.__command_byte_size)
             command_id = self._get_command_id(command_bytes)
             command_name = self._command_id_name[command_id]
             handler[command_name]()
