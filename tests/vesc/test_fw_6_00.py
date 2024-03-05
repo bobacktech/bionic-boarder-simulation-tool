@@ -1,13 +1,16 @@
 import pytest
+from unittest import mock
 import struct
 from augmented_skateboarding_simulator.vesc.fw_6_00 import (
     FirmwareMessage,
     StateMessage,
     IMUStateMessage,
+    FW6_00CMP,
 )
 from math import ldexp
 import struct
 import math
+from threading import Lock
 
 
 def test_firmware_message_initialization():
@@ -124,3 +127,20 @@ class TestIMUStateMessage:
         assert math.isclose(acc_z, message.acc[2], rel_tol=1e-6)
         q1 = bytes_to_float32(struct.unpack(">I", buf[49:53])[0])
         assert math.isclose(q1, message.q[0], rel_tol=1e-6)
+
+
+""" 
+Unit tests for class FW6_00CMP
+"""
+
+
+@pytest.fixture
+def mock_serial(mocker):
+    return mocker.patch("serial.Serial", autospec=True)
+
+
+def test_firmware_command(mock_serial):
+    cmp = FW6_00CMP("COM1", 8, Lock(), Lock())
+    cmp._publish_firmware()
+    data = b"\x02A\x00\x06\x00HardwareName" + bytes(50)
+    mock_serial.return_value.write.assert_called_once_with(data)

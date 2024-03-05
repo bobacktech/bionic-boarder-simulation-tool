@@ -205,7 +205,10 @@ class FW6_00CMP(CommandMessageProcessor):
         return self.__cmd_id_name
 
     def _get_command_id(self, command: bytes) -> int:
-        pass
+        """
+        The command ID for the received command is in the third byte of the [command] data buffer.
+        """
+        return ord(command[3])
 
     def _publish_state(self):
         pass
@@ -214,7 +217,10 @@ class FW6_00CMP(CommandMessageProcessor):
         pass
 
     def _publish_firmware(self):
-        pass
+        fw = FirmwareMessage()
+        header = int.to_bytes(2) + int.to_bytes(FirmwareMessage.BYTE_LENGTH)
+        data = header + fw.buffer
+        self.serial.write(data)
 
     def _update_duty_cycle(self, command):
         pass
