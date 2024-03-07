@@ -20,11 +20,10 @@ def test_firmware_message_initialization():
     ), "Buffer length does not match expected length."
 
     # Test initial values set in buffer
-    assert msg.buffer[0] == 0, "First byte of buffer should be 0."
-    assert msg.buffer[1] == 6, "Second byte of buffer should be 6."
-    assert msg.buffer[2] == 0, "Third byte of buffer should be 0."
+    assert msg.buffer[0] == 6, "Second byte of buffer should be 6."
+    assert msg.buffer[1] == 0, "Third byte of buffer should be 0."
     assert (
-        msg.buffer[3:15] == b"HardwareName"
+        msg.buffer[2:14] == b"HardwareName"
     ), "Bytes 3-15 should be encoded 'HardwareName'."
 
 
@@ -142,19 +141,19 @@ def mock_serial(mocker):
 def test_firmware_command(mock_serial):
     cmp = FW6_00CMP("COM1", 8, None, Lock(), None, Lock())
     cmp._publish_firmware()
-    data = b"\x02A\x00\x06\x00HardwareName" + bytes(50)
+    data = b"\x02@\x00\x06\x00HardwareName" + bytes(50)
     mock_serial.return_value.write.assert_called_once_with(data)
 
 
 def test_state_command(mock_serial):
     cmp = FW6_00CMP("COM1", 8, StateMessage(), Lock(), None, Lock())
     cmp._publish_state()
-    data = b"\x02L" + bytes(76)
+    data = b"\x02L\x04" + bytes(76)
     mock_serial.return_value.write.assert_called_once_with(data)
 
 
 def test_imu_state_command(mock_serial):
     cmp = FW6_00CMP("COM1", 8, None, Lock(), IMUStateMessage(), Lock())
     cmp._publish_imu_state()
-    data = b"\x02D" + bytes(68)
+    data = b"\x02DA" + bytes(68)
     mock_serial.return_value.write.assert_called_once_with(data)

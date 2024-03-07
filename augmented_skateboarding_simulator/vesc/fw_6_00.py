@@ -10,7 +10,7 @@ class FirmwareMessage:
     in VESC bldc-6.00 source code on Github.
     """
 
-    BYTE_LENGTH = 65
+    BYTE_LENGTH = 64
 
     def __init__(self) -> None:
         """
@@ -20,10 +20,9 @@ class FirmwareMessage:
         The buffer is initialized with predefined values, and a section is filled with an encoded string.
         """
         self.__buffer = bytearray(FirmwareMessage.BYTE_LENGTH)
-        self.__buffer[0] = 0
-        self.__buffer[1] = 6
-        self.__buffer[2] = 0
-        self.__buffer[3:15] = "HardwareName".encode("utf-8")
+        self.__buffer[0] = 6
+        self.__buffer[1] = 0
+        self.__buffer[2:14] = "HardwareName".encode("utf-8")
 
     @property
     def buffer(self):
@@ -204,7 +203,9 @@ class FW6_00CMP(CommandMessageProcessor):
         }
         self.__state_msg = state_msg
         self.__imu_state_msg = imu_state_msg
-        self.__packet_header = lambda l: int.to_bytes(2) + int.to_bytes(l)
+        self.__packet_header = (
+            lambda id, l: int.to_bytes(2) + int.to_bytes(l) + int.to_bytes(id)
+        )
 
     @property
     def _command_id_name(self):
@@ -221,17 +222,17 @@ class FW6_00CMP(CommandMessageProcessor):
 
     def _publish_state(self):
         msg_data = self.__state_msg.buffer
-        packet = self.__packet_header(len(msg_data)) + msg_data
+        packet = self.__packet_header(4, len(msg_data)) + msg_data
         self.serial.write(packet)
 
     def _publish_imu_state(self):
         msg_data = self.__imu_state_msg.buffer
-        packet = self.__packet_header(len(msg_data)) + msg_data
+        packet = self.__packet_header(65, len(msg_data)) + msg_data
         self.serial.write(packet)
 
     def _publish_firmware(self):
         fw = FirmwareMessage()
-        packet = self.__packet_header(FirmwareMessage.BYTE_LENGTH) + fw.buffer
+        packet = self.__packet_header(0, FirmwareMessage.BYTE_LENGTH) + fw.buffer
         self.serial.write(packet)
 
     def _update_duty_cycle(self, command):
