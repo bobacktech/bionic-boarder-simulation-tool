@@ -248,4 +248,7 @@ class FW6_00CMP(CommandMessageProcessor):
         self.__state_msg.rpm = rpm
 
     def _heartbeat(self):
+        """
+        Do nothing.
+        """
         pass

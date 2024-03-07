@@ -157,3 +157,32 @@ def test_imu_state_command(mock_serial):
     cmp._publish_imu_state()
     data = b"\x02DA" + bytes(68)
     mock_serial.return_value.write.assert_called_once_with(data)
+
+
+def test_update_duty_cycle(mock_serial):
+    sm = StateMessage()
+    cmp = FW6_00CMP("COM1", 8, sm, Lock(), None, Lock())
+    duty_cycle = 0.01
+    temp = int(duty_cycle * 100000)
+    command = bytes(3) + temp.to_bytes(4, "big")
+    cmp._update_duty_cycle(command)
+    assert sm.duty_cycle == duty_cycle
+
+
+def test_update_current(mock_serial):
+    sm = StateMessage()
+    cmp = FW6_00CMP("COM1", 8, sm, Lock(), None, Lock())
+    current = 24.3
+    temp = int(current * 1000)
+    command = bytes(3) + temp.to_bytes(4, "big")
+    cmp._update_current(command)
+    assert sm.motor_current == current
+
+
+def test_update_rpm(mock_serial):
+    sm = StateMessage()
+    cmp = FW6_00CMP("COM1", 8, sm, Lock(), None, Lock())
+    rpm = 15596
+    command = bytes(3) + rpm.to_bytes(4, "big")
+    cmp._update_rpm(command)
+    assert sm.rpm == rpm
