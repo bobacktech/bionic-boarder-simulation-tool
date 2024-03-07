@@ -1,5 +1,7 @@
 from . import fw
+from .command_message_processor import CommandMessageProcessor
 import struct
+from threading import Lock
 
 
 class FirmwareMessage:
@@ -8,7 +10,7 @@ class FirmwareMessage:
     in VESC bldc-6.00 source code on Github.
     """
 
-    BYTE_LENGTH = 65
+    BYTE_LENGTH = 64
 
     def __init__(self) -> None:
         """
@@ -18,10 +20,9 @@ class FirmwareMessage:
         The buffer is initialized with predefined values, and a section is filled with an encoded string.
         """
         self.__buffer = bytearray(FirmwareMessage.BYTE_LENGTH)
-        self.__buffer[0] = 0
-        self.__buffer[1] = 6
-        self.__buffer[2] = 0
-        self.__buffer[3:15] = "HardwareName".encode("utf-8")
+        self.__buffer[0] = 6
+        self.__buffer[1] = 0
+        self.__buffer[2:14] = "HardwareName".encode("utf-8")
 
     @property
     def buffer(self):
@@ -178,3 +179,76 @@ class IMUStateMessage:
     @property
     def q(self):
         return self.__q
+
+
+class FW6_00CMP(CommandMessageProcessor):
+    def __init__(
+        self,
+        com_port,
+        command_byte_size,
+        state_msg: StateMessage,
+        state_lock: Lock,
+        imu_state_msg: IMUStateMessage,
+        imu_state_lock: Lock,
+    ):
+        super().__init__(com_port, command_byte_size, state_lock, imu_state_lock)
+        self.__cmd_id_name = {
+            5: CommandMessageProcessor.DUTY_CYCLE,
+            6: CommandMessageProcessor.CURRENT,
+            8: CommandMessageProcessor.RPM,
+            30: CommandMessageProcessor.HEARTBEAT,
+            0: CommandMessageProcessor.FIRMWARE,
+            4: CommandMessageProcessor.STATE,
+            65: CommandMessageProcessor.IMU_STATE,
+        }
+        self.__state_msg = state_msg
+        self.__imu_state_msg = imu_state_msg
+        self.__packet_header = (
+            lambda id, l: int.to_bytes(2) + int.to_bytes(l) + int.to_bytes(id)
+        )
+
+    @property
+    def _command_id_name(self):
+        """
+        Returns a dictionary of the command id associated to the name of the command.
+        """
+        return self.__cmd_id_name
+
+    def _get_command_id(self, command: bytes) -> int:
+        """
+        The command ID for the received command is in the third byte of the [command] data buffer.
+        """
+        return ord(command[3])
+
+    def _publish_state(self):
+        msg_data = self.__state_msg.buffer
+        packet = self.__packet_header(4, len(msg_data)) + msg_data
+        self.serial.write(packet)
+
+    def _publish_imu_state(self):
+        msg_data = self.__imu_state_msg.buffer
+        packet = self.__packet_header(65, len(msg_data)) + msg_data
+        self.serial.write(packet)
+
+    def _publish_firmware(self):
+        fw = FirmwareMessage()
+        packet = self.__packet_header(0, FirmwareMessage.BYTE_LENGTH) + fw.buffer
+        self.serial.write(packet)
+
+    def _update_duty_cycle(self, command):
+        duty_cycle_commanded = int.from_bytes(command[3:7], byteorder="big") / 100000.0
+        self.__state_msg.duty_cycle = duty_cycle_commanded
+
+    def _update_current(self, command):
+        motor_current_commanded = int.from_bytes(command[3:7], byteorder="big") / 1000.0
+        self.__state_msg.motor_current = motor_current_commanded
+
+    def _update_rpm(self, command):
+        rpm = int.from_bytes(command[3:7], byteorder="big")
+        self.__state_msg.rpm = rpm
+
+    def _heartbeat(self):
+        """
+        Do nothing.
+        """
+        pass

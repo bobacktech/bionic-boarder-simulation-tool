@@ -1,13 +1,16 @@
 import pytest
+from unittest import mock
 import struct
 from augmented_skateboarding_simulator.vesc.fw_6_00 import (
     FirmwareMessage,
     StateMessage,
     IMUStateMessage,
+    FW6_00CMP,
 )
 from math import ldexp
 import struct
 import math
+from threading import Lock
 
 
 def test_firmware_message_initialization():
@@ -17,11 +20,10 @@ def test_firmware_message_initialization():
     ), "Buffer length does not match expected length."
 
     # Test initial values set in buffer
-    assert msg.buffer[0] == 0, "First byte of buffer should be 0."
-    assert msg.buffer[1] == 6, "Second byte of buffer should be 6."
-    assert msg.buffer[2] == 0, "Third byte of buffer should be 0."
+    assert msg.buffer[0] == 6, "Second byte of buffer should be 6."
+    assert msg.buffer[1] == 0, "Third byte of buffer should be 0."
     assert (
-        msg.buffer[3:15] == b"HardwareName"
+        msg.buffer[2:14] == b"HardwareName"
     ), "Bytes 3-15 should be encoded 'HardwareName'."
 
 
@@ -124,3 +126,63 @@ class TestIMUStateMessage:
         assert math.isclose(acc_z, message.acc[2], rel_tol=1e-6)
         q1 = bytes_to_float32(struct.unpack(">I", buf[49:53])[0])
         assert math.isclose(q1, message.q[0], rel_tol=1e-6)
+
+
+""" 
+Unit tests for class FW6_00CMP
+"""
+
+
+@pytest.fixture
+def mock_serial(mocker):
+    return mocker.patch("serial.Serial", autospec=True)
+
+
+def test_firmware_command(mock_serial):
+    cmp = FW6_00CMP("COM1", 8, None, Lock(), None, Lock())
+    cmp._publish_firmware()
+    data = b"\x02@\x00\x06\x00HardwareName" + bytes(50)
+    mock_serial.return_value.write.assert_called_once_with(data)
+
+
+def test_state_command(mock_serial):
+    cmp = FW6_00CMP("COM1", 8, StateMessage(), Lock(), None, Lock())
+    cmp._publish_state()
+    data = b"\x02L\x04" + bytes(76)
+    mock_serial.return_value.write.assert_called_once_with(data)
+
+
+def test_imu_state_command(mock_serial):
+    cmp = FW6_00CMP("COM1", 8, None, Lock(), IMUStateMessage(), Lock())
+    cmp._publish_imu_state()
+    data = b"\x02DA" + bytes(68)
+    mock_serial.return_value.write.assert_called_once_with(data)
+
+
+def test_update_duty_cycle(mock_serial):
+    sm = StateMessage()
+    cmp = FW6_00CMP("COM1", 8, sm, Lock(), None, Lock())
+    duty_cycle = 0.01
+    temp = int(duty_cycle * 100000)
+    command = bytes(3) + temp.to_bytes(4, "big")
+    cmp._update_duty_cycle(command)
+    assert sm.duty_cycle == duty_cycle
+
+
+def test_update_current(mock_serial):
+    sm = StateMessage()
+    cmp = FW6_00CMP("COM1", 8, sm, Lock(), None, Lock())
+    current = 24.3
+    temp = int(current * 1000)
+    command = bytes(3) + temp.to_bytes(4, "big")
+    cmp._update_current(command)
+    assert sm.motor_current == current
+
+
+def test_update_rpm(mock_serial):
+    sm = StateMessage()
+    cmp = FW6_00CMP("COM1", 8, sm, Lock(), None, Lock())
+    rpm = 15596
+    command = bytes(3) + rpm.to_bytes(4, "big")
+    cmp._update_rpm(command)
+    assert sm.rpm == rpm
