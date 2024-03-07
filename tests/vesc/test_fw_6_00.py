@@ -140,7 +140,21 @@ def mock_serial(mocker):
 
 
 def test_firmware_command(mock_serial):
-    cmp = FW6_00CMP("COM1", 8, Lock(), Lock())
+    cmp = FW6_00CMP("COM1", 8, None, Lock(), None, Lock())
     cmp._publish_firmware()
     data = b"\x02A\x00\x06\x00HardwareName" + bytes(50)
+    mock_serial.return_value.write.assert_called_once_with(data)
+
+
+def test_state_command(mock_serial):
+    cmp = FW6_00CMP("COM1", 8, StateMessage(), Lock(), None, Lock())
+    cmp._publish_state()
+    data = b"\x02L" + bytes(76)
+    mock_serial.return_value.write.assert_called_once_with(data)
+
+
+def test_imu_state_command(mock_serial):
+    cmp = FW6_00CMP("COM1", 8, None, Lock(), IMUStateMessage(), Lock())
+    cmp._publish_imu_state()
+    data = b"\x02D" + bytes(68)
     mock_serial.return_value.write.assert_called_once_with(data)
