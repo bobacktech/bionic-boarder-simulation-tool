@@ -235,13 +235,16 @@ class FW6_00CMP(CommandMessageProcessor):
         self.serial.write(packet)
 
     def _update_duty_cycle(self, command):
-        pass
+        duty_cycle_commanded = int.from_bytes(command[3:7], byteorder="big") / 100000.0
+        self.__state_msg.duty_cycle = duty_cycle_commanded
 
     def _update_current(self, command):
-        pass
+        motor_current_commanded = int.from_bytes(command[3:7], byteorder="big") / 1000.0
+        self.__state_msg.motor_current = motor_current_commanded
 
     def _update_rpm(self, command):
-        pass
+        rpm = int.from_bytes(command[3:7], byteorder="big")
+        self.__state_msg.rpm = rpm
 
     def _heartbeat(self):
         pass
