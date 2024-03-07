@@ -184,7 +184,13 @@ class IMUStateMessage:
 
 class FW6_00CMP(CommandMessageProcessor):
     def __init__(
-        self, com_port, command_byte_size, state_lock: Lock, imu_state_lock: Lock
+        self,
+        com_port,
+        command_byte_size,
+        state_msg: StateMessage,
+        state_lock: Lock,
+        imu_state_msg: IMUStateMessage,
+        imu_state_lock: Lock,
     ):
         super().__init__(com_port, command_byte_size, state_lock, imu_state_lock)
         self.__cmd_id_name = {
@@ -196,6 +202,9 @@ class FW6_00CMP(CommandMessageProcessor):
             4: CommandMessageProcessor.STATE,
             65: CommandMessageProcessor.IMU_STATE,
         }
+        self.__state_msg = state_msg
+        self.__imu_state_msg = imu_state_msg
+        self.__packet_header = lambda l: int.to_bytes(2) + int.to_bytes(l)
 
     @property
     def _command_id_name(self):
@@ -211,16 +220,19 @@ class FW6_00CMP(CommandMessageProcessor):
         return ord(command[3])
 
     def _publish_state(self):
-        pass
+        msg_data = self.__state_msg.buffer
+        packet = self.__packet_header(len(msg_data)) + msg_data
+        self.serial.write(packet)
 
     def _publish_imu_state(self):
-        pass
+        msg_data = self.__imu_state_msg.buffer
+        packet = self.__packet_header(len(msg_data)) + msg_data
+        self.serial.write(packet)
 
     def _publish_firmware(self):
         fw = FirmwareMessage()
-        header = int.to_bytes(2) + int.to_bytes(FirmwareMessage.BYTE_LENGTH)
-        data = header + fw.buffer
-        self.serial.write(data)
+        packet = self.__packet_header(FirmwareMessage.BYTE_LENGTH) + fw.buffer
+        self.serial.write(packet)
 
     def _update_duty_cycle(self, command):
         pass
