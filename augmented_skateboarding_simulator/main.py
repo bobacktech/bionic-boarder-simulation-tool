@@ -4,11 +4,28 @@ import re
 import threading
 
 
+def firmwareRegex(argValue, pattern=re.compile(r"^\d*[.]\d*$")):
+    if not pattern.match(argValue):
+        raise argparse.ArgumentTypeError(
+            "VESC firmware version specified as $MajorVersion.$MinorVersion, e.g 2.18"
+        )
+    return argValue
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    """
-        Parse command line arguments to configure execution of the simulation.
-    """
+
+    parser.add_argument(
+        "--vescFW",
+        help="Specifies the VESC firmware version to be used in the simulation.",
+        type=firmwareRegex,
+    )
+    parser.add_argument(
+        "--comPort", help="The com port for the attached USB FTDI module."
+    )
+    args = parser.parse_args()
+    com_port = args.comPort
+    vesc_fw = args.vescFW
 
     """
         Instantiate published VESC messages, specifically the System state message and the IMU state message.
