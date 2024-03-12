@@ -246,9 +246,3 @@ class FW6_00CMP(CommandMessageProcessor):
     def _update_rpm(self, command):
         rpm = int.from_bytes(command[3:7], byteorder="big")
         self.__state_msg.rpm = rpm
-
-    def _heartbeat(self):
-        """
-        Do nothing.
-        """
-        pass

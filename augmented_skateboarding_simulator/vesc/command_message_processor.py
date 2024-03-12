@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from threading import Lock
+from threading import Timer
+import sys
 import serial
 
 
@@ -16,6 +18,7 @@ class CommandMessageProcessor(ABC):
     CURRENT = "CURRENT"
     RPM = "RPM"
     HEARTBEAT = "HEARTBEAT"
+    HEARTBEAT_TIMEOUT_SEC = 1.5
 
     # Message request commands
     FIRMWARE = "FIRMWARE"
@@ -53,6 +56,7 @@ class CommandMessageProcessor(ABC):
         self.__command_byte_size = command_byte_size
         self.__sl = state_lock
         self.__isl = imu_state_lock
+        self.__heartbeat_timer = None
 
     def handle_command(self):
         """
@@ -87,7 +91,7 @@ class CommandMessageProcessor(ABC):
                 self._update_rpm(command_bytes),
                 self.__sl.release(),
             ),
-            CommandMessageProcessor.HEARTBEAT: lambda: self._heartbeat(),
+            CommandMessageProcessor.HEARTBEAT: lambda: self.heartbeat(),
         }
         while True:
             command_bytes = self.serial.read(self.__command_byte_size)
@@ -159,9 +163,26 @@ class CommandMessageProcessor(ABC):
         """
         pass
 
-    @abstractmethod
-    def _heartbeat(self):
+    def heartbeat(self):
         """
-        Abstract method to handle the 'heartbeat' command.
+        Handle the 'heartbeat' command.
         """
-        pass
+        if self.__heartbeat_timer == None:
+            self.__heartbeat_timer = Timer(
+                CommandMessageProcessor.HEARTBEAT_TIMEOUT_SEC,
+                self.__heartbeat_not_receieved,
+            )
+            self.__heartbeat_timer.start()
+        else:
+            self.__heartbeat_timer.cancel()
+            self.__heartbeat_timer = Timer(
+                CommandMessageProcessor.HEARTBEAT_TIMEOUT_SEC,
+                self.__heartbeat_not_receieved,
+            )
+            self.__heartbeat_timer.start()
+
+    def __heartbeat_not_receieved(self):
+        """
+        If heartbeat message has not been received within the specified timeout, terminate the simulation.
+        """
+        sys.exit()
