@@ -46,9 +46,6 @@ class TestCommandMessageProcessor(CommandMessageProcessor):
     def _update_rpm(self, command):
         pass
 
-    def _heartbeat(self):
-        pass
-
 
 @pytest.fixture
 def mock_serial(mocker):
@@ -86,11 +83,11 @@ def test_handle_command_rpm(processor, mocker):
 
 
 def test_handle_command_heartbeat(processor, mocker):
-    mocker.patch.object(processor, "_heartbeat", autospec=True)
+    mocker.patch.object(processor, "heartbeat", autospec=True)
     mocker.patch.object(processor, "_get_command_id", return_value=4)
     with pytest.raises(StopIteration):
         processor.handle_command()
-    processor._heartbeat.assert_called_once()
+    processor.heartbeat.assert_called_once()
 
 
 def test_handle_command_firmware(processor, mocker):
