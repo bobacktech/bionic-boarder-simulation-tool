@@ -11,6 +11,7 @@ from math import ldexp
 import struct
 import math
 from threading import Lock
+import time
 
 
 def test_firmware_message_initialization():
@@ -147,14 +148,24 @@ def test_firmware_command(mock_serial):
 
 def test_state_command(mock_serial):
     cmp = FW6_00CMP("COM1", 8, StateMessage(), Lock(), None, Lock())
+    start_time = time.perf_counter()
     cmp._publish_state()
+    end_time = time.perf_counter()
+    assert (end_time - start_time) >= (
+        int(1000 / FW6_00CMP.PUBLISH_STATE_MESSAGE_HZ) / 1000.0
+    )
     data = b"\x02L\x04" + bytes(76)
     mock_serial.return_value.write.assert_called_once_with(data)
 
 
 def test_imu_state_command(mock_serial):
     cmp = FW6_00CMP("COM1", 8, None, Lock(), IMUStateMessage(), Lock())
+    start_time = time.perf_counter()
     cmp._publish_imu_state()
+    end_time = time.perf_counter()
+    assert (end_time - start_time) >= (
+        int(1000 / FW6_00CMP.PUBLISH_IMU_STATE_MESSAGE_HZ) / 1000.0
+    )
     data = b"\x02DA" + bytes(68)
     mock_serial.return_value.write.assert_called_once_with(data)
 
