@@ -2,6 +2,7 @@ from . import fw
 from .command_message_processor import CommandMessageProcessor
 import struct
 from threading import Lock
+import time
 
 
 class FirmwareMessage:
@@ -182,6 +183,9 @@ class IMUStateMessage:
 
 
 class FW6_00CMP(CommandMessageProcessor):
+    PUBLISH_STATE_MESSAGE_DELAY_SEC = 0.05
+    PUBLISH_IMU_STATE_MESSAGE_DELAY_SEC = 0.05
+
     def __init__(
         self,
         com_port,
@@ -223,11 +227,19 @@ class FW6_00CMP(CommandMessageProcessor):
     def _publish_state(self):
         msg_data = self.__state_msg.buffer
         packet = self.__packet_header(4, len(msg_data)) + msg_data
+        start = time.perf_counter()
+        while time.perf_counter() - start < FW6_00CMP.PUBLISH_STATE_MESSAGE_DELAY_SEC:
+            pass
         self.serial.write(packet)
 
     def _publish_imu_state(self):
         msg_data = self.__imu_state_msg.buffer
         packet = self.__packet_header(65, len(msg_data)) + msg_data
+        start = time.perf_counter()
+        while (
+            time.perf_counter() - start < FW6_00CMP.PUBLISH_IMU_STATE_MESSAGE_DELAY_SEC
+        ):
+            pass
         self.serial.write(packet)
 
     def _publish_firmware(self):
