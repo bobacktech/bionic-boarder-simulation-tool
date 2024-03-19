@@ -222,7 +222,7 @@ class FW6_00CMP(CommandMessageProcessor):
         """
         The command ID for the received command is in the third byte of the [command] data buffer.
         """
-        return ord(command[3])
+        return command[2]
 
     def _publish_state(self):
         msg_data = self.__state_msg.buffer
