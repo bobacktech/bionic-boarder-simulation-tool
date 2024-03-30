@@ -9,3 +9,6 @@ class EBoard:
     battery_max_voltage: float
     gear_ratio: float
     motor_kv: int
+    motor_max_torque: float
+    motor_max_amps: float
+    motor_max_power_watts: float
