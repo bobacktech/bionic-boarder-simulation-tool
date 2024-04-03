@@ -1,5 +1,15 @@
 import math
 import struct
+from enum import Enum
+
+"""
+Enum class for the names of the VESC firmware versions
+"""
+
+
+class FirmwareVersion(Enum):
+    FW_6_00 = "6.00"
+
 
 """
 The following methods are utilities that are available to all implemented firmware versions.
