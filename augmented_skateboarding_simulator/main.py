@@ -2,7 +2,7 @@ from sim_time_manager import SimTimeManager
 import argparse
 import re
 import threading
-from vesc import fw_6_00
+from vesc import fw_6_00, fw
 import sys
 
 
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     imu_state_message = None
     imu_state_lock = threading.Lock()
     cmp_thread = None
-    if vesc_fw == "6.00":
+    if vesc_fw == fw.FirmwareVersion.FW_6_00.value:
         state_message = fw_6_00.StateMessage()
         imu_state_message = fw_6_00.IMUStateMessage()
         cmp = fw_6_00.FW6_00CMP(
