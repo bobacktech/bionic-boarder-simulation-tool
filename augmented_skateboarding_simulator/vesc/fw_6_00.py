@@ -46,7 +46,7 @@ class StateMessage:
         self.__duty_cycle: float = 0
         self.__rpm: int = 0
         self.__motor_current: float = 0
-        self.__input_voltage: float = 0
+        self.__watt_hours: float = 0
 
     @property
     def buffer(self) -> bytes:
@@ -60,7 +60,7 @@ class StateMessage:
         - Motor current (mc) is stored from bytes 9 to 12, represented as an unsigned int (">I"), scaled by 100.
         - Duty cycle (dc) is stored from bytes 25 to 26, represented as an unsigned short (">H"), scaled by 1000.
         - RPM is stored from bytes 27 to 30, represented directly as an unsigned int (">I") without scaling.
-        - Input voltage (iv) is stored from bytes 31 to 32, represented as an unsigned short (">H"), scaled by 10.
+        - Watt hours (Wh) is stored from bytes 41 to 44, represented as an unsigned short (">H"), scaled by 10000.
 
         Returns:
             bytes: A bytes object representing the encoded state message, suitable for transmission or processing
@@ -68,12 +68,12 @@ class StateMessage:
         """
         buffer = bytearray(76)
         dc = int(self.duty_cycle * 1000)
-        iv = int(self.__input_voltage * 10.0)
+        wh = int(self.__watt_hours * 10000.0)
         mc = int(self.__motor_current * 100.0)
         buffer[9:13] = struct.pack(">I", mc)
         buffer[25:27] = struct.pack(">H", dc)
         buffer[27:31] = struct.pack(">I", self.__rpm)
-        buffer[31:33] = struct.pack(">H", iv)
+        buffer[41:45] = struct.pack(">I", wh)
         return bytes(buffer)
 
     @property
@@ -101,12 +101,12 @@ class StateMessage:
         self.__motor_current = value
 
     @property
-    def input_voltage(self) -> float:
-        return self.__input_voltage
+    def watt_hours(self) -> float:
+        return self.__watt_hours
 
-    @input_voltage.setter
-    def input_voltage(self, value: float) -> None:
-        self.__input_voltage = value
+    @watt_hours.setter
+    def watt_hours(self, value: float) -> None:
+        self.__watt_hours = value
 
 
 class IMUStateMessage:
