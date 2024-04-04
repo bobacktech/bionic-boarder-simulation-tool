@@ -44,7 +44,7 @@ class TestStateMessage:
         assert msg.duty_cycle == 0
         assert msg.rpm == 0
         assert msg.motor_current == 0
-        assert msg.input_voltage == 0
+        assert msg.watt_hours == 0
 
     def test_setting_properties(self):
         """Test setting properties of StateMessage."""
@@ -52,12 +52,12 @@ class TestStateMessage:
         msg.duty_cycle = 0.5
         msg.rpm = 1200
         msg.motor_current = 1.5
-        msg.input_voltage = 12.5
+        msg.watt_hours = 12.5
 
         assert msg.duty_cycle == 0.5
         assert msg.rpm == 1200
         assert msg.motor_current == 1.5
-        assert msg.input_voltage == 12.5
+        assert msg.watt_hours == 12.5
 
     def test_buffer_property(self):
         """Test the buffer property to ensure correct byte structure."""
@@ -65,7 +65,7 @@ class TestStateMessage:
         msg.duty_cycle = 0.5
         msg.rpm = 1200
         msg.motor_current = 1.5
-        msg.input_voltage = 12.5
+        msg.watt_hours = 12.5
 
         buffer = msg.buffer
         assert len(buffer) == 76  # Check buffer size
@@ -73,12 +73,12 @@ class TestStateMessage:
         unpacked_mc = struct.unpack(">I", buffer[9:13])[0]
         unpacked_dc = struct.unpack(">H", buffer[25:27])[0]
         unpacked_rpm = struct.unpack(">I", buffer[27:31])[0]
-        unpacked_iv = struct.unpack(">H", buffer[31:33])[0]
+        unpacked_wh = struct.unpack(">I", buffer[41:45])[0]
 
         assert unpacked_mc == int(1.5 * 100)
         assert unpacked_dc == int(0.5 * 1000)
         assert unpacked_rpm == 1200
-        assert unpacked_iv == int(12.5 * 10)
+        assert unpacked_wh == int(12.5 * 10000)
 
 
 def bytes_to_float32(res: int) -> float:
