@@ -14,9 +14,10 @@ class BatteryDischargeModel:
         self.__total_energy_consumed_lock.release()
         return e
 
-    def discharge(self):
-        power = self.__nominal_voltage * self.__current_draw  # Power in Watts
-        energy_consumed = power * (1 / 3600)  # Convert to Wh for 1 second
+    def discharge(self, time_duration_ms: int):
+        power_watts = self.__nominal_voltage * self.__current_draw
+        step = time_duration_ms / 1000
+        energy_consumed = power_watts * (step / 3600)
         self.__total_energy_consumed_lock.acquire()
         self.__total_energy_consumed_Wh += energy_consumed
         self.__total_energy_consumed_lock.release()
