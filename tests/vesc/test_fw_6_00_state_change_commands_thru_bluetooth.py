@@ -10,6 +10,7 @@ from PyQt6.QtBluetooth import (
 )
 from PyQt6.QtCore import QCoreApplication, QObject
 import time
+from augmented_skateboarding_simulator.riding.motor_state import MotorState
 
 
 class BluetoothStateChangeClient(QObject):
@@ -99,6 +100,7 @@ def test_handle_state_change_commands():
             Lock(),
             fw_6_00.IMUStateMessage(),
             Lock(),
+            MotorState(),
         )
     except:
         assert (

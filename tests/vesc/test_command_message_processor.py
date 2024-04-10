@@ -3,11 +3,14 @@ from augmented_skateboarding_simulator.vesc.command_message_processor import (
     CommandMessageProcessor,
 )
 from threading import Lock
+from augmented_skateboarding_simulator.riding.motor_state import MotorState
 
 
 class TestCommandMessageProcessor(CommandMessageProcessor):
     def __init__(self, com_port, command_byte_size):
-        super().__init__(com_port, command_byte_size, Lock(), Lock())
+        super().__init__(
+            com_port, command_byte_size, Lock(), Lock(), MotorState(1, 1, 1)
+        )
         self.__cmd_id_name = {
             1: CommandMessageProcessor.DUTY_CYCLE,
             2: CommandMessageProcessor.CURRENT,
