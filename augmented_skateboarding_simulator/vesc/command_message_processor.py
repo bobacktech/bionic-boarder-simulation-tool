@@ -3,6 +3,7 @@ from threading import Lock
 from threading import Timer
 import sys
 import serial
+from augmented_skateboarding_simulator.riding.motor_state import MotorState
 
 
 class CommandMessageProcessor(ABC):
@@ -37,7 +38,12 @@ class CommandMessageProcessor(ABC):
         pass
 
     def __init__(
-        self, com_port, command_byte_size, state_lock: Lock, imu_state_lock: Lock
+        self,
+        com_port,
+        command_byte_size,
+        state_lock: Lock,
+        imu_state_lock: Lock,
+        ms: MotorState,
     ):
         """
         Initializes a new instance of CommandMessageProcessor.
@@ -57,6 +63,7 @@ class CommandMessageProcessor(ABC):
         self.__sl = state_lock
         self.__isl = imu_state_lock
         self.__heartbeat_timer = None
+        self.motor_state = ms
 
     def handle_command(self):
         """

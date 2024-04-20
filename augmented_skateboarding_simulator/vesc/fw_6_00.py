@@ -3,6 +3,7 @@ from .command_message_processor import CommandMessageProcessor
 import struct
 from threading import Lock
 import time
+from augmented_skateboarding_simulator.riding.motor_state import MotorState
 
 
 class FirmwareMessage:
@@ -194,8 +195,9 @@ class FW6_00CMP(CommandMessageProcessor):
         state_lock: Lock,
         imu_state_msg: IMUStateMessage,
         imu_state_lock: Lock,
+        ms: MotorState,
     ):
-        super().__init__(com_port, command_byte_size, state_lock, imu_state_lock)
+        super().__init__(com_port, command_byte_size, state_lock, imu_state_lock, ms)
         self.__cmd_id_name = {
             5: CommandMessageProcessor.DUTY_CYCLE,
             6: CommandMessageProcessor.CURRENT,
