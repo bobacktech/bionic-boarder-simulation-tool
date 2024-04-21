@@ -68,11 +68,7 @@ class CommandMessageProcessor(ABC):
         """
         command_bytes = None
         handler = {
-            CommandMessageProcessor.STATE: lambda: (
-                self.__sl.acquire(),
-                self._publish_state(),
-                self.__sl.release(),
-            ),
+            CommandMessageProcessor.STATE: lambda: self._publish_state(),
             CommandMessageProcessor.IMU_STATE: lambda: (
                 self.__isl.acquire(),
                 self._publish_imu_state(),
