@@ -141,14 +141,14 @@ def mock_serial(mocker):
 
 
 def test_firmware_command(mock_serial):
-    cmp = FW6_00CMP("COM1", 8, None, Lock(), None, Lock(), None)
+    cmp = FW6_00CMP("COM1", 8, None, Lock(), MotorState(0, 0, 0), Lock())
     cmp._publish_firmware()
     data = b"\x02@\x00\x06\x00HardwareName" + bytes(50)
     mock_serial.return_value.write.assert_called_once_with(data)
 
 
 def test_state_command(mock_serial):
-    cmp = FW6_00CMP("COM1", 8, StateMessage(), Lock(), None, Lock(), None)
+    cmp = FW6_00CMP("COM1", 8, None, Lock(), MotorState(0, 0, 0), Lock())
     start_time = time.perf_counter()
     cmp._publish_state()
     end_time = time.perf_counter()
@@ -158,7 +158,7 @@ def test_state_command(mock_serial):
 
 
 def test_imu_state_command(mock_serial):
-    cmp = FW6_00CMP("COM1", 8, None, Lock(), IMUStateMessage(), Lock(), None)
+    cmp = FW6_00CMP("COM1", 8, IMUStateMessage(), Lock(), MotorState(0, 0, 0), Lock())
     start_time = time.perf_counter()
     cmp._publish_imu_state()
     end_time = time.perf_counter()
@@ -168,29 +168,29 @@ def test_imu_state_command(mock_serial):
 
 
 def test_update_duty_cycle(mock_serial):
-    sm = StateMessage()
-    cmp = FW6_00CMP("COM1", 8, sm, Lock(), None, Lock(), None)
+    ms = MotorState(0, 0, 0)
+    cmp = FW6_00CMP("COM1", 8, None, Lock(), ms, Lock())
     duty_cycle = 0.01
     temp = int(duty_cycle * 100000)
     command = bytes(3) + temp.to_bytes(4, "big")
     cmp._update_duty_cycle(command)
-    assert sm.duty_cycle == duty_cycle
+    assert ms.duty_cycle == duty_cycle
 
 
 def test_update_current(mock_serial):
-    sm = StateMessage()
-    cmp = FW6_00CMP("COM1", 8, sm, Lock(), None, Lock(), None)
+    ms = MotorState(0, 0, 0)
+    cmp = FW6_00CMP("COM1", 8, None, Lock(), ms, Lock())
     current = 24.3
     temp = int(current * 1000)
     command = bytes(3) + temp.to_bytes(4, "big")
     cmp._update_current(command)
-    assert sm.motor_current == current
+    assert ms.input_current == current
 
 
 def test_update_rpm(mock_serial):
-    sm = StateMessage()
-    cmp = FW6_00CMP("COM1", 8, sm, Lock(), None, Lock(), None)
+    ms = MotorState(0, 0, 0)
+    cmp = FW6_00CMP("COM1", 8, None, Lock(), ms, Lock())
     rpm = 15596
     command = bytes(3) + rpm.to_bytes(4, "big")
     cmp._update_rpm(command)
-    assert sm.rpm == rpm
+    assert ms.erpm == rpm

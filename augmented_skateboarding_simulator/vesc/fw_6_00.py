@@ -196,7 +196,7 @@ class FW6_00CMP(CommandMessageProcessor):
         ms: MotorState,
         ms_lock: Lock,
     ):
-        super().__init__(com_port, command_byte_size, imu_state_lock, ms)
+        super().__init__(com_port, command_byte_size, imu_state_lock)
         self.__cmd_id_name = {
             5: CommandMessageProcessor.DUTY_CYCLE,
             6: CommandMessageProcessor.CURRENT,
