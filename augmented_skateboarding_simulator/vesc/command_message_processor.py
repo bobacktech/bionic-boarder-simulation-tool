@@ -41,9 +41,7 @@ class CommandMessageProcessor(ABC):
         self,
         com_port,
         command_byte_size,
-        state_lock: Lock,
         imu_state_lock: Lock,
-        ms: MotorState,
     ):
         """
         Initializes a new instance of CommandMessageProcessor.
@@ -60,10 +58,8 @@ class CommandMessageProcessor(ABC):
             bytesize=serial.EIGHTBITS,
         )
         self.__command_byte_size = command_byte_size
-        self.__sl = state_lock
         self.__isl = imu_state_lock
         self.__heartbeat_timer = None
-        self.motor_state = ms
 
     def handle_command(self):
         """
@@ -72,32 +68,18 @@ class CommandMessageProcessor(ABC):
         """
         command_bytes = None
         handler = {
-            CommandMessageProcessor.STATE: lambda: (
-                self.__sl.acquire(),
-                self._publish_state(),
-                self.__sl.release(),
-            ),
+            CommandMessageProcessor.STATE: lambda: self._publish_state(),
             CommandMessageProcessor.IMU_STATE: lambda: (
                 self.__isl.acquire(),
                 self._publish_imu_state(),
                 self.__isl.release(),
             ),
             CommandMessageProcessor.FIRMWARE: lambda: self._publish_firmware(),
-            CommandMessageProcessor.DUTY_CYCLE: lambda: (
-                self.__sl.acquire(),
-                self._update_duty_cycle(command_bytes),
-                self.__sl.release(),
+            CommandMessageProcessor.DUTY_CYCLE: self._update_duty_cycle(command_bytes),
+            CommandMessageProcessor.CURRENT: lambda: self._update_current(
+                command_bytes
             ),
-            CommandMessageProcessor.CURRENT: lambda: (
-                self.__sl.acquire(),
-                self._update_current(command_bytes),
-                self.__sl.release(),
-            ),
-            CommandMessageProcessor.RPM: lambda: (
-                self.__sl.acquire(),
-                self._update_rpm(command_bytes),
-                self.__sl.release(),
-            ),
+            CommandMessageProcessor.RPM: lambda: self._update_rpm(command_bytes),
             CommandMessageProcessor.HEARTBEAT: lambda: self.heartbeat(),
         }
         while True:

@@ -191,13 +191,12 @@ class FW6_00CMP(CommandMessageProcessor):
         self,
         com_port,
         command_byte_size,
-        state_msg: StateMessage,
-        state_lock: Lock,
         imu_state_msg: IMUStateMessage,
         imu_state_lock: Lock,
         ms: MotorState,
+        ms_lock: Lock,
     ):
-        super().__init__(com_port, command_byte_size, state_lock, imu_state_lock, ms)
+        super().__init__(com_port, command_byte_size, imu_state_lock)
         self.__cmd_id_name = {
             5: CommandMessageProcessor.DUTY_CYCLE,
             6: CommandMessageProcessor.CURRENT,
@@ -207,11 +206,12 @@ class FW6_00CMP(CommandMessageProcessor):
             4: CommandMessageProcessor.STATE,
             65: CommandMessageProcessor.IMU_STATE,
         }
-        self.__state_msg = state_msg
         self.__imu_state_msg = imu_state_msg
         self.__packet_header = (
             lambda id, l: int.to_bytes(2) + int.to_bytes(l) + int.to_bytes(id)
         )
+        self.__ms = ms
+        self.__msl = ms_lock
 
     @property
     def _command_id_name(self):
@@ -227,7 +227,13 @@ class FW6_00CMP(CommandMessageProcessor):
         return command[2]
 
     def _publish_state(self):
-        msg_data = self.__state_msg.buffer
+        sm = StateMessage()
+        self.__msl.acquire()
+        sm.duty_cycle = self.__ms.duty_cycle
+        sm.motor_current = self.__ms.input_current
+        sm.rpm = self.__ms.erpm
+        self.__msl.release()
+        msg_data = sm.buffer
         packet = self.__packet_header(4, len(msg_data)) + msg_data
         start = time.perf_counter()
         while time.perf_counter() - start < FW6_00CMP.PUBLISH_STATE_MESSAGE_DELAY_SEC:
@@ -251,12 +257,18 @@ class FW6_00CMP(CommandMessageProcessor):
 
     def _update_duty_cycle(self, command):
         duty_cycle_commanded = int.from_bytes(command[3:7], byteorder="big") / 100000.0
-        self.__state_msg.duty_cycle = duty_cycle_commanded
+        self.__msl.acquire()
+        self.__ms.duty_cycle = duty_cycle_commanded
+        self.__msl.release()
 
     def _update_current(self, command):
         motor_current_commanded = int.from_bytes(command[3:7], byteorder="big") / 1000.0
-        self.__state_msg.motor_current = motor_current_commanded
+        self.__msl.acquire()
+        self.__ms.input_current = motor_current_commanded
+        self.__msl.release()
 
     def _update_rpm(self, command):
         rpm = int.from_bytes(command[3:7], byteorder="big")
-        self.__state_msg.rpm = rpm
+        self.__msl.acquire()
+        self.__ms.erpm = rpm
+        self.__msl.release()
