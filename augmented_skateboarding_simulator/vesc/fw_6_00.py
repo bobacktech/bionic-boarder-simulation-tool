@@ -4,6 +4,9 @@ import struct
 from threading import Lock
 import time
 from augmented_skateboarding_simulator.riding.motor_state import MotorState
+from augmented_skateboarding_simulator.riding.battery_discharge_model import (
+    BatteryDischargeModel,
+)
 
 
 class FirmwareMessage:
@@ -195,6 +198,7 @@ class FW6_00CMP(CommandMessageProcessor):
         imu_state_lock: Lock,
         ms: MotorState,
         ms_lock: Lock,
+        bdm: BatteryDischargeModel,
     ):
         super().__init__(com_port, command_byte_size, imu_state_lock)
         self.__cmd_id_name = {
@@ -212,6 +216,7 @@ class FW6_00CMP(CommandMessageProcessor):
         )
         self.__ms = ms
         self.__msl = ms_lock
+        self.__bdm = bdm
 
     @property
     def _command_id_name(self):
@@ -232,6 +237,7 @@ class FW6_00CMP(CommandMessageProcessor):
         sm.duty_cycle = self.__ms.duty_cycle
         sm.motor_current = self.__ms.input_current
         sm.rpm = self.__ms.erpm
+        sm.watt_hours = self.__bdm.get_watt_hours_consumed()
         self.__msl.release()
         msg_data = sm.buffer
         packet = self.__packet_header(4, len(msg_data)) + msg_data
