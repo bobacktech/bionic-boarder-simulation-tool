@@ -13,6 +13,9 @@ import math
 from threading import Lock
 import time
 from augmented_skateboarding_simulator.riding.motor_state import MotorState
+from augmented_skateboarding_simulator.riding.battery_discharge_model import (
+    BatteryDischargeModel,
+)
 
 
 def test_firmware_message_initialization():
@@ -141,14 +144,30 @@ def mock_serial(mocker):
 
 
 def test_firmware_command(mock_serial):
-    cmp = FW6_00CMP("COM1", 8, None, Lock(), MotorState(0, 0, 0), Lock())
+    cmp = FW6_00CMP(
+        "COM1",
+        8,
+        None,
+        Lock(),
+        MotorState(0, 0, 0),
+        Lock(),
+        BatteryDischargeModel(42.0),
+    )
     cmp._publish_firmware()
     data = b"\x02@\x00\x06\x00HardwareName" + bytes(50)
     mock_serial.return_value.write.assert_called_once_with(data)
 
 
 def test_state_command(mock_serial):
-    cmp = FW6_00CMP("COM1", 8, None, Lock(), MotorState(0, 0, 0), Lock())
+    cmp = FW6_00CMP(
+        "COM1",
+        8,
+        None,
+        Lock(),
+        MotorState(0, 0, 0),
+        Lock(),
+        BatteryDischargeModel(42.0),
+    )
     start_time = time.perf_counter()
     cmp._publish_state()
     end_time = time.perf_counter()
@@ -158,7 +177,15 @@ def test_state_command(mock_serial):
 
 
 def test_imu_state_command(mock_serial):
-    cmp = FW6_00CMP("COM1", 8, IMUStateMessage(), Lock(), MotorState(0, 0, 0), Lock())
+    cmp = FW6_00CMP(
+        "COM1",
+        8,
+        IMUStateMessage(),
+        Lock(),
+        MotorState(0, 0, 0),
+        Lock(),
+        BatteryDischargeModel(42.0),
+    )
     start_time = time.perf_counter()
     cmp._publish_imu_state()
     end_time = time.perf_counter()
@@ -169,7 +196,7 @@ def test_imu_state_command(mock_serial):
 
 def test_update_duty_cycle(mock_serial):
     ms = MotorState(0, 0, 0)
-    cmp = FW6_00CMP("COM1", 8, None, Lock(), ms, Lock())
+    cmp = FW6_00CMP("COM1", 8, None, Lock(), ms, Lock(), BatteryDischargeModel(42.0))
     duty_cycle = 0.01
     temp = int(duty_cycle * 100000)
     command = bytes(3) + temp.to_bytes(4, "big")
@@ -179,7 +206,7 @@ def test_update_duty_cycle(mock_serial):
 
 def test_update_current(mock_serial):
     ms = MotorState(0, 0, 0)
-    cmp = FW6_00CMP("COM1", 8, None, Lock(), ms, Lock())
+    cmp = FW6_00CMP("COM1", 8, None, Lock(), ms, Lock(), BatteryDischargeModel(42.0))
     current = 24.3
     temp = int(current * 1000)
     command = bytes(3) + temp.to_bytes(4, "big")
@@ -189,7 +216,7 @@ def test_update_current(mock_serial):
 
 def test_update_rpm(mock_serial):
     ms = MotorState(0, 0, 0)
-    cmp = FW6_00CMP("COM1", 8, None, Lock(), ms, Lock())
+    cmp = FW6_00CMP("COM1", 8, None, Lock(), ms, Lock(), BatteryDischargeModel(42.0))
     rpm = 15596
     command = bytes(3) + rpm.to_bytes(4, "big")
     cmp._update_rpm(command)
