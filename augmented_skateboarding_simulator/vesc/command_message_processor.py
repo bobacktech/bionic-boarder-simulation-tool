@@ -41,7 +41,6 @@ class CommandMessageProcessor(ABC):
         self,
         com_port,
         command_byte_size,
-        imu_state_lock: Lock,
     ):
         """
         Initializes a new instance of CommandMessageProcessor.
@@ -58,7 +57,6 @@ class CommandMessageProcessor(ABC):
             bytesize=serial.EIGHTBITS,
         )
         self.__command_byte_size = command_byte_size
-        self.__isl = imu_state_lock
         self.__heartbeat_timer = None
 
     def handle_command(self):
@@ -69,11 +67,7 @@ class CommandMessageProcessor(ABC):
         command_bytes = None
         handler = {
             CommandMessageProcessor.STATE: lambda: self._publish_state(),
-            CommandMessageProcessor.IMU_STATE: lambda: (
-                self.__isl.acquire(),
-                self._publish_imu_state(),
-                self.__isl.release(),
-            ),
+            CommandMessageProcessor.IMU_STATE: lambda: self._publish_imu_state(),
             CommandMessageProcessor.FIRMWARE: lambda: self._publish_firmware(),
             CommandMessageProcessor.DUTY_CYCLE: self._update_duty_cycle(command_bytes),
             CommandMessageProcessor.CURRENT: lambda: self._update_current(

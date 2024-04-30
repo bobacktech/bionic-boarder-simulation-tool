@@ -4,6 +4,7 @@ import re
 import threading
 from vesc import fw_6_00, fw
 import sys
+from riding import motor_state
 
 
 def firmwareRegex(argValue, pattern=re.compile(r"^\d*[.]\d*$")):
@@ -28,17 +29,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
     com_port = args.comPort
     vesc_fw = args.vescFW
-    state_message = None
-    state_lock = threading.Lock()
-    imu_state_message = None
-    imu_state_lock = threading.Lock()
+    motor_state = motor_state.MotorState(0.0, 0.0, 0.0)
+    motor_state_lock = threading.Lock()
     cmp_thread = None
     if vesc_fw == fw.FirmwareVersion.FW_6_00.value:
-        state_message = fw_6_00.StateMessage()
-        imu_state_message = fw_6_00.IMUStateMessage()
-        cmp = fw_6_00.FW6_00CMP(
-            com_port, 100, state_message, state_lock, imu_state_message, imu_state_lock
-        )
+        cmp = fw_6_00.FW6_00CMP(com_port, 100, motor_state, motor_state_lock)
         cmp_thread = threading.Thread(target=cmp.handle_command())
         cmp_thread.daemon = True
         cmp_thread.start()

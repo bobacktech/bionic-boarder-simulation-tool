@@ -194,13 +194,11 @@ class FW6_00CMP(CommandMessageProcessor):
         self,
         com_port,
         command_byte_size,
-        imu_state_msg: IMUStateMessage,
-        imu_state_lock: Lock,
         ms: MotorState,
         ms_lock: Lock,
         bdm: BatteryDischargeModel,
     ):
-        super().__init__(com_port, command_byte_size, imu_state_lock)
+        super().__init__(com_port, command_byte_size)
         self.__cmd_id_name = {
             5: CommandMessageProcessor.DUTY_CYCLE,
             6: CommandMessageProcessor.CURRENT,
@@ -210,7 +208,6 @@ class FW6_00CMP(CommandMessageProcessor):
             4: CommandMessageProcessor.STATE,
             65: CommandMessageProcessor.IMU_STATE,
         }
-        self.__imu_state_msg = imu_state_msg
         self.__packet_header = (
             lambda id, l: int.to_bytes(2) + int.to_bytes(l) + int.to_bytes(id)
         )
@@ -247,7 +244,9 @@ class FW6_00CMP(CommandMessageProcessor):
         self.serial.write(packet)
 
     def _publish_imu_state(self):
-        msg_data = self.__imu_state_msg.buffer
+        imu = IMUStateMessage()
+        # TBD - Populate IMUStateMessage instance later
+        msg_data = imu.buffer
         packet = self.__packet_header(65, len(msg_data)) + msg_data
         start = time.perf_counter()
         while (
