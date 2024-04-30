@@ -8,7 +8,7 @@ from augmented_skateboarding_simulator.riding.motor_state import MotorState
 
 class TestCommandMessageProcessor(CommandMessageProcessor):
     def __init__(self, com_port, command_byte_size):
-        super().__init__(com_port, command_byte_size, Lock())
+        super().__init__(com_port, command_byte_size)
         self.__cmd_id_name = {
             1: CommandMessageProcessor.DUTY_CYCLE,
             2: CommandMessageProcessor.CURRENT,
