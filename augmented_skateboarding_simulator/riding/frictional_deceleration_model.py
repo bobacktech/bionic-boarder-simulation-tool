@@ -8,13 +8,13 @@ class FrictionalDecelerationModel:
     """
 
     GRAVITY = 9.81  # m/s^2
+    AIR_DENSITY = 1.225  # kg/m3
 
     def __init__(
         self,
         mu_rolling: float,
         c_drag: float,
         frontal_area_m2: float,
-        air_density_kg_per_m3: float,
         eboard: EBoard,
     ) -> None:
         """
@@ -29,7 +29,6 @@ class FrictionalDecelerationModel:
         self.mu_rolling = mu_rolling
         self.c_drag = c_drag
         self.frontal_area_m2 = frontal_area_m2
-        self.air_density_kg_per_m3 = air_density_kg_per_m3
         self.eboard = eboard
 
     def decelerate(self, current_velocity_m_per_s: float, time_step_ms: float) -> float:
@@ -40,9 +39,17 @@ class FrictionalDecelerationModel:
         Return:
             velocity of skateboarder that is reduced by the friction and drag over the time_step_ms
         """
-        force_friction = self.mu_rolling * self.eboard.total_weight_with_rider_kg * self.GRAVITY
-        force_drag = self.c_drag * self.air_density_kg_per_m3 * (current_velocity_m_per_s ** 2) * self.frontal_area_m2
-        net_deceleration_m_per_s2 = (force_friction + force_drag) / self.eboard.total_weight_with_rider_kg
+        force_friction = (
+            self.mu_rolling * self.eboard.total_weight_with_rider_kg * self.GRAVITY
+        )
+        force_drag = (
+            self.c_drag
+            * self.AIR_DENSITY
+            * (current_velocity_m_per_s**2)
+            * self.frontal_area_m2
+        )
+        net_deceleration_m_per_s2 = (
+            force_friction + force_drag
+        ) / self.eboard.total_weight_with_rider_kg
         velocity_reduction_m_per_s = net_deceleration_m_per_s2 * (time_step_ms / 1000)
         return max(0, current_velocity_m_per_s - velocity_reduction_m_per_s)
-        
