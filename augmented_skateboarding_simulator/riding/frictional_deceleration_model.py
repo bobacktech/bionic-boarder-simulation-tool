@@ -19,8 +19,6 @@ class FrictionalDecelerationModel:
         Args:
             mu_rolling: coefficient of rolling friction
             c_drag: coefficient of drag
-            frontal_area_m2: area of skateboarder facing the wind in square meters
-            air_density: air density at sea level in kg/m3
         Return:
             None
         """
@@ -45,8 +43,10 @@ class FrictionalDecelerationModel:
             * (current_velocity_m_per_s**2)
             * self.eboard.frontal_area_of_rider_m2
         )
-        net_deceleration_m_per_s2 = (
-            force_friction + force_drag
-        ) / self.eboard.total_weight_with_rider_kg
-        velocity_reduction_m_per_s = net_deceleration_m_per_s2 * (time_step_ms / 1000)
+        velocity_reduction_m_per_s = (
+            (force_friction + force_drag)
+            / self.eboard.total_weight_with_rider_kg
+            * time_step_ms
+            / 1000
+        )
         return max(0, current_velocity_m_per_s - velocity_reduction_m_per_s)
