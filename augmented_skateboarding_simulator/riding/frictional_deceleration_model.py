@@ -1,5 +1,4 @@
 from .eboard import EBoard
-import numpy
 
 
 class FrictionalDecelerationModel:
@@ -14,7 +13,6 @@ class FrictionalDecelerationModel:
         self,
         mu_rolling: float,
         c_drag: float,
-        frontal_area_m2: float,
         eboard: EBoard,
     ) -> None:
         """
@@ -28,7 +26,6 @@ class FrictionalDecelerationModel:
         """
         self.mu_rolling = mu_rolling
         self.c_drag = c_drag
-        self.frontal_area_m2 = frontal_area_m2
         self.eboard = eboard
 
     def decelerate(self, current_velocity_m_per_s: float, time_step_ms: float) -> float:
@@ -46,7 +43,7 @@ class FrictionalDecelerationModel:
             self.c_drag
             * self.AIR_DENSITY
             * (current_velocity_m_per_s**2)
-            * self.frontal_area_m2
+            * self.eboard.frontal_area_of_rider_m2
         )
         net_deceleration_m_per_s2 = (
             force_friction + force_drag
