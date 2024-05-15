@@ -6,18 +6,22 @@ from augmented_skateboarding_simulator.riding.eboard import EBoard
 
 
 class TestFrictionalDecelerationModel:
-    """
-    A few tests of FrictionalDecelerationModel class that vary the coefficient of rolling friction and the coefficient of drag.
-    """
 
-    @pytest.fixture
-    def eboard(self):
-        return EBoard(80, 1.8288 * 0.6096, 0, 0, 0, 0, 0, 0, 0, 0)
-
-    def test_1(self, eboard: EBoard):
-        v = EBoard(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    def test_decelerate(self):
+        eboard = EBoard(80, 1.8288 * 0.6096, 0, 0, 0, 0, 0, 0, 0, 0)
         fdm = FrictionalDecelerationModel(
-            rolling_friction_coefficient=0.1, drag_coefficient=0.1, eboard=eboard
+            mu_rolling=0.01, c_drag=0.90, eboard=eboard
         )
-        current_velocity_m_per_s = 1000
-        time_step_ms = 20
+        current_velocity_m_per_s = 1000/3600
+        time_step_ms = (20, 40, 60, 80, 100)
+        temp = current_velocity_m_per_s
+        for t in time_step_ms:
+            new_velocity_m_per_s = fdm.decelerate(current_velocity_m_per_s, t)
+            assert new_velocity_m_per_s < temp
+            temp = new_velocity_m_per_s
+        
+        current_velocity_m_per_s = 0
+        new_velocity_m_per_s = fdm.decelerate(current_velocity_m_per_s, 20)
+        assert new_velocity_m_per_s == 0
+            
+                    
