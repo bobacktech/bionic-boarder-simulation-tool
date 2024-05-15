@@ -6,14 +6,15 @@ authors = ["bobacktech <bobacktech@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
-pyserial = "^3.5"
-multiprocess = "^0.70.15"
-loguru = "^0.7.2"
-pytest = "^7.4.3"
-pytest-mock = "^3.12.0"
-Sphinx = "^7.2.6"
-pyqt6 = "^6.6.1"
+python = "3.12.3"
+pyserial = "3.5"
+multiprocess = "0.70.15"
+loguru = "0.7.2"
+pytest = "7.4.3"
+pytest-mock = "3.12.0"
+Sphinx = "7.2.6"
+pyqt6 = "6.6.1"
+numpy = "1.26.4" 
 
 
 [build-system]
