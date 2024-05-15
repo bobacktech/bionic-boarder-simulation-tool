@@ -4,6 +4,9 @@ from .eboard import EBoard
 class FrictionalDecelerationModel:
     """
     Frictional deceleration model
+
+    Provides the calculation to determine the velocity reduction due to friction and drag to subtract
+    from current velocity of the skateboard over a fixed time step.
     """
 
     GRAVITY = 9.81  # m/s^2
@@ -25,6 +28,9 @@ class FrictionalDecelerationModel:
         self.__mu_rolling = mu_rolling
         self.__c_drag = c_drag
         self.eboard = eboard
+        self.__force_friction = (
+            self.__mu_rolling * self.eboard.total_weight_with_rider_kg * self.GRAVITY
+        )
 
     def decelerate(self, current_velocity_m_per_s: float, time_step_ms: float) -> float:
         """
@@ -34,9 +40,6 @@ class FrictionalDecelerationModel:
         Return:
             velocity of skateboarder that is reduced by the friction and drag over the time_step_ms
         """
-        force_friction = (
-            self.__mu_rolling * self.eboard.total_weight_with_rider_kg * self.GRAVITY
-        )
         force_drag = (
             self.__c_drag
             * self.AIR_DENSITY
@@ -44,7 +47,7 @@ class FrictionalDecelerationModel:
             * self.eboard.frontal_area_of_rider_m2
         )
         velocity_reduction_m_per_s = (
-            (force_friction + force_drag)
+            (self.__force_friction + force_drag)
             / self.eboard.total_weight_with_rider_kg
             * time_step_ms
             / 1000
