@@ -15,6 +15,16 @@ class PushModel:
 
     A typical push time, which is the time the foot/paddle makes contact with the ground, ranges from
     a minimum of 500ms to a maximum of 1500ms. The duration of each push is determined at random.
+
+    The force applied by the user's foot or the stick paddle is not constant over the entire push duration
+    and is not always in the positive x-axis direction. The force right when the foot/paddle makes contact
+    with the ground is in the negative x-axis direction which cause a slight slowing down of the skateboard's
+    velocity. Then within a very short time, the force turns positive and the skateboard's velocity is increasing.
+
+    Use this breakdown for the acceleration applied:
+    1. First 10% of the push duration, the force is in the negative x-axis direction.
+    2. The remaining 90% of the push duration, the force is in the positive x-axis direction.
+    This above breakdown is arbitrary and needs to be further analyzed.
     """
 
     def __init__(self, eboard: EBoard, eks: EboardKinematicState, eks_lock: Lock):
@@ -25,10 +35,11 @@ class PushModel:
         self.__elapsed_time_ms: int = 0
         self.__push_active = False
 
-    def activate(self):
+    def activate(self, slope_angle_deg: float):
         self.__push_active = True
         self.__duration_ms = random.randint(500, 1500)
         self.__elapsed_time_ms = 0
+        """Define the acceleration breakdown for this push"""
 
     def step(self, time_step_ms: int):
         """
