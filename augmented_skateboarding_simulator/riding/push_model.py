@@ -1,7 +1,5 @@
 from .eboard import EBoard
-from .eboard_kinematic_state import EboardKinematicState
-from threading import Lock
-import random
+import math
 
 
 class PushModel:
@@ -12,9 +10,6 @@ class PushModel:
     pushing motion. The simulated acceleration is along the x-axis of the skateboard, which is the
     long axis of the skateboard. The assumption is that there is no significant acceleration in either
     the y-axis or z-axis.
-
-    A typical push time, which is the time the foot/paddle makes contact with the ground, ranges from
-    a minimum of 500ms to a maximum of 1500ms. The duration of each push is determined at random.
 
     The force applied by the user's foot or the stick paddle is not constant over the entire push duration
     and is not always in the positive x-axis direction. The force right when the foot/paddle makes contact
@@ -27,30 +22,73 @@ class PushModel:
     This above breakdown is arbitrary and needs to be further analyzed.
     """
 
-    def __init__(self, eboard: EBoard, eks: EboardKinematicState, eks_lock: Lock):
+    GRAVITY_MPS2 = 9.81
+
+    PUSH_TIME_MS = 500
+    """
+    Typical push time for a skateboard rider to make contact with the ground to accelerate the skateboard
+    """
+    INITIAL_SLOWDOWN_TIME_MS = 50
+    """
+    The time in milliseconds when the force is in the negative x-axis direction.
+    """
+
+    def __init__(self, eboard: EBoard):
         self.eboard = eboard
-        self.eks = eks
-        self.eks_lock = eks_lock
-        self.__duration_ms: int = 0
         self.__elapsed_time_ms: int = 0
         self.__push_active = False
 
-    def activate(self, slope_angle_deg: float):
-        self.__push_active = True
-        self.__duration_ms = random.randint(500, 1500)
-        self.__elapsed_time_ms = 0
-        """Define the acceleration breakdown for this push"""
-
-    def step(self, time_step_ms: int):
+    def setup(self, velocity_increase_kph: float, slope_angle_deg: float):
         """
-        This increases the velocity of the skateboard by a small amount using the acceleration
-        algorithm for accelerating the skateboard.
+        F_total = F_gravity + F_rider
+
+        F_total is the total force applied to the skateboard to increase the skateboard's velocity
+        to velocity_increase_kph over the time interval of PUSH_TIME_MS.
+        F_gravity is the force due to gravity along the x-axis of the skateboard.
+        F_rider is the force due to the rider pushing the skateboard.
+
+        The force right when the foot/paddle makes contact with the ground is in the negative x-axis direction.
+        This causes a slight slowing down of the skateboard's velocity. This negative x-axis force is modeled
+        simply as a small percentage of the total force.
+
+        Args:
+            velocity_increase_kph: the desired velocity increase in kph for this current PUSH
+            slope_angle_deg: the angle of the slope in degrees. Ranges between +90 and -90 degrees
+        """
+        self.__push_active = True
+        self.__elapsed_time_ms = 0
+        F_gravity_x_axis_N = (
+            self.eboard.total_weight_with_rider_kg
+            * self.GRAVITY_MPS2
+            * math.sin(math.radians(slope_angle_deg))
+        )
+        F_rider_x_axis_N = self.eboard.total_weight_with_rider_kg * (
+            velocity_increase_kph / self.PUSH_TIME_MS
+        )
+        self.__F_total_N = F_rider_x_axis_N + F_gravity_x_axis_N
+        self.__F_slowdown_N = 0.10 * self.__F_total_N
+
+    def step(self, time_step_ms: int) -> float:
+        """
+        This method returns the velocity change in m/s when the force is applied for
+        time_step_ms duration.
         """
         if not self.__push_active:
-            return
-        self.eks_lock.acquire()
-        # TBD
-        self.eks_lock.release()
+            return None
+
+        velocity_delta_mps = None
+        if self.__elapsed_time_ms < self.INITIAL_SLOWDOWN_TIME_MS:
+            neg_acceleration_mps2 = (
+                self.__F_slowdown_N / self.eboard.total_weight_with_rider_kg
+            )
+            velocity_delta_mps = neg_acceleration_mps2 * (time_step_ms / 1000.0)
+        else:
+            acceleration_mps2 = (
+                self.__F_total_N / self.eboard.total_weight_with_rider_kg
+            )
+            velocity_delta_mps = acceleration_mps2 * (time_step_ms / 1000.0)
+
         self.__elapsed_time_ms += time_step_ms
-        if self.__elapsed_time_ms >= self.__duration_ms:
+        if self.__elapsed_time_ms >= self.PUSH_TIME_MS:
             self.__push_active = False
+        return velocity_delta_mps
