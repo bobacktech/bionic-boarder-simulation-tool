@@ -39,6 +39,8 @@ class PushModel:
         self.eboard = eboard
         self.__elapsed_time_s: int = 0
         self.__push_active = False
+        self.__F_rider_x_axis_N: float = 0
+        self.__F_slowdown_x_axis_N: float = 0
 
     def setup(self, velocity_increase_mps: float, slope_angle_deg: float):
         """
@@ -85,7 +87,7 @@ class PushModel:
         return self.__F_rider_x_axis_N
 
     @property
-    def slowdown_force_N(self) -> float:
+    def force_slowdown_N(self) -> float:
         """
         Returns the force that causes a small slowdown in the skateboard's velocity when
         a push is started by the rider.
