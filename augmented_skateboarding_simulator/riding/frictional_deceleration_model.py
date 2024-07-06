@@ -34,7 +34,7 @@ class FrictionalDecelerationModel:
         """
         Args:
             current_velocity_m_per_s: current velocity of skateboarder in m/s
-            time_step_ms: time step in milliseconds
+            time_step_ms: time step in milliseconds that the force is applied over
         Return:
             acceleration in m/s^2 due to friction and drag
             delta velocity in m/s due to friction and drag
