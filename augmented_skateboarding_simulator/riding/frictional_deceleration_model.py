@@ -5,8 +5,8 @@ class FrictionalDecelerationModel:
     """
     Frictional deceleration model
 
-    Provides the calculation to determine the velocity reduction due to friction and drag to subtract
-    from current velocity of the skateboard over a fixed time step.
+    Provides the calculation to determine the velocity reduction due to friction and drag over a fixed time step
+    to subtract from current velocity of the skateboard.
     """
 
     GRAVITY = 9.81  # m/s^2
@@ -28,28 +28,21 @@ class FrictionalDecelerationModel:
         self.__mu_rolling = mu_rolling
         self.__c_drag = c_drag
         self.eboard = eboard
-        self.__force_friction = (
-            self.__mu_rolling * self.eboard.total_weight_with_rider_kg * self.GRAVITY
-        )
+        self.__force_friction = self.__mu_rolling * self.eboard.total_weight_with_rider_kg * self.GRAVITY
 
-    def decelerate(self, current_velocity_m_per_s: float, time_step_ms: float) -> float:
+    def decelerate(self, current_velocity_m_per_s: float, time_step_ms: float) -> tuple[float, float]:
         """
         Args:
             current_velocity_m_per_s: current velocity of skateboarder in m/s
-            time_step_ms: time step in milliseconds
+            time_step_ms: time step in milliseconds that the force is applied over
         Return:
-            velocity of skateboarder that is reduced by the friction and drag over the time_step_ms
+            acceleration in m/s^2 due to friction and drag
+            delta velocity in m/s due to friction and drag
         """
         force_drag = (
-            self.__c_drag
-            * self.AIR_DENSITY
-            * (current_velocity_m_per_s**2)
-            * self.eboard.frontal_area_of_rider_m2
+            self.__c_drag * self.AIR_DENSITY * (current_velocity_m_per_s**2) * self.eboard.frontal_area_of_rider_m2
         )
-        velocity_reduction_m_per_s = (
-            (self.__force_friction + force_drag)
-            / self.eboard.total_weight_with_rider_kg
-            * time_step_ms
-            / 1000
-        )
-        return max(0, current_velocity_m_per_s - velocity_reduction_m_per_s)
+        force_total = self.__force_friction + force_drag
+        acceleration_ms2 = force_total / self.eboard.total_weight_with_rider_kg
+        delta_velocity_m_per_s = acceleration_ms2 * time_step_ms / 1000
+        return acceleration_ms2, delta_velocity_m_per_s
