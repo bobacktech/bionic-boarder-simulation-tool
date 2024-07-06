@@ -6,7 +6,7 @@ from augmented_skateboarding_simulator.riding.eboard import EBoard
 @pytest.fixture
 def pm():
     eboard = EBoard(80, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    pm = PushModel(eboard, 10)
+    pm = PushModel(eboard)
     return pm
 
 
@@ -19,7 +19,7 @@ class TestPushModel:
         prev_accel, prev_delta_v = -float("inf"), -float("inf")
         elapsed_time_ms = 0
         while elapsed_time_ms <= pm.slowdown_duration_ms:
-            accel, delta_v = pm.step()
+            accel, delta_v = pm.step(10)
             assert accel > prev_accel
             assert delta_v > prev_delta_v
             prev_accel, prev_delta_v = accel, delta_v
@@ -34,11 +34,11 @@ class TestPushModel:
         assert pm.push_active == True
         elapsed_time_ms = 0
         while elapsed_time_ms <= pm.slowdown_duration_ms:
-            pm.step()
+            pm.step(10)
             elapsed_time_ms += 10
         prev_accel, prev_delta_v = 0, 0
         while pm.push_active:
-            accel, delta_v = pm.step()
+            accel, delta_v = pm.step(10)
             assert accel > prev_accel
             assert delta_v > prev_delta_v
             prev_accel, prev_delta_v = accel, delta_v
