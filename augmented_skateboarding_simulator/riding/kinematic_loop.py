@@ -9,6 +9,10 @@ import random
 
 
 class KinematicLoop:
+    """
+    This class implements the main loop for the kinematic model of the electric skateboard. It
+    moves the skateboard through time via the provided push model and frictional deceleration model.
+    """
 
     def __init__(
         self,
@@ -62,6 +66,9 @@ class KinematicLoop:
         self.__push_period_sec = value
 
     def loop(self) -> None:
+        """
+        The logic assumes that the electric skateboard's velocity can never be less than zero.
+        """
         self.__loop_active = True
         theta_slope_deg = 0.0
         theta_slope_time_step_sec = 0
