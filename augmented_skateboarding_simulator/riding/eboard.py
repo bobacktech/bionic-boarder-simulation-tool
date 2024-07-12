@@ -13,3 +13,4 @@ class EBoard:
     motor_max_torque: float
     motor_max_amps: float
     motor_max_power_watts: float
+    motor_pole_pairs: int

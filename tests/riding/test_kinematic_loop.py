@@ -13,7 +13,7 @@ from time import sleep
 
 @pytest.fixture
 def eboard():
-    return EBoard(80, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    return EBoard(80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
 
 @pytest.fixture

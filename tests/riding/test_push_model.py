@@ -5,7 +5,7 @@ from augmented_skateboarding_simulator.riding.eboard import EBoard
 
 @pytest.fixture
 def pm():
-    eboard = EBoard(80, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    eboard = EBoard(80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     pm = PushModel(eboard)
     return pm
 
