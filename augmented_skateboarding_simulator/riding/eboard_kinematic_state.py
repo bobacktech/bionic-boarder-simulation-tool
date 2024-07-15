@@ -28,3 +28,8 @@ class EboardKinematicState:
     pitch: float
     roll: float
     yaw: float
+
+    """ Electric Motor State """
+    erpm: int
+    input_current: float
+    duty_cycle: float
