@@ -14,6 +14,9 @@ def test_state():
         pitch=5.0,
         roll=6.0,
         yaw=7.0,
+        erpm=8,
+        input_current=9.0,
+        duty_cycle=10.0,
     )
 
 
@@ -43,3 +46,15 @@ def test_roll(test_state):
 
 def test_yaw(test_state):
     assert test_state.yaw == 7.0
+
+
+def test_erpm(test_state):
+    assert test_state.erpm == 8
+
+
+def test_input_current(test_state):
+    assert test_state.input_current == 9.0
+
+
+def test_duty_cycle(test_state):
+    assert test_state.duty_cycle == 10.0

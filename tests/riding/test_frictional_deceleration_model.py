@@ -23,7 +23,7 @@ class TestFrictionalDecelerationModel:
         This test ensures that the decelerate method behaves as expected for different
         velocity values.
         """
-        eboard = EBoard(80, 1.8288 * 0.6096, 0, 0, 0, 0, 0, 0, 0, 0)
+        eboard = EBoard(80, 1.8288 * 0.6096, 0, 0, 0, 0, 0, 0, 0, 0, 0)
         fdm = FrictionalDecelerationModel(mu_rolling=0.01, c_drag=0.90, eboard=eboard)
         current_velocity_m_per_s = 1000 / 3600
         time_step_ms = (20, 40, 60, 80, 100)
