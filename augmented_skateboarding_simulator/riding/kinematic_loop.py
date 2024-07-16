@@ -113,6 +113,9 @@ class KinematicLoop:
                 accel_x_m_per_s2, delta_velocity_push_m_per_s = self.__pm.step(self.__fixed_time_step_ms)
                 self.__eks.acceleration_x += accel_x_m_per_s2
                 self.__eks.velocity += delta_velocity_push_m_per_s
+            wheel_rpm = (self.__eks.velocity / (self.__eb.wheel_diameter_m * math.pi)) * 60
+            motor_rpm = wheel_rpm * self.__eb.gear_ratio
+            self.__eks.erpm = int(self.__eb.motor_pole_pairs * motor_rpm)
             self.__eks_lock.release()
             if not self.__loop_active:
                 break
