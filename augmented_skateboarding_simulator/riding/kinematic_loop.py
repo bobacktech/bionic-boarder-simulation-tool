@@ -30,6 +30,7 @@ class KinematicLoop:
         self.__pm = pm
         self.__push_period_sec = -1.0
         self.__theta_slope_period_sec = -1.0
+        self.__initial_theta_slope_deg = 0.0
         self.__loop_active = False
         self.__slope_range_bound_deg = None
 
@@ -65,12 +66,20 @@ class KinematicLoop:
     def push_period_sec(self, value: int) -> None:
         self.__push_period_sec = value
 
+    @property
+    def initial_theta_slope_deg(self) -> float:
+        return self.__initial_theta_slope_deg
+
+    @initial_theta_slope_deg.setter
+    def initial_theta_slope_deg(self, value: float) -> None:
+        self.__initial_theta_slope_deg = value
+
     def loop(self) -> None:
         """
         The logic assumes that the electric skateboard's velocity can never be less than zero.
         """
         self.__loop_active = True
-        theta_slope_deg = 0.0
+        theta_slope_deg = self.__initial_theta_slope_deg
         theta_slope_time_step_sec = 0
         push_period_time_step_sec = 0
 
@@ -97,8 +106,12 @@ class KinematicLoop:
             accel_friction_ms2, delta_velocity_friction_m_per_s = self.__fdm.decelerate(
                 self.__eks.velocity, self.fixed_time_step_ms
             )
-            self.__eks.velocity -= delta_velocity_friction_m_per_s
-            self.__eks.acceleration_x = -accel_friction_ms2
+            if self.__eks.velocity < 0.0:
+                self.__eks.velocity = min(0, self.__eks.velocity + delta_velocity_friction_m_per_s)
+                self.__eks.acceleration_x = accel_friction_ms2
+            else:
+                self.__eks.velocity = max(0, self.__eks.velocity - delta_velocity_friction_m_per_s)
+                self.__eks.acceleration_x = -accel_friction_ms2
             accel_gravity_x_m_per_s2 = 9.81 * math.sin(math.radians(abs(theta_slope_deg)))
             delta_velocity_gravity_x_m_per_s = accel_gravity_x_m_per_s2 * self.__fixed_time_step_ms / 1000.0
             if theta_slope_deg >= 0.0:
@@ -107,8 +120,6 @@ class KinematicLoop:
             else:
                 self.__eks.velocity += delta_velocity_gravity_x_m_per_s
                 self.__eks.acceleration_x += accel_gravity_x_m_per_s2
-            if self.__eks.velocity < 0.0:
-                self.__eks.velocity = 0.0
             if self.__pm.push_active:
                 accel_x_m_per_s2, delta_velocity_push_m_per_s = self.__pm.step(self.__fixed_time_step_ms)
                 self.__eks.acceleration_x += accel_x_m_per_s2

@@ -52,7 +52,7 @@ class TestKinematicLoop:
         kloop.theta_slope_period_sec = 0.6
         t = threading.Thread(target=kloop.loop)
         t.start()
-        time.sleep(0.6)
+        time.sleep(0.3)
         kloop.stop()
         assert eks.velocity == 0.0
         assert eks.erpm == 0
@@ -66,7 +66,7 @@ class TestKinematicLoop:
         eks.acceleration_x = 0
         t = threading.Thread(target=kloop.loop)
         t.start()
-        time.sleep(0.6)
+        time.sleep(0.3)
         kloop.stop()
         assert eks.velocity < 10
         assert eks.acceleration_x == -0.1
@@ -111,3 +111,18 @@ class TestKinematicLoop:
         assert eks.velocity < 10 + (25 * 0.2)
         assert eks.velocity >= 10 + ((25 * 0.2) - (25 * 0.02))
         assert eks.erpm > temp_erpm
+
+    def test_initial_velocity_zero_no_push_negative_velocity(self, kloop: KinematicLoop, eks: EboardKinematicState):
+        kloop.fixed_time_step_ms = 20
+        kloop.slope_range_bound_deg = 10
+        kloop.push_period_sec = 1.0
+        kloop.theta_slope_period_sec = 1.0
+        kloop.initial_theta_slope_deg = 5.0
+        eks.velocity = 0
+        eks.erpm = 0
+        t = threading.Thread(target=kloop.loop)
+        t.start()
+        time.sleep(0.2)
+        kloop.stop()
+        assert eks.velocity < 0
+        assert eks.erpm < 0
