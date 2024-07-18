@@ -126,3 +126,15 @@ class TestKinematicLoop:
         kloop.stop()
         assert eks.velocity < 0
         assert eks.erpm < 0
+
+    def test_current_slope_angle_accessible_loop_running(self, kloop: KinematicLoop):
+        kloop.fixed_time_step_ms = 20
+        kloop.slope_range_bound_deg = 10
+        kloop.push_period_sec = 0.6
+        kloop.theta_slope_period_sec = 0.1
+        assert kloop.current_theta_slope_deg == 0
+        t = threading.Thread(target=kloop.loop)
+        t.start()
+        time.sleep(0.2)
+        kloop.stop()
+        assert kloop.current_theta_slope_deg != 0
