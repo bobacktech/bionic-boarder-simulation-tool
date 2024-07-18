@@ -2,8 +2,6 @@ import pytest
 from augmented_skateboarding_simulator.vesc.command_message_processor import (
     CommandMessageProcessor,
 )
-from threading import Lock
-from augmented_skateboarding_simulator.riding.motor_state import MotorState
 
 
 class TestCommandMessageProcessor(CommandMessageProcessor):
