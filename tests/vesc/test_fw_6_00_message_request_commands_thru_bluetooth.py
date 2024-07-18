@@ -10,7 +10,6 @@ from PyQt6.QtBluetooth import (
 )
 from PyQt6.QtCore import QCoreApplication, QObject, QByteArray
 import time
-from augmented_skateboarding_simulator.riding.motor_state import MotorState
 
 
 class BluetoothMessageRequestClient(QObject):
@@ -92,19 +91,9 @@ def test_handle_message_request_commands():
     state_msg = fw_6_00.StateMessage()
     cmp = None
     try:
-        cmp = fw_6_00.FW6_00CMP(
-            "/dev/ttyUSB0",
-            256,
-            state_msg,
-            Lock(),
-            fw_6_00.IMUStateMessage(),
-            Lock(),
-            MotorState(),
-        )
+        cmp = fw_6_00.FW6_00CMP("/dev/ttyUSB0", 256, state_msg, Lock(), fw_6_00.IMUStateMessage())
     except:
-        assert (
-            False
-        ), "Test Command Message Processor did not establish connection with FTDI USB adapter."
+        assert False, "Test Command Message Processor did not establish connection with FTDI USB adapter."
 
     def handle():
         try:

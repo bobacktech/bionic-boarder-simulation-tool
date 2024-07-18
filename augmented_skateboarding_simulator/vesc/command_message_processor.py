@@ -3,7 +3,6 @@ from threading import Lock
 from threading import Timer
 import sys
 import serial
-from augmented_skateboarding_simulator.riding.motor_state import MotorState
 
 
 class CommandMessageProcessor(ABC):
@@ -70,9 +69,7 @@ class CommandMessageProcessor(ABC):
             CommandMessageProcessor.IMU_STATE: lambda: self._publish_imu_state(),
             CommandMessageProcessor.FIRMWARE: lambda: self._publish_firmware(),
             CommandMessageProcessor.DUTY_CYCLE: self._update_duty_cycle(command_bytes),
-            CommandMessageProcessor.CURRENT: lambda: self._update_current(
-                command_bytes
-            ),
+            CommandMessageProcessor.CURRENT: lambda: self._update_current(command_bytes),
             CommandMessageProcessor.RPM: lambda: self._update_rpm(command_bytes),
             CommandMessageProcessor.HEARTBEAT: lambda: self.heartbeat(),
         }

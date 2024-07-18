@@ -1,7 +1,6 @@
 import pytest
 from augmented_skateboarding_simulator.riding.kinematic_loop import KinematicLoop
 from augmented_skateboarding_simulator.riding.eboard import EBoard
-from augmented_skateboarding_simulator.riding.motor_state import MotorState
 from unittest.mock import MagicMock
 from augmented_skateboarding_simulator.riding.frictional_deceleration_model import FrictionalDecelerationModel
 from augmented_skateboarding_simulator.riding.push_model import PushModel

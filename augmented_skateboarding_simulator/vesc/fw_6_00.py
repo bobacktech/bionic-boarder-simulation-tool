@@ -3,7 +3,6 @@ from .command_message_processor import CommandMessageProcessor
 import struct
 from threading import Lock
 import time
-from augmented_skateboarding_simulator.riding.motor_state import MotorState
 from augmented_skateboarding_simulator.riding.battery_discharge_model import (
     BatteryDischargeModel,
 )
@@ -194,8 +193,6 @@ class FW6_00CMP(CommandMessageProcessor):
         self,
         com_port,
         command_byte_size,
-        ms: MotorState,
-        ms_lock: Lock,
         bdm: BatteryDischargeModel,
     ):
         super().__init__(com_port, command_byte_size)
@@ -208,11 +205,7 @@ class FW6_00CMP(CommandMessageProcessor):
             4: CommandMessageProcessor.STATE,
             65: CommandMessageProcessor.IMU_STATE,
         }
-        self.__packet_header = (
-            lambda id, l: int.to_bytes(2) + int.to_bytes(l) + int.to_bytes(id)
-        )
-        self.__ms = ms
-        self.__msl = ms_lock
+        self.__packet_header = lambda id, l: int.to_bytes(2) + int.to_bytes(l) + int.to_bytes(id)
         self.__bdm = bdm
 
     @property
@@ -230,12 +223,12 @@ class FW6_00CMP(CommandMessageProcessor):
 
     def _publish_state(self):
         sm = StateMessage()
-        self.__msl.acquire()
-        sm.duty_cycle = self.__ms.duty_cycle
-        sm.motor_current = self.__ms.input_current
-        sm.rpm = self.__ms.erpm
+        # self.__msl.acquire()
+        # sm.duty_cycle = self.__ms.duty_cycle
+        # sm.motor_current = self.__ms.input_current
+        # sm.rpm = self.__ms.erpm
         sm.watt_hours = self.__bdm.get_watt_hours_consumed()
-        self.__msl.release()
+        # self.__msl.release()
         msg_data = sm.buffer
         packet = self.__packet_header(4, len(msg_data)) + msg_data
         start = time.perf_counter()
@@ -249,9 +242,7 @@ class FW6_00CMP(CommandMessageProcessor):
         msg_data = imu.buffer
         packet = self.__packet_header(65, len(msg_data)) + msg_data
         start = time.perf_counter()
-        while (
-            time.perf_counter() - start < FW6_00CMP.PUBLISH_IMU_STATE_MESSAGE_DELAY_SEC
-        ):
+        while time.perf_counter() - start < FW6_00CMP.PUBLISH_IMU_STATE_MESSAGE_DELAY_SEC:
             pass
         self.serial.write(packet)
 
@@ -262,18 +253,18 @@ class FW6_00CMP(CommandMessageProcessor):
 
     def _update_duty_cycle(self, command):
         duty_cycle_commanded = int.from_bytes(command[3:7], byteorder="big") / 100000.0
-        self.__msl.acquire()
-        self.__ms.duty_cycle = duty_cycle_commanded
-        self.__msl.release()
+        # self.__msl.acquire()
+        # self.__ms.duty_cycle = duty_cycle_commanded
+        # self.__msl.release()
 
     def _update_current(self, command):
         motor_current_commanded = int.from_bytes(command[3:7], byteorder="big") / 1000.0
-        self.__msl.acquire()
-        self.__ms.input_current = motor_current_commanded
-        self.__msl.release()
+        # self.__msl.acquire()
+        # self.__ms.input_current = motor_current_commanded
+        # self.__msl.release()
 
     def _update_rpm(self, command):
         rpm = int.from_bytes(command[3:7], byteorder="big")
-        self.__msl.acquire()
-        self.__ms.erpm = rpm
-        self.__msl.release()
+        # self.__msl.acquire()
+        # self.__ms.erpm = rpm
+        # self.__msl.release()
