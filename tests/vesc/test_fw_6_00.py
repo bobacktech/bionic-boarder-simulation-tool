@@ -12,9 +12,8 @@ import struct
 import math
 from threading import Lock
 import time
-from augmented_skateboarding_simulator.riding.battery_discharge_model import (
-    BatteryDischargeModel,
-)
+from augmented_skateboarding_simulator.riding.battery_discharge_model import BatteryDischargeModel
+from augmented_skateboarding_simulator.riding.eboard_kinematic_state import EboardKinematicState
 
 
 def test_firmware_message_initialization():
@@ -140,7 +139,9 @@ def test_firmware_command(mock_serial):
     cmp = FW6_00CMP(
         "COM1",
         8,
-        BatteryDischargeModel(42.0),
+        None,
+        None,
+        None,
     )
     cmp._publish_firmware()
     data = b"\x02@\x00\x06\x00HardwareName" + bytes(50)
@@ -151,6 +152,8 @@ def test_state_command(mock_serial):
     cmp = FW6_00CMP(
         "COM1",
         8,
+        EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        Lock(),
         BatteryDischargeModel(42.0),
     )
     start_time = time.perf_counter()
@@ -165,6 +168,8 @@ def test_imu_state_command(mock_serial):
     cmp = FW6_00CMP(
         "COM1",
         8,
+        EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        Lock(),
         BatteryDischargeModel(42.0),
     )
     start_time = time.perf_counter()

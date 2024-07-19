@@ -3,9 +3,8 @@ from .command_message_processor import CommandMessageProcessor
 import struct
 from threading import Lock
 import time
-from augmented_skateboarding_simulator.riding.battery_discharge_model import (
-    BatteryDischargeModel,
-)
+from augmented_skateboarding_simulator.riding.battery_discharge_model import BatteryDischargeModel
+from augmented_skateboarding_simulator.riding.eboard_kinematic_state import EboardKinematicState
 
 
 class FirmwareMessage:
@@ -193,6 +192,8 @@ class FW6_00CMP(CommandMessageProcessor):
         self,
         com_port,
         command_byte_size,
+        eks: EboardKinematicState,
+        eks_lock: Lock,
         bdm: BatteryDischargeModel,
     ):
         super().__init__(com_port, command_byte_size)
@@ -206,6 +207,8 @@ class FW6_00CMP(CommandMessageProcessor):
             65: CommandMessageProcessor.IMU_STATE,
         }
         self.__packet_header = lambda id, l: int.to_bytes(2) + int.to_bytes(l) + int.to_bytes(id)
+        self.__eks = eks
+        self.__eks_lock = eks_lock
         self.__bdm = bdm
 
     @property
@@ -223,12 +226,12 @@ class FW6_00CMP(CommandMessageProcessor):
 
     def _publish_state(self):
         sm = StateMessage()
-        # self.__msl.acquire()
-        # sm.duty_cycle = self.__ms.duty_cycle
-        # sm.motor_current = self.__ms.input_current
-        # sm.rpm = self.__ms.erpm
+        self.__eks_lock.acquire()
+        sm.duty_cycle = self.__eks.duty_cycle
+        sm.motor_current = self.__eks.input_current
+        sm.rpm = self.__eks.erpm
+        self.__eks_lock.release()
         sm.watt_hours = self.__bdm.get_watt_hours_consumed()
-        # self.__msl.release()
         msg_data = sm.buffer
         packet = self.__packet_header(4, len(msg_data)) + msg_data
         start = time.perf_counter()
