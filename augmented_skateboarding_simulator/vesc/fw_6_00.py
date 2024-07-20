@@ -241,7 +241,10 @@ class FW6_00CMP(CommandMessageProcessor):
 
     def _publish_imu_state(self):
         imu = IMUStateMessage()
-        # TBD - Populate IMUStateMessage instance later
+        self.__eks_lock.acquire()
+        imu.acc[0] = self.__eks.acceleration_x
+        # Add other IMU data if it deems necessary to do so - TBD
+        self.__eks_lock.release()
         msg_data = imu.buffer
         packet = self.__packet_header(65, len(msg_data)) + msg_data
         start = time.perf_counter()
