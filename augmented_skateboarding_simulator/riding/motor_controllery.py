@@ -23,9 +23,6 @@ class MotorController:
         self.__erpm_sem = Semaphore(0)
         self.__erpm_thread = Thread(target=self.__erpm_control)
 
-        self.__duty = 0.0
-        self.__duty_sem = Semaphore(0)
-        self.__duty_thread = Thread(target=self.__duty_control)
         self.__current = 0.0
         self.__current_sem = Semaphore(0)
         self.__current_thread = Thread(target=self.__current_control)
@@ -33,13 +30,11 @@ class MotorController:
 
     def start(self) -> None:
         self.__erpm_thread.start()
-        self.__duty_thread.start()
         self.__current_thread.start()
 
     def stop(self) -> None:
         self.__stop_event.set()
         self.__erpm_sem.release()
-        self.__duty_sem.release()
         self.__current_sem.release()
 
     def __erpm_control(self) -> None:
@@ -53,13 +48,6 @@ class MotorController:
             while time.perf_counter() < et:
                 pass
             self.__eks.erpm = self.__erpm
-            self.__eks_lock.release()
-
-    def __duty_control(self) -> None:
-        while not self.__stop_event.is_set():
-            self.__duty_sem.acquire()
-            self.__eks_lock.acquire()
-            self.__eks.duty = 0.0
             self.__eks_lock.release()
 
     def __current_control(self) -> None:
@@ -80,14 +68,6 @@ class MotorController:
     @erpm.setter
     def erpm(self, value: int) -> None:
         self.__erpm = value
-
-    @property
-    def duty(self) -> float:
-        return self.__duty
-
-    @duty.setter
-    def duty(self, value: float) -> None:
-        self.__duty = value
 
     @property
     def current(self) -> float:
