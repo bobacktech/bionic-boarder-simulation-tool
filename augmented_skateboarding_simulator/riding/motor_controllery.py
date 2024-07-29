@@ -24,7 +24,7 @@ class MotorController:
         self.__erpm_sem = Semaphore(0)
         self.__erpm_thread = Thread(target=self.__erpm_control)
 
-        self.__current = 0.0
+        self.__target_current = 0.0
         self.__current_sem = Semaphore(0)
         self.__current_thread = Thread(target=self.__current_control)
         self.__stop_event = Event()
@@ -96,11 +96,15 @@ class MotorController:
                     last_erpm_value -= erpm_step
 
     def __current_control(self) -> None:
+        """
+        At this time, the only purpose of this motor control scheme is to set the current to 0.0
+        so that the motor will disengage out of ERPM control and just coast. In the future, this scheme will
+        be replaced with a more sophisticated control scheme.
+        """
         while not self.__stop_event.is_set():
             self.__current_sem.acquire()
-            self.__eks_lock.acquire()
-            self.__eks.input_current = self.__current
-            self.__eks_lock.release()
+            with self.__eks_lock:
+                self.__eks.input_current = self.__target_current
 
     @property
     def control_time_step_ms(self) -> int:
@@ -123,12 +127,14 @@ class MotorController:
         self.__target_erpm = value
 
     @property
-    def current(self) -> float:
-        return self.__current
+    def target_current(self) -> float:
+        return self.__target_current
 
-    @current.setter
-    def current(self, value: float) -> None:
-        self.__current = value
+    @target_current.setter
+    def target_current(self, value: float) -> None:
+        if value != 0.0:
+            raise ValueError("Target Current must be set to 0.0")
+        self.__target_current = value
 
     @property
     def erpm_sem(self) -> Semaphore:
