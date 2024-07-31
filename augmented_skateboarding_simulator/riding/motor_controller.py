@@ -13,13 +13,14 @@ class MotorController:
         self.__eb = eb
 
         # Compute max acceleration the motor can move this particular eboard in ERPM/sec
-        torque_at_wheel = eb.motor_max_torque * eb.gear_ratio
         wheel_radius = eb.wheel_diameter_m / 2
+        torque_at_wheel = eb.motor_max_torque * eb.gear_ratio
         force_at_wheel = torque_at_wheel / wheel_radius
         linear_acceleration = force_at_wheel / eb.total_weight_with_rider_kg
         angular_acceleration_wheel_rad_per_sec2 = linear_acceleration / wheel_radius
-        angular_acceleration_motor_rad_per_sec2 = angular_acceleration_wheel_rad_per_sec2 / eb.gear_ratio
-        self.__erpm_per_sec = angular_acceleration_motor_rad_per_sec2 * (60 / (2 * math.pi)) * eb.motor_pole_pairs
+        angular_acceleration_wheel_rpm_sec = angular_acceleration_wheel_rad_per_sec2 * (60 / (2 * math.pi))
+        motor_acceleration_rpm_sec = angular_acceleration_wheel_rpm_sec * eb.gear_ratio
+        self.__erpm_per_sec = motor_acceleration_rpm_sec * eb.motor_pole_pairs
         self.__target_erpm = 0
         self.__erpm_sem = Semaphore(0)
         self.__erpm_thread = Thread(target=self.__erpm_control)
