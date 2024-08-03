@@ -24,13 +24,15 @@ class MotorController:
         self.__target_erpm = 0
         self.__erpm_sem = Semaphore(0)
         self.__erpm_thread = Thread(target=self.__erpm_control)
+        self.__erpm_thread.daemon = True
 
         self.__target_current = 0.0
         self.__current_sem = Semaphore(0)
         self.__current_thread = Thread(target=self.__current_control)
+        self.__current_thread.daemon = True
         self.__stop_event = Event()
 
-        self.__control_time_step_ms = 0
+        self.__control_time_step_sec = 0
 
     def start(self) -> None:
         self.__erpm_thread.start()
@@ -48,53 +50,32 @@ class MotorController:
             delta_erpm = self.__target_erpm - self.__eks.erpm
             starting_erpm = self.__eks.erpm
             self.__eks_lock.release()
-            control_time_step_sec = self.__control_time_step_ms / 1000.0
-            erpm_step = self.__erpm_per_sec * control_time_step_sec
+            erpm_step = self.__erpm_per_sec * self.__control_time_step_sec
             erpm_step = erpm_step if delta_erpm >= 0 else -erpm_step
             last_erpm_value = starting_erpm
             target_erpm = starting_erpm + delta_erpm
-            if delta_erpm >= 0:
-                while last_erpm_value <= target_erpm:
-                    st = time.perf_counter()
-                    while (time.perf_counter() - st) < control_time_step_sec:
-                        pass
-                    with self.__eks_lock:
-                        self.__eks.erpm += erpm_step
-                        self.__eks.velocity = (
-                            (self.__eks.erpm / self.__eb.motor_pole_pairs) / self.__eb.gear_ratio
-                        ) * ((math.pi * self.__eb.wheel_diameter_m) / 60)
-                        mechanical_rpm = self.__eks.erpm / self.__eb.motor_pole_pairs
-                        mechanical_rad_per_sec = (mechanical_rpm * 2 * math.pi) / 60
-                        wheel_radius_m = self.__eb.wheel_diameter_m / 2
-                        gravitational_force_N = self.__eb.total_weight_with_rider_kg * 9.81
-                        torque_required_Nm = (gravitational_force_N * wheel_radius_m) / self.__eb.gear_ratio
-                        power_required_watts = torque_required_Nm * mechanical_rad_per_sec
-                        self.__eks.input_current = power_required_watts / self.__eb.battery_max_voltage
-                        # Calculate linear acceleration in m/s^2
-                        force_required_N = torque_required_Nm / wheel_radius_m
-                        self.__eks.acceleration_x = force_required_N / self.__eb.total_weight_with_rider_kg
-                    last_erpm_value += erpm_step
-            else:
-                while last_erpm_value >= target_erpm:
-                    st = time.perf_counter()
-                    while (time.perf_counter() - st) < control_time_step_sec:
-                        pass
-                    with self.__eks_lock:
-                        self.__eks.erpm -= erpm_step
-                        self.__eks.velocity = (
-                            (self.__eks.erpm / self.__eb.motor_pole_pairs) / self.__eb.gear_ratio
-                        ) * ((math.pi * self.__eb.wheel_diameter_m) / 60)
-                        mechanical_rpm = self.__eks.erpm / self.__eb.motor_pole_pairs
-                        mechanical_rad_per_sec = (mechanical_rpm * 2 * math.pi) / 60
-                        wheel_radius_m = self.__eb.wheel_diameter_m / 2
-                        gravitational_force_N = self.__eb.total_weight_with_rider_kg * 9.81
-                        torque_required_Nm = (gravitational_force_N * wheel_radius_m) / self.__eb.gear_ratio
-                        power_required_watts = torque_required_Nm * mechanical_rad_per_sec
-                        self.__eks.input_current = power_required_watts / self.__eb.battery_max_voltage
-                        # Calculate linear acceleration in m/s^2
-                        force_required_N = torque_required_Nm / wheel_radius_m
-                        self.__eks.acceleration_x = force_required_N / self.__eb.total_weight_with_rider_kg
-                    last_erpm_value -= erpm_step
+            while (
+                (erpm_step > 0 and last_erpm_value <= target_erpm) or (erpm_step < 0 and last_erpm_value >= target_erpm)
+            ) and not self.__stop_event.is_set():
+                st = time.perf_counter()
+                while (time.perf_counter() - st) < self.__control_time_step_sec:
+                    pass
+                with self.__eks_lock:
+                    self.__eks.erpm += erpm_step
+                    self.__eks.velocity = ((self.__eks.erpm / self.__eb.motor_pole_pairs) / self.__eb.gear_ratio) * (
+                        (math.pi * self.__eb.wheel_diameter_m) / 60
+                    )
+                    mechanical_rpm = self.__eks.erpm / self.__eb.motor_pole_pairs
+                    mechanical_rad_per_sec = (mechanical_rpm * 2 * math.pi) / 60
+                    wheel_radius_m = self.__eb.wheel_diameter_m / 2
+                    gravitational_force_N = self.__eb.total_weight_with_rider_kg * 9.81
+                    torque_required_Nm = (gravitational_force_N * wheel_radius_m) / self.__eb.gear_ratio
+                    power_required_watts = torque_required_Nm * mechanical_rad_per_sec
+                    self.__eks.input_current = power_required_watts / self.__eb.battery_max_voltage
+                    # Calculate linear acceleration in m/s^2
+                    force_required_N = torque_required_Nm / wheel_radius_m
+                    self.__eks.acceleration_x = force_required_N / self.__eb.total_weight_with_rider_kg
+                last_erpm_value += erpm_step
 
     def __current_control(self) -> None:
         """
@@ -109,11 +90,11 @@ class MotorController:
 
     @property
     def control_time_step_ms(self) -> int:
-        return self.__control_time_step_ms
+        return int(self.__control_time_step_sec * 1000.0)
 
     @control_time_step_ms.setter
     def control_time_step_ms(self, value: int) -> None:
-        self.__control_time_step_ms = value
+        self.__control_time_step_sec = value / 1000.0
 
     @property
     def erpm_per_sec(self) -> float:
