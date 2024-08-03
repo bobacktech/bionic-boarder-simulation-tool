@@ -46,17 +46,14 @@ class MotorController:
     def __erpm_control(self) -> None:
         while not self.__stop_event.is_set():
             self.__erpm_sem.acquire()
-            self.__eks_lock.acquire()
-            delta_erpm = self.__target_erpm - self.__eks.erpm
-            starting_erpm = self.__eks.erpm
-            self.__eks_lock.release()
+            with self.__eks_lock:
+                starting_erpm = self.__eks.erpm
+            if starting_erpm == self.__target_erpm:
+                continue
             erpm_step = self.__erpm_per_sec * self.__control_time_step_sec
-            erpm_step = erpm_step if delta_erpm >= 0 else -erpm_step
+            erpm_step = erpm_step if starting_erpm < self.__target_erpm else -erpm_step
             last_erpm_value = starting_erpm
-            target_erpm = starting_erpm + delta_erpm
-            while (
-                (erpm_step > 0 and last_erpm_value <= target_erpm) or (erpm_step < 0 and last_erpm_value >= target_erpm)
-            ) and not self.__stop_event.is_set():
+            while (erpm_step > 0) == (last_erpm_value < self.__target_erpm) and not self.__stop_event.is_set():
                 st = time.perf_counter()
                 while (time.perf_counter() - st) < self.__control_time_step_sec:
                     pass
