@@ -45,7 +45,6 @@ class StateMessage:
     """
 
     def __init__(self) -> None:
-        self.__duty_cycle: float = 0
         self.__rpm: int = 0
         self.__motor_current: float = 0
         self.__watt_hours: float = 0
@@ -69,22 +68,12 @@ class StateMessage:
                 in accordance with the "COMM_GET_VALUES" message specification of the VESC firmware.
         """
         buffer = bytearray(76)
-        dc = int(self.duty_cycle * 1000)
         wh = int(self.__watt_hours * 10000.0)
         mc = int(self.__motor_current * 100.0)
         buffer[9:13] = struct.pack(">I", mc)
-        buffer[25:27] = struct.pack(">H", dc)
         buffer[27:31] = struct.pack(">I", self.__rpm)
         buffer[41:45] = struct.pack(">I", wh)
         return bytes(buffer)
-
-    @property
-    def duty_cycle(self) -> float:
-        return self.__duty_cycle
-
-    @duty_cycle.setter
-    def duty_cycle(self, value: float) -> None:
-        self.__duty_cycle = value
 
     @property
     def rpm(self) -> int:
@@ -198,7 +187,6 @@ class FW6_00CMP(CommandMessageProcessor):
     ):
         super().__init__(com_port, command_byte_size)
         self.__cmd_id_name = {
-            5: CommandMessageProcessor.DUTY_CYCLE,
             6: CommandMessageProcessor.CURRENT,
             8: CommandMessageProcessor.RPM,
             30: CommandMessageProcessor.HEARTBEAT,
@@ -227,7 +215,6 @@ class FW6_00CMP(CommandMessageProcessor):
     def _publish_state(self):
         sm = StateMessage()
         self.__eks_lock.acquire()
-        sm.duty_cycle = self.__eks.duty_cycle
         sm.motor_current = self.__eks.input_current
         sm.rpm = self.__eks.erpm
         self.__eks_lock.release()
@@ -256,12 +243,6 @@ class FW6_00CMP(CommandMessageProcessor):
         fw = FirmwareMessage()
         packet = self.__packet_header(0, FirmwareMessage.BYTE_LENGTH) + fw.buffer
         self.serial.write(packet)
-
-    def _update_duty_cycle(self, command):
-        duty_cycle_commanded = int.from_bytes(command[3:7], byteorder="big") / 100000.0
-        # self.__msl.acquire()
-        # self.__ms.duty_cycle = duty_cycle_commanded
-        # self.__msl.release()
 
     def _update_current(self, command):
         motor_current_commanded = int.from_bytes(command[3:7], byteorder="big") / 1000.0

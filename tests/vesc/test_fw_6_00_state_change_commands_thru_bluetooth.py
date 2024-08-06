@@ -13,7 +13,6 @@ import time
 
 
 class BluetoothStateChangeClient(QObject):
-    duty_cycle = 0.455
     current = 24.57
     rpm = 14560
 
@@ -44,17 +43,6 @@ class BluetoothStateChangeClient(QObject):
         self.socket.errorOccurred.connect(self.on_error_occurred)
 
     def on_connected(self):
-        # VESC duty cycle command
-        b = bytearray(5)
-        b[0] = 5
-        d = int(BluetoothStateChangeClient.duty_cycle * 100000)
-        b[1] = (d >> 24) & 0xFF
-        b[2] = (d >> 16) & 0xFF
-        b[3] = (d >> 8) & 0xFF
-        b[4] = d & 0xFF
-        d1 = self.packetize(b)
-        bytes_sent = self.socket.write(d1)
-        assert bytes_sent == 256
         # VESC current command
         b = bytearray(5)
         b[0] = 6
@@ -117,9 +105,6 @@ def test_handle_state_change_commands():
     client.connect_to_device(simHC06_address)
 
     def state_change_check():
-        while state_msg.duty_cycle == 0:
-            time.sleep(0.4)
-        assert state_msg.duty_cycle == BluetoothStateChangeClient.duty_cycle
         while state_msg.motor_current == 0:
             time.sleep(0.4)
         assert state_msg.motor_current == BluetoothStateChangeClient.current

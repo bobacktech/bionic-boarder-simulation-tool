@@ -8,7 +8,6 @@ class TestCommandMessageProcessor(CommandMessageProcessor):
     def __init__(self, com_port, command_byte_size):
         super().__init__(com_port, command_byte_size)
         self.__cmd_id_name = {
-            1: CommandMessageProcessor.DUTY_CYCLE,
             2: CommandMessageProcessor.CURRENT,
             3: CommandMessageProcessor.RPM,
             4: CommandMessageProcessor.HEARTBEAT,
@@ -36,9 +35,6 @@ class TestCommandMessageProcessor(CommandMessageProcessor):
     def _publish_firmware(self):
         pass
 
-    def _update_duty_cycle(self, command):
-        pass
-
     def _update_current(self, command):
         pass
 
@@ -55,14 +51,6 @@ def mock_serial(mocker):
 def processor(mock_serial):
     mock_serial.return_value.read.side_effect = [b"some_bytes", StopIteration()]
     return TestCommandMessageProcessor("COM1", 8)
-
-
-def test_handle_command_duty_cycle(processor, mocker):
-    mocker.patch.object(processor, "_update_duty_cycle", autospec=True)
-    mocker.patch.object(processor, "_get_command_id", return_value=1)
-    with pytest.raises(StopIteration):
-        processor.handle_command()
-    processor._update_duty_cycle.assert_called_once()
 
 
 def test_handle_command_current(processor, mocker):
@@ -114,7 +102,6 @@ def test_handle_command_imu_state(processor, mocker):
 
 
 def test_command_id_names(processor):
-    assert processor._command_id_name[1] == CommandMessageProcessor.DUTY_CYCLE
     assert processor._command_id_name[2] == CommandMessageProcessor.CURRENT
     assert processor._command_id_name[3] == CommandMessageProcessor.RPM
     assert processor._command_id_name[4] == CommandMessageProcessor.HEARTBEAT

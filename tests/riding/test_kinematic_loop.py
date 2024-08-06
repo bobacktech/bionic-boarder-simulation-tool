@@ -17,7 +17,7 @@ def eboard():
 
 @pytest.fixture
 def eks():
-    return EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    return EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0)
 
 
 @pytest.fixture

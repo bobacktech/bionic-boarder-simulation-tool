@@ -14,7 +14,6 @@ class CommandMessageProcessor(ABC):
     """
 
     # State change commands
-    DUTY_CYCLE = "DUTY CYCLE"
     CURRENT = "CURRENT"
     RPM = "RPM"
     HEARTBEAT = "HEARTBEAT"
@@ -68,7 +67,6 @@ class CommandMessageProcessor(ABC):
             CommandMessageProcessor.STATE: lambda: self._publish_state(),
             CommandMessageProcessor.IMU_STATE: lambda: self._publish_imu_state(),
             CommandMessageProcessor.FIRMWARE: lambda: self._publish_firmware(),
-            CommandMessageProcessor.DUTY_CYCLE: self._update_duty_cycle(command_bytes),
             CommandMessageProcessor.CURRENT: lambda: self._update_current(command_bytes),
             CommandMessageProcessor.RPM: lambda: self._update_rpm(command_bytes),
             CommandMessageProcessor.HEARTBEAT: lambda: self.heartbeat(),
@@ -110,16 +108,6 @@ class CommandMessageProcessor(ABC):
     def _publish_firmware(self):
         """
         Abstract method to publish the 'firmware' message.
-        """
-        pass
-
-    @abstractmethod
-    def _update_duty_cycle(self, command):
-        """
-        Abstract method to update the duty cycle in the state data based on the provided command.
-
-        Args:
-            command: The command containing the information to update the duty cycle.
         """
         pass
 
