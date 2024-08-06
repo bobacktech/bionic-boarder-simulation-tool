@@ -37,7 +37,6 @@ class TestStateMessage:
     def test_initial_state(self):
         """Test initial state of StateMessage."""
         msg = StateMessage()
-        assert msg.duty_cycle == 0
         assert msg.rpm == 0
         assert msg.motor_current == 0
         assert msg.watt_hours == 0
@@ -45,12 +44,10 @@ class TestStateMessage:
     def test_setting_properties(self):
         """Test setting properties of StateMessage."""
         msg = StateMessage()
-        msg.duty_cycle = 0.5
         msg.rpm = 1200
         msg.motor_current = 1.5
         msg.watt_hours = 12.5
 
-        assert msg.duty_cycle == 0.5
         assert msg.rpm == 1200
         assert msg.motor_current == 1.5
         assert msg.watt_hours == 12.5
@@ -58,7 +55,6 @@ class TestStateMessage:
     def test_buffer_property(self):
         """Test the buffer property to ensure correct byte structure."""
         msg = StateMessage()
-        msg.duty_cycle = 0.5
         msg.rpm = 1200
         msg.motor_current = 1.5
         msg.watt_hours = 12.5
@@ -67,12 +63,10 @@ class TestStateMessage:
         assert len(buffer) == 76  # Check buffer size
         # Decode specific fields to verify correct packing
         unpacked_mc = struct.unpack(">I", buffer[9:13])[0]
-        unpacked_dc = struct.unpack(">H", buffer[25:27])[0]
         unpacked_rpm = struct.unpack(">I", buffer[27:31])[0]
         unpacked_wh = struct.unpack(">I", buffer[41:45])[0]
 
         assert unpacked_mc == int(1.5 * 100)
-        assert unpacked_dc == int(0.5 * 1000)
         assert unpacked_rpm == 1200
         assert unpacked_wh == int(12.5 * 10000)
 
@@ -152,7 +146,7 @@ def test_state_command(mock_serial):
     cmp = FW6_00CMP(
         "COM1",
         8,
-        EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0),
         Lock(),
         BatteryDischargeModel(42.0),
     )
@@ -168,7 +162,7 @@ def test_imu_state_command(mock_serial):
     cmp = FW6_00CMP(
         "COM1",
         8,
-        EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0),
         Lock(),
         BatteryDischargeModel(42.0),
     )
@@ -178,16 +172,6 @@ def test_imu_state_command(mock_serial):
     assert (end_time - start_time) >= FW6_00CMP.PUBLISH_IMU_STATE_MESSAGE_DELAY_SEC
     data = b"\x02DA" + bytes(68)
     mock_serial.return_value.write.assert_called_once_with(data)
-
-
-# def test_update_duty_cycle(mock_serial):
-#     ms = MotorState(0, 0, 0)
-#     cmp = FW6_00CMP("COM1", 8, ms, Lock(), BatteryDischargeModel(42.0))
-#     duty_cycle = 0.01
-#     temp = int(duty_cycle * 100000)
-#     command = bytes(3) + temp.to_bytes(4, "big")
-#     cmp._update_duty_cycle(command)
-#     assert ms.duty_cycle == duty_cycle
 
 
 # def test_update_current(mock_serial):

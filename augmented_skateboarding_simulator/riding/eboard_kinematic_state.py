@@ -32,4 +32,3 @@ class EboardKinematicState:
     """ Electric Motor State """
     erpm: int
     input_current: float
-    duty_cycle: float

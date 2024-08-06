@@ -8,7 +8,7 @@ import time
 
 @pytest.fixture
 def eks():
-    return EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    return EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0)
 
 
 class TestMotorController:
