@@ -55,11 +55,10 @@ class StateMessage:
         Generates a byte representation of the state message based on the current properties of the object.
 
         The state message is structured as a 76-byte array, with specific portions of the array dedicated to
-        representing the duty cycle, input voltage, motor current, and RPM, encoded in specific formats.
+        representing the input voltage, motor current, and RPM, encoded in specific formats.
 
         The encoding is as follows:
         - Motor current (mc) is stored from bytes 9 to 12, represented as an unsigned int (">I"), scaled by 100.
-        - Duty cycle (dc) is stored from bytes 25 to 26, represented as an unsigned short (">H"), scaled by 1000.
         - RPM is stored from bytes 27 to 30, represented directly as an unsigned int (">I") without scaling.
         - Watt hours (Wh) is stored from bytes 41 to 44, represented as an unsigned short (">H"), scaled by 10000.
 
