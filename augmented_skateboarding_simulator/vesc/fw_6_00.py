@@ -3,6 +3,7 @@ from .command_message_processor import CommandMessageProcessor
 import struct
 from threading import Lock
 import time
+import math
 from augmented_skateboarding_simulator.riding.battery_discharge_model import BatteryDischargeModel
 from augmented_skateboarding_simulator.riding.eboard_kinematic_state import EboardKinematicState
 
@@ -227,10 +228,9 @@ class FW6_00CMP(CommandMessageProcessor):
 
     def _publish_imu_state(self):
         imu = IMUStateMessage()
-        self.__eks_lock.acquire()
-        imu.acc[0] = self.__eks.acceleration_x
-        # Add other IMU data if it deems necessary to do so - TBD
-        self.__eks_lock.release()
+        with self.__eks_lock:
+            imu.acc[0] = self.__eks.acceleration_x
+            imu.rpy[1] = self.__eks.pitch * (math.pi / 180.0)
         msg_data = imu.buffer
         packet = self.__packet_header(65, len(msg_data)) + msg_data
         start = time.perf_counter()
