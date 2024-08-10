@@ -137,3 +137,15 @@ class TestKinematicLoop:
         time.sleep(0.2)
         kloop.stop()
         assert kloop.current_theta_slope_deg != 0
+
+    def test_eks_pitch_is_updated_in_loop(self, kloop: KinematicLoop, eks: EboardKinematicState):
+        kloop.fixed_time_step_ms = 10
+        kloop.slope_range_bound_deg = 10
+        kloop.push_period_sec = 0.6
+        kloop.theta_slope_period_sec = 0.05
+        assert eks.pitch == 0
+        t = threading.Thread(target=kloop.loop)
+        t.start()
+        time.sleep(0.1)
+        kloop.stop()
+        assert eks.pitch != 0

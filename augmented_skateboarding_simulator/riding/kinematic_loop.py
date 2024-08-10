@@ -96,6 +96,8 @@ class KinematicLoop:
                 else:
                     self.__current_theta_slope_deg = 0.0
                 theta_slope_time_step_sec = 0
+                with self.__eks_lock:
+                    self.__eks.pitch = self.__current_theta_slope_deg
             theta_slope_time_step_sec += self.__fixed_time_step_ms / 1000.0
             if push_period_time_step_sec >= self.__push_period_sec:
                 force_1g_N = self.__eb.total_weight_with_rider_kg * 9.81
