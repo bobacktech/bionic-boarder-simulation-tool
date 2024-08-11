@@ -46,14 +46,15 @@ class MotorController:
     def __erpm_control(self) -> None:
         while not self.__stop_event.is_set():
             self.__erpm_sem.acquire()
+            target_erpm = self.__target_erpm
             with self.__eks_lock:
                 starting_erpm = self.__eks.erpm
             if starting_erpm == self.__target_erpm:
                 continue
             erpm_step = self.__erpm_per_sec * self.__control_time_step_sec
-            erpm_step = erpm_step if starting_erpm < self.__target_erpm else -erpm_step
+            erpm_step = erpm_step if starting_erpm < target_erpm else -erpm_step
             last_erpm_value = starting_erpm
-            while (erpm_step > 0) == (last_erpm_value < self.__target_erpm) and not self.__stop_event.is_set():
+            while (erpm_step > 0) == (last_erpm_value < target_erpm) and not self.__stop_event.is_set():
                 st = time.perf_counter()
                 while (time.perf_counter() - st) < self.__control_time_step_sec:
                     pass
@@ -73,6 +74,9 @@ class MotorController:
                     force_required_N = torque_required_Nm / wheel_radius_m
                     self.__eks.acceleration_x = force_required_N / self.__eb.total_weight_with_rider_kg
                 last_erpm_value += erpm_step
+                if self.__target_erpm != target_erpm:
+                    target_erpm = self.__target_erpm
+                    erpm_step = erpm_step if last_erpm_value < target_erpm else -erpm_step
 
     def __current_control(self) -> None:
         """
