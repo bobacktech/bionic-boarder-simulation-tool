@@ -14,6 +14,8 @@ from threading import Lock
 import time
 from augmented_skateboarding_simulator.riding.battery_discharge_model import BatteryDischargeModel
 from augmented_skateboarding_simulator.riding.eboard_kinematic_state import EboardKinematicState
+from augmented_skateboarding_simulator.riding.motor_controller import MotorController
+from augmented_skateboarding_simulator.riding.eboard import EBoard
 
 
 def test_firmware_message_initialization():
@@ -136,6 +138,7 @@ def test_firmware_command(mock_serial):
         None,
         None,
         None,
+        None,
     )
     cmp._publish_firmware()
     data = b"\x02@\x00\x06\x00HardwareName" + bytes(50)
@@ -149,6 +152,7 @@ def test_state_command(mock_serial):
         EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0),
         Lock(),
         BatteryDischargeModel(42.0),
+        None,
     )
     start_time = time.perf_counter()
     cmp._publish_state()
@@ -160,11 +164,7 @@ def test_state_command(mock_serial):
 
 def test_imu_state_command(mock_serial):
     cmp = FW6_00CMP(
-        "COM1",
-        8,
-        EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0),
-        Lock(),
-        BatteryDischargeModel(42.0),
+        "COM1", 8, EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0), Lock(), BatteryDischargeModel(42.0), None
     )
     start_time = time.perf_counter()
     cmp._publish_imu_state()
@@ -174,20 +174,76 @@ def test_imu_state_command(mock_serial):
     mock_serial.return_value.write.assert_called_once_with(data)
 
 
-# def test_update_current(mock_serial):
-#     ms = MotorState(0, 0, 0)
-#     cmp = FW6_00CMP("COM1", 8, ms, Lock(), BatteryDischargeModel(42.0))
-#     current = 24.3
-#     temp = int(current * 1000)
-#     command = bytes(3) + temp.to_bytes(4, "big")
-#     cmp._update_current(command)
-#     assert ms.input_current == current
+def test_update_current(mock_serial):
+    eks = EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0)
+    eks_lock = Lock()
+    eb = EBoard(
+        total_weight_with_rider_kg=80.0,
+        frontal_area_of_rider_m2=0.5,
+        wheel_diameter_m=0.1,
+        battery_max_capacity_Ah=10.0,
+        battery_max_voltage=36.0,
+        gear_ratio=2.0,
+        motor_kv=190,
+        motor_max_torque=6.0,
+        motor_max_amps=50.0,
+        motor_max_power_watts=500.0,
+        motor_pole_pairs=7,
+    )
+    mc = MotorController(eb, eks, eks_lock)
+    mc.control_time_step_ms = 20
+    mc.start()
+    eks.input_current = 45.0
+    cmp = FW6_00CMP("COM1", 8, eks, eks_lock, BatteryDischargeModel(42.0), mc)
+    current = 0.0
+    temp = int(current * 1000)
+    command = bytes(3) + temp.to_bytes(4, "big")
+    cmp._update_current(command)
+    while eks.input_current > current:
+        pass
+    assert eks.input_current == mc.target_current
+    mc.stop()
 
 
-# def test_update_rpm(mock_serial):
-#     ms = MotorState(0, 0, 0)
-#     cmp = FW6_00CMP("COM1", 8, ms, Lock(), BatteryDischargeModel(42.0))
-#     rpm = 15596
-#     command = bytes(3) + rpm.to_bytes(4, "big")
-#     cmp._update_rpm(command)
-#     assert ms.erpm == rpm
+def test_update_rpm(mock_serial):
+    eks = EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0)
+    eks_lock = Lock()
+    eb = EBoard(
+        total_weight_with_rider_kg=80.0,
+        frontal_area_of_rider_m2=0.5,
+        wheel_diameter_m=0.1,
+        battery_max_capacity_Ah=10.0,
+        battery_max_voltage=36.0,
+        gear_ratio=2.0,
+        motor_kv=190,
+        motor_max_torque=6.0,
+        motor_max_amps=50.0,
+        motor_max_power_watts=500.0,
+        motor_pole_pairs=7,
+    )
+    mc = MotorController(eb, eks, eks_lock)
+    mc.control_time_step_ms = 20
+    mc.start()
+    assert eks.erpm == 0
+    cmp = FW6_00CMP("COM1", 8, eks, eks_lock, BatteryDischargeModel(42.0), mc)
+
+    # Set the RPM to 1000 to create a speed increase
+    rpm = 1000
+    command = bytes(3) + rpm.to_bytes(4, "big")
+    cmp._update_rpm(command)
+    assert rpm == mc.target_erpm
+    while eks.erpm < mc.target_erpm:
+        pass
+    assert eks.erpm >= mc.target_erpm
+
+    # Now set RPM to 500 to create a speed decrease
+    rpm = 500
+    assert rpm < mc.target_erpm
+    assert rpm < eks.erpm
+    command = bytes(3) + rpm.to_bytes(4, "big")
+    cmp._update_rpm(command)
+    assert rpm == mc.target_erpm
+    while eks.erpm > mc.target_erpm:
+        pass
+    assert eks.erpm <= mc.target_erpm
+    mc.stop()

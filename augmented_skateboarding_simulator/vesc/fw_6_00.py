@@ -6,6 +6,7 @@ import time
 import math
 from augmented_skateboarding_simulator.riding.battery_discharge_model import BatteryDischargeModel
 from augmented_skateboarding_simulator.riding.eboard_kinematic_state import EboardKinematicState
+from augmented_skateboarding_simulator.riding.motor_controller import MotorController
 
 
 class FirmwareMessage:
@@ -184,6 +185,7 @@ class FW6_00CMP(CommandMessageProcessor):
         eks: EboardKinematicState,
         eks_lock: Lock,
         bdm: BatteryDischargeModel,
+        mc: MotorController,
     ):
         super().__init__(com_port, command_byte_size)
         self.__cmd_id_name = {
@@ -198,6 +200,7 @@ class FW6_00CMP(CommandMessageProcessor):
         self.__eks = eks
         self.__eks_lock = eks_lock
         self.__bdm = bdm
+        self.__mc = mc
 
     @property
     def _command_id_name(self):
@@ -245,12 +248,10 @@ class FW6_00CMP(CommandMessageProcessor):
 
     def _update_current(self, command):
         motor_current_commanded = int.from_bytes(command[3:7], byteorder="big") / 1000.0
-        # self.__msl.acquire()
-        # self.__ms.input_current = motor_current_commanded
-        # self.__msl.release()
+        self.__mc.target_current = motor_current_commanded
+        self.__mc.current_sem.release()
 
     def _update_rpm(self, command):
-        rpm = int.from_bytes(command[3:7], byteorder="big")
-        # self.__msl.acquire()
-        # self.__ms.erpm = rpm
-        # self.__msl.release()
+        erpm_commanded = int.from_bytes(command[3:7], byteorder="big")
+        self.__mc.target_erpm = erpm_commanded
+        self.__mc.erpm_sem.release()
