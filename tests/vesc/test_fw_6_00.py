@@ -174,14 +174,35 @@ def test_imu_state_command(mock_serial):
     mock_serial.return_value.write.assert_called_once_with(data)
 
 
-# def test_update_current(mock_serial):
-#     ms = MotorState(0, 0, 0)
-#     cmp = FW6_00CMP("COM1", 8, ms, Lock(), BatteryDischargeModel(42.0))
-#     current = 24.3
-#     temp = int(current * 1000)
-#     command = bytes(3) + temp.to_bytes(4, "big")
-#     cmp._update_current(command)
-#     assert ms.input_current == current
+def test_update_current(mock_serial):
+    eks = EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0)
+    eks_lock = Lock()
+    eb = EBoard(
+        total_weight_with_rider_kg=80.0,
+        frontal_area_of_rider_m2=0.5,
+        wheel_diameter_m=0.1,
+        battery_max_capacity_Ah=10.0,
+        battery_max_voltage=36.0,
+        gear_ratio=2.0,
+        motor_kv=190,
+        motor_max_torque=6.0,
+        motor_max_amps=50.0,
+        motor_max_power_watts=500.0,
+        motor_pole_pairs=7,
+    )
+    mc = MotorController(eb, eks, eks_lock)
+    mc.control_time_step_ms = 20
+    mc.start()
+    eks.input_current = 45.0
+    cmp = FW6_00CMP("COM1", 8, eks, eks_lock, BatteryDischargeModel(42.0), mc)
+    current = 0.0
+    temp = int(current * 1000)
+    command = bytes(3) + temp.to_bytes(4, "big")
+    cmp._update_current(command)
+    while eks.input_current > current:
+        pass
+    assert eks.input_current == mc.target_current
+    mc.stop()
 
 
 def test_update_rpm(mock_serial):
