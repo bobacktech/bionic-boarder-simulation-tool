@@ -86,6 +86,15 @@ class KinematicLoop:
         push_period_time_step_sec = 0
 
         while True:
+            if self.__eks.input_current > 0:
+                """
+                This means that the electric motor is controlling the skateboard because a current is 
+                being injected into the motor. In this case, the skateboard's kinematics will not be
+                adjusted due to frictional forces, gravity, and/or a user's push. Instead, just skip to
+                next iteration of the loop after the fixed time step.
+                """
+                time.sleep(self.__fixed_time_step_ms / 1000.0)
+                continue
             start_time = time.perf_counter()
             if theta_slope_time_step_sec >= self.__theta_slope_period_sec:
                 if self.__current_theta_slope_deg == 0.0:
