@@ -33,6 +33,7 @@ class MotorController:
         self.__stop_event = Event()
 
         self.__control_time_step_sec = 0
+        self.__zero_current_flag = False
 
     def start(self) -> None:
         self.__erpm_thread.start()
@@ -45,6 +46,7 @@ class MotorController:
 
     def __erpm_control(self) -> None:
         while not self.__stop_event.is_set():
+            self.__zero_current_flag = False
             self.__erpm_sem.acquire()
             target_erpm = self.__target_erpm
             with self.__eks_lock:
@@ -77,6 +79,10 @@ class MotorController:
                 if self.__target_erpm != target_erpm:
                     target_erpm = self.__target_erpm
                     erpm_step = erpm_step if last_erpm_value < target_erpm else -erpm_step
+                if self.__zero_current_flag:
+                    with self.__eks_lock:
+                        self.__eks.input_current = 0.0
+                    break
 
     def __current_control(self) -> None:
         """
@@ -86,6 +92,10 @@ class MotorController:
         """
         while not self.__stop_event.is_set():
             self.__current_sem.acquire()
+            if self.__target_current == 0.0:
+                self.__zero_current_flag = True
+            else:
+                raise ValueError("Target Current must be set to 0.0")
             with self.__eks_lock:
                 self.__eks.input_current = self.__target_current
 
