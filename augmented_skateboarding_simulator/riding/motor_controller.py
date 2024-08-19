@@ -1,5 +1,5 @@
 from .eboard_kinematic_state import EboardKinematicState
-from threading import Lock, Semaphore, Thread, Event
+from threading import Lock, BoundedSemaphore, Thread, Event
 from .eboard import EBoard
 import math
 import time
@@ -22,12 +22,12 @@ class MotorController:
         motor_acceleration_rpm_sec = angular_acceleration_wheel_rpm_sec * eb.gear_ratio
         self.__erpm_per_sec = motor_acceleration_rpm_sec * eb.motor_pole_pairs
         self.__target_erpm = 0
-        self.__erpm_sem = Semaphore(0)
+        self.__erpm_sem = BoundedSemaphore(1)
         self.__erpm_thread = Thread(target=self.__erpm_control)
         self.__erpm_thread.daemon = True
 
         self.__target_current = 0.0
-        self.__current_sem = Semaphore(0)
+        self.__current_sem = BoundedSemaphore(1)
         self.__current_thread = Thread(target=self.__current_control)
         self.__current_thread.daemon = True
         self.__stop_event = Event()
@@ -36,6 +36,9 @@ class MotorController:
         self.__zero_current_flag = False
 
     def start(self) -> None:
+        # Decrement the semaphore counters by 1
+        self.__erpm_sem.acquire()
+        self.__current_sem.acquire()
         self.__erpm_thread.start()
         self.__current_thread.start()
 
@@ -130,9 +133,9 @@ class MotorController:
         self.__target_current = value
 
     @property
-    def erpm_sem(self) -> Semaphore:
+    def erpm_sem(self) -> BoundedSemaphore:
         return self.__erpm_sem
 
     @property
-    def current_sem(self) -> Semaphore:
+    def current_sem(self) -> BoundedSemaphore:
         return self.__current_sem
