@@ -61,8 +61,8 @@ class TestMotorController:
             motor_pole_pairs=7,
         )
         mc = MotorController(eboard, eks, Lock())
-        assert mc.current_sem._value == 0
-        assert mc.erpm_sem._value == 0
+        assert mc.current_sem._value == 1
+        assert mc.erpm_sem._value == 1
         assert mc._MotorController__current_thread.is_alive() == False
         assert mc._MotorController__erpm_thread.is_alive() == False
         mc.start()

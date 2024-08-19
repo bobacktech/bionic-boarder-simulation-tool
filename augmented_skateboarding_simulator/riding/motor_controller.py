@@ -1,5 +1,5 @@
 from .eboard_kinematic_state import EboardKinematicState
-from threading import Lock, Semaphore, Thread, Event
+from threading import Lock, BoundedSemaphore, Thread, Event
 from .eboard import EBoard
 import math
 import time
@@ -22,19 +22,23 @@ class MotorController:
         motor_acceleration_rpm_sec = angular_acceleration_wheel_rpm_sec * eb.gear_ratio
         self.__erpm_per_sec = motor_acceleration_rpm_sec * eb.motor_pole_pairs
         self.__target_erpm = 0
-        self.__erpm_sem = Semaphore(0)
+        self.__erpm_sem = BoundedSemaphore(1)
         self.__erpm_thread = Thread(target=self.__erpm_control)
         self.__erpm_thread.daemon = True
 
         self.__target_current = 0.0
-        self.__current_sem = Semaphore(0)
+        self.__current_sem = BoundedSemaphore(1)
         self.__current_thread = Thread(target=self.__current_control)
         self.__current_thread.daemon = True
         self.__stop_event = Event()
 
         self.__control_time_step_sec = 0
+        self.__zero_current_flag = False
 
     def start(self) -> None:
+        # Decrement the semaphore counters by 1
+        self.__erpm_sem.acquire()
+        self.__current_sem.acquire()
         self.__erpm_thread.start()
         self.__current_thread.start()
 
@@ -45,6 +49,7 @@ class MotorController:
 
     def __erpm_control(self) -> None:
         while not self.__stop_event.is_set():
+            self.__zero_current_flag = False
             self.__erpm_sem.acquire()
             target_erpm = self.__target_erpm
             with self.__eks_lock:
@@ -77,6 +82,10 @@ class MotorController:
                 if self.__target_erpm != target_erpm:
                     target_erpm = self.__target_erpm
                     erpm_step = erpm_step if last_erpm_value < target_erpm else -erpm_step
+                if self.__zero_current_flag:
+                    with self.__eks_lock:
+                        self.__eks.input_current = 0.0
+                    break
 
     def __current_control(self) -> None:
         """
@@ -86,6 +95,10 @@ class MotorController:
         """
         while not self.__stop_event.is_set():
             self.__current_sem.acquire()
+            if self.__target_current == 0.0:
+                self.__zero_current_flag = True
+            else:
+                raise ValueError("Target Current must be set to 0.0")
             with self.__eks_lock:
                 self.__eks.input_current = self.__target_current
 
@@ -120,9 +133,9 @@ class MotorController:
         self.__target_current = value
 
     @property
-    def erpm_sem(self) -> Semaphore:
+    def erpm_sem(self) -> BoundedSemaphore:
         return self.__erpm_sem
 
     @property
-    def current_sem(self) -> Semaphore:
+    def current_sem(self) -> BoundedSemaphore:
         return self.__current_sem
