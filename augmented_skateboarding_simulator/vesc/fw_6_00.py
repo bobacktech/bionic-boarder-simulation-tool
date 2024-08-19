@@ -249,9 +249,15 @@ class FW6_00CMP(CommandMessageProcessor):
     def _update_current(self, command):
         motor_current_commanded = int.from_bytes(command[3:7], byteorder="big") / 1000.0
         self.__mc.target_current = motor_current_commanded
-        self.__mc.current_sem.release()
+        try:
+            self.__mc.current_sem.release()
+        except ValueError as e:
+            pass
 
     def _update_rpm(self, command):
         erpm_commanded = int.from_bytes(command[3:7], byteorder="big")
         self.__mc.target_erpm = erpm_commanded
-        self.__mc.erpm_sem.release()
+        try:
+            self.__mc.erpm_sem.release()
+        except ValueError as e:
+            pass
