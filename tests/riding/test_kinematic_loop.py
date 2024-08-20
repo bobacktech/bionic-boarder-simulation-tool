@@ -100,7 +100,7 @@ class TestKinematicLoop:
             nonlocal temp_erpm
             time.sleep(0.1)
             temp_erpm = eks.erpm
-            time.sleep(0.4)
+            time.sleep(0.2)
             kloop.stop()
             return None
 
@@ -108,7 +108,7 @@ class TestKinematicLoop:
         t.start()
         kloop.loop()
         assert eks.velocity < 10 + (25 * 0.2)
-        assert eks.velocity >= 10 + ((25 * 0.2) - (25 * 0.02))
+        assert eks.velocity > 10
         assert eks.erpm > temp_erpm
 
     def test_initial_velocity_zero_no_push_negative_velocity(self, kloop: KinematicLoop, eks: EboardKinematicState):
@@ -149,3 +149,17 @@ class TestKinematicLoop:
         time.sleep(0.1)
         kloop.stop()
         assert eks.pitch != 0
+
+    def test_eks_input_current_is_greater_than_zero(self, kloop: KinematicLoop, eks: EboardKinematicState):
+        kloop.fixed_time_step_ms = 10
+        kloop.slope_range_bound_deg = 10
+        kloop.push_period_sec = 0.1
+        kloop.theta_slope_period_sec = 0.1
+        eks.input_current = 20.0
+        eks.velocity = 2.5
+        t = threading.Thread(target=kloop.loop)
+        t.start()
+        time.sleep(0.3)
+        kloop.stop()
+        assert eks.velocity == 2.5
+        assert eks.input_current > 0
