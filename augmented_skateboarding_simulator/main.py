@@ -1,14 +1,11 @@
 from dataclasses import dataclass
-from sim_time_manager import SimTimeManager
 import argparse
 import re
 import threading
-from vesc import fw_6_00, fw
 import sys
-from riding import motor_state
 
 
-@dataclass
+@dataclass(frozen=True)
 class AppInputArguments:
 
     # Electric Skateboard Specifics
@@ -77,7 +74,3 @@ if __name__ == "__main__":
         sys.exit(1)
 
     cmp_thread.join()
-
-    # stm = SimTimeManager()
-    # stm.set_sim_time_step(10)
-    # stm.start_sim()
