@@ -1,0 +1,119 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "total_weight_with_rider_kg": {
+        "type": "number",
+        "description": "Electric Skateboard Specifics"
+      },
+      "frontal_area_of_rider_m2": {
+        "type": "number",
+        "description": "Electric Skateboard Specifics"
+      },
+      "wheel_diameter_m": {
+        "type": "number",
+        "description": "Electric Skateboard Specifics"
+      },
+      "battery_max_capacity_Ah": {
+        "type": "number",
+        "description": "Electric Skateboard Specifics"
+      },
+      "battery_max_voltage": {
+        "type": "number",
+        "description": "Electric Skateboard Specifics"
+      },
+      "gear_ratio": {
+        "type": "number",
+        "description": "Electric Skateboard Specifics"
+      },
+      "motor_kv": {
+        "type": "integer",
+        "description": "Electric Skateboard Specifics"
+      },
+      "motor_max_torque": {
+        "type": "number",
+        "description": "Electric Skateboard Specifics"
+      },
+      "motor_max_amps": {
+        "type": "number",
+        "description": "Electric Skateboard Specifics"
+      },
+      "motor_max_power_watts": {
+        "type": "number",
+        "description": "Electric Skateboard Specifics"
+      },
+      "motor_pole_pairs": {
+        "type": "integer",
+        "description": "Electric Skateboard Specifics"
+      },
+      "com_port": {
+        "type": "string",
+        "description": "Serial I/O"
+      },
+      "baud_rate": {
+        "type": "integer",
+        "description": "Serial I/O"
+      },
+      "fixed_time_step_ms": {
+        "type": "integer",
+        "description": "Kinematic loop"
+      },
+      "push_period_sec": {
+        "type": "number",
+        "description": "Kinematic loop"
+      },
+      "theta_slope_period_sec": {
+        "type": "number",
+        "description": "Kinematic loop"
+      },
+      "slope_range_bound_deg": {
+        "type": "number",
+        "description": "Kinematic loop"
+      },
+      "mu_rolling": {
+        "type": "number",
+        "description": "Friction model"
+      },
+      "c_drag": {
+        "type": "number",
+        "description": "Friction model"
+      },
+      "control_time_step_sec": {
+        "type": "number",
+        "description": "Motor Controller"
+      },
+      "vesc_fw": {
+        "type": "string",
+        "description": "VESC"
+      },
+      "heartbeat_timeout_sec": {
+        "type": "number",
+        "description": "VESC"
+      }
+    },
+    "required": [
+      "total_weight_with_rider_kg",
+      "frontal_area_of_rider_m2",
+      "wheel_diameter_m",
+      "battery_max_capacity_Ah",
+      "battery_max_voltage",
+      "gear_ratio",
+      "motor_kv",
+      "motor_max_torque",
+      "motor_max_amps",
+      "motor_max_power_watts",
+      "motor_pole_pairs",
+      "com_port",
+      "baud_rate",
+      "fixed_time_step_ms",
+      "push_period_sec",
+      "theta_slope_period_sec",
+      "slope_range_bound_deg",
+      "mu_rolling",
+      "c_drag",
+      "control_time_step_sec",
+      "vesc_fw",
+      "heartbeat_timeout_sec"
+    ],
+    "additionalProperties": false
+  }
