@@ -17,18 +17,18 @@ The velocity is the speed along the long axis, i.e. x-axis, of the electric skat
 class EboardKinematicState:
     """Velocity is the speed along the long axis of the eboard. Units m/s"""
 
-    velocity: float
+    velocity: float = 0.0
 
-    """ 3-Dimensional linear acceleration vector. Units m/s^2 """
-    acceleration_x: float
-    acceleration_y: float
-    acceleration_z: float
+    """3-Dimensional linear acceleration vector. Units m/s^2"""
+    acceleration_x: float = 0.0
+    acceleration_y: float = 0.0
+    acceleration_z: float = 0.0
 
-    """ Attitude - pitch, roll, yaw - in degrees """
-    pitch: float
-    roll: float
-    yaw: float
+    """Attitude - pitch, roll, yaw - in degrees"""
+    pitch: float = 0.0
+    roll: float = 0.0
+    yaw: float = 0.0
 
-    """ Electric Motor State """
-    erpm: int
-    input_current: float
+    """Electric Motor State"""
+    erpm: int = 0
+    input_current: float = 0.0

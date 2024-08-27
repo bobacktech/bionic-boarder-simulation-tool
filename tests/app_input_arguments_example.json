@@ -19,6 +19,6 @@
     "mu_rolling": 0.015,
     "c_drag": 0.9,
     "control_time_step_sec": 0.01,
-    "vesc_fw": "5.2",
+    "vesc_fw": "6.00",
     "heartbeat_timeout_sec": 1.0
   }
