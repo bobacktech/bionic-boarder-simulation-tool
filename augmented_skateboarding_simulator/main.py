@@ -1,8 +1,12 @@
 from dataclasses import dataclass
 import argparse
-import re
 import threading
 import sys
+import json
+from jsonschema import validate, ValidationError
+import os
+from augmented_skateboarding_simulator.riding import *
+from augmented_skateboarding_simulator.vesc import fw_6_00
 
 
 @dataclass(frozen=True)
@@ -43,34 +47,81 @@ class AppInputArguments:
     heartbeat_timeout_sec: float
 
 
-def firmwareRegex(argValue, pattern=re.compile(r"^\d*[.]\d*$")):
-    if not pattern.match(argValue):
-        raise argparse.ArgumentTypeError("VESC firmware version specified as $MajorVersion.$MinorVersion, e.g 2.18")
-    return argValue
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "--vescFW",
-        help="Specifies the VESC firmware version to be used in the simulation.",
-        type=firmwareRegex,
-    )
-    parser.add_argument("--comPort", help="The com port for the attached USB FTDI module.")
+    parser.add_argument("app_inputs_json", type=str, help="This is the path to the simulation app inputs file.")
     args = parser.parse_args()
-    com_port = args.comPort
-    vesc_fw = args.vescFW
-    motor_state = motor_state.MotorState(0.0, 0.0, 0.0)
-    motor_state_lock = threading.Lock()
-    cmp_thread = None
-    if vesc_fw == fw.FirmwareVersion.FW_6_00.value:
-        cmp = fw_6_00.FW6_00CMP(com_port, 100, motor_state, motor_state_lock)
-        cmp_thread = threading.Thread(target=cmp.handle_command())
-        cmp_thread.daemon = True
-        cmp_thread.start()
-    else:
-        print("No VESC firmware specified. Exiting simulation.")
+    if len(sys.argv) != 2:
+        print("Error: Exactly one argument is required.")
         sys.exit(1)
 
-    cmp_thread.join()
+    script_dir = os.path.dirname(__file__)
+    schema_path = os.path.join(script_dir, "./app_input_arguments.schema.json")
+    app_input_json = None
+    with open(args.app_inputs_json, "r") as file:
+        app_input_json = json.load(file)
+        schema = None
+        with open(schema_path, "r") as schema_file:
+            schema = json.load(schema_file)
+        try:
+            validate(instance=app_input_json, schema=schema)
+        except ValidationError as e:
+            print("Error: App inputs data file did not validate against the app input schema.")
+            sys.exit(1)
+
+    app_input_arguments = AppInputArguments(**app_input_json)
+    eboard_kinematic_state = eboard_kinematic_state.EboardKinematicState()
+    eboard_kinematic_state_lock = threading.Lock()
+    battery_discharge_model = battery_discharge_model.BatteryDischargeModel(app_input_arguments.battery_max_voltage)
+    eboard = eboard.EBoard(
+        app_input_arguments.total_weight_with_rider_kg,
+        app_input_arguments.frontal_area_of_rider_m2,
+        app_input_arguments.wheel_diameter_m,
+        app_input_arguments.battery_max_capacity_Ah,
+        app_input_arguments.battery_max_voltage,
+        app_input_arguments.gear_ratio,
+        app_input_arguments.motor_kv,
+        app_input_arguments.motor_max_torque,
+        app_input_arguments.motor_max_amps,
+        app_input_arguments.motor_max_power_watts,
+        app_input_arguments.motor_pole_pairs,
+    )
+    frictional_deceleration_model = frictional_deceleration_model.FrictionalDecelerationModel(
+        app_input_arguments.mu_rolling, app_input_arguments.c_drag, eboard
+    )
+    push_model = push_model.PushModel(eboard)
+    motor_controller = motor_controller.MotorController(eboard, eboard_kinematic_state, eboard_kinematic_state_lock)
+    kinematic_loop = kinematic_loop.KinematicLoop(
+        eboard, eboard_kinematic_state, eboard_kinematic_state_lock, frictional_deceleration_model, push_model
+    )
+    kinematic_loop.fixed_time_step_ms = app_input_arguments.fixed_time_step_ms
+    kinematic_loop.theta_slope_period_sec = app_input_arguments.theta_slope_period_sec
+    kinematic_loop.slope_range_bound_deg = app_input_arguments.slope_range_bound_deg
+    kinematic_loop.push_period_sec = app_input_arguments.push_period_sec
+    vesc_command_message_processor = None
+    if app_input_arguments.vesc_fw == "6.00":
+        vesc_command_message_processor = fw_6_00.FW6_00CMP(
+            app_input_arguments.com_port,
+            256,
+            eboard_kinematic_state,
+            eboard_kinematic_state_lock,
+            battery_discharge_model,
+            motor_controller,
+        )
+    else:
+        print(f"Error: There is no VESC firmware version matching {app_input_arguments.vesc_fw}")
+        sys.exit(1)
+
+    # Launch simulation threads
+    kinematic_loop_thread = threading.Thread(target=kinematic_loop.loop)
+    kinematic_loop_thread.daemon = True
+    vesc_command_message_processor_thread = threading.Thread(target=vesc_command_message_processor.handle_command)
+    vesc_command_message_processor_thread.daemon = True
+    vesc_command_message_processor_thread.start()
+    motor_controller.start()
+    kinematic_loop_thread.start()
+
+    kinematic_loop_thread.join()
+    vesc_command_message_processor_thread.join()
+    motor_controller.stop()
+    sys.exit(0)

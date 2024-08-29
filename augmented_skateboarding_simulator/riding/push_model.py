@@ -25,6 +25,7 @@ class PushModel:
 
     def __init__(self, eboard: EBoard) -> None:
         self.__eboard = eboard
+        self.__push_active = False
 
     def setup(self, force_rider_N: float, push_duration_ms: int) -> None:
         """
