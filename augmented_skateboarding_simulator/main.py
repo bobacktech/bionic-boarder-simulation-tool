@@ -6,6 +6,7 @@ import json
 from jsonschema import validate, ValidationError
 import os
 from augmented_skateboarding_simulator.riding import *
+from augmented_skateboarding_simulator.vesc import fw_6_00
 
 
 @dataclass(frozen=True)
@@ -93,3 +94,34 @@ if __name__ == "__main__":
     kinematic_loop = kinematic_loop.KinematicLoop(
         eboard, eboard_kinematic_state, eboard_kinematic_state_lock, frictional_deceleration_model, push_model
     )
+    kinematic_loop.fixed_time_step_ms = app_input_arguments.fixed_time_step_ms
+    kinematic_loop.theta_slope_period_sec = app_input_arguments.theta_slope_period_sec
+    kinematic_loop.slope_range_bound_deg = app_input_arguments.slope_range_bound_deg
+    kinematic_loop.push_period_sec = app_input_arguments.push_period_sec
+    vesc_command_message_processor = None
+    if app_input_arguments.vesc_fw == "6.00":
+        vesc_command_message_processor = fw_6_00.FW6_00CMP(
+            app_input_arguments.com_port,
+            256,
+            eboard_kinematic_state,
+            eboard_kinematic_state_lock,
+            battery_discharge_model,
+            motor_controller,
+        )
+    else:
+        print(f"Error: There is no VESC firmware version matching {app_input_arguments.vesc_fw}")
+        sys.exit(1)
+
+    # Launch simulation threads
+    kinematic_loop_thread = threading.Thread(target=kinematic_loop.loop)
+    kinematic_loop_thread.daemon = True
+    vesc_command_message_processor_thread = threading.Thread(target=vesc_command_message_processor.handle_command)
+    vesc_command_message_processor_thread.daemon = True
+    vesc_command_message_processor_thread.start()
+    motor_controller.start()
+    kinematic_loop_thread.start()
+
+    kinematic_loop_thread.join()
+    vesc_command_message_processor_thread.join()
+    motor_controller.stop()
+    sys.exit(0)
