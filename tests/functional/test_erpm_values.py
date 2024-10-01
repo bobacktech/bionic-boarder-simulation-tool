@@ -13,7 +13,7 @@ VESC_STATE_MSG_REQUEST_DURATION_SEC = 5
 
 
 @pytest.mark.skip(reason="This test is currently disabled.")
-def test_erpm_values(start_sim_process):
+def test_erpm_values_without_commanding_motor(start_sim_process):
     vsmr = vesc_state_msg_requester.VescStateMsgRequester(VESC_STATE_MSG_REQUEST_DURATION_SEC * 1000)
     app = QCoreApplication(sys.argv)
     mac_address = os.getenv("SIMHC06_MAC_ADDRESS")
@@ -28,6 +28,8 @@ def test_erpm_values(start_sim_process):
     erpms = []
     assert len(vsmr.state_msg_buffer) > 0
     for timestamp, byte_array in vsmr.state_msg_buffer:
+        current = struct.unpack(">I", byte_array[12:16])[0]
+        assert current == 0
         erpms.append(struct.unpack(">I", byte_array[30:34])[0])
         times.append(timestamp)
     assert len(times) == len(erpms)
