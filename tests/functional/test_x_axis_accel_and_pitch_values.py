@@ -2,30 +2,36 @@ import sys
 from PyQt6.QtCore import QCoreApplication
 from . import vesc_imu_state_msg_requester
 from .start_sim_fixture import start_sim_process
+from .bluetooth_socket_fixture import bluetooth_socket as socket
 import struct
 import matplotlib.pyplot as plt
 import os
 from datetime import datetime
 import pytest
 import math
+from PyQt6.QtBluetooth import QBluetoothSocket
+import time
 
-
-# Set this time value to whatever duration is desired
-VESC_IMU_STATE_MSG_REQUEST_DURATION_SEC = 5
+NUMBER_VESC_IMU_STATE_MSG_REQUESTS = 30
 
 
 @pytest.mark.skip(reason="This test is currently disabled.")
-def test_erpm_values_without_commanding_motor(start_sim_process):
-    vismr = vesc_imu_state_msg_requester.VescIMUStateMsgRequester(VESC_IMU_STATE_MSG_REQUEST_DURATION_SEC * 1000)
+def test_x_axis_accel_and_pitch_values(start_sim_process, socket: QBluetoothSocket):
     app = QCoreApplication(sys.argv)
-    mac_address = os.getenv("SIMHC06_MAC_ADDRESS")
-    if mac_address is None:
-        pytest.skip("Environment variable for SIMHC06 bluetooth module MAC address is not set. Test is skipped.")
-    vismr.connect_to_device(mac_address)
-    try:
-        sys.exit(app.exec())
-    except:
-        pass
+    while socket.state() != QBluetoothSocket.SocketState.ConnectedState:
+        app.processEvents()
+    start_time = int(time.time() * 1000)
+    vismr = vesc_imu_state_msg_requester.VescIMUStateMsgRequester(socket)
+    vismr.send_imu_state_msg_request()
+    count = 0
+    while count < NUMBER_VESC_IMU_STATE_MSG_REQUESTS:
+        while vismr.imu_state_msg_received == False:
+            app.processEvents()
+        vismr.send_imu_state_msg_request()
+        count += 1
+    socket.disconnectFromService()
+    socket.close()
+    app.quit()
     times = []
     x_accels = []
     pitchs = []
@@ -33,7 +39,7 @@ def test_erpm_values_without_commanding_motor(start_sim_process):
     for timestamp, byte_array in vismr.imu_state_msg_buffer:
         x_accels.append(struct.unpack(">f", byte_array[16:20])[0])
         pitchs.append(struct.unpack(">f", byte_array[8:12])[0] * 180.0 / math.pi)
-        times.append(timestamp)
+        times.append(timestamp - start_time)
     assert len(times) == len(pitchs)
     assert len(times) == len(x_accels)
 
