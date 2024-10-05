@@ -8,6 +8,7 @@ from PyQt6.QtBluetooth import (
 )
 from . import vesc_state_msg_requester
 from .start_sim_fixture import start_sim_process
+from .bluetooth_socket_fixture import bluetooth_socket as socket
 import struct
 import matplotlib.pyplot as plt
 import os
@@ -19,17 +20,8 @@ NUMBER_VESC_STATE_MSG_REQUESTS = 40
 
 
 @pytest.mark.skip(reason="This test is currently disabled.")
-def test_erpm_values_without_commanding_motor(start_sim_process):
+def test_erpm_values_without_commanding_motor(start_sim_process, socket):
     app = QCoreApplication(sys.argv)
-    socket = QBluetoothSocket(QBluetoothServiceInfo.Protocol.RfcommProtocol)
-    mac_address = os.getenv("SIMHC06_MAC_ADDRESS")
-    if mac_address is None:
-        pytest.skip("Environment variable for SIMHC06 bluetooth module MAC address is not set. Test is skipped.")
-    SERIAL_PORT_PROFILE_UUID = "00001101-0000-1000-8000-00805F9B34FB"
-    socket.connectToService(
-        QBluetoothAddress(mac_address),
-        QBluetoothUuid(SERIAL_PORT_PROFILE_UUID),
-    )
     while socket.state() != QBluetoothSocket.SocketState.ConnectedState:
         app.processEvents()
     start_time = int(time.time() * 1000)
