@@ -1,38 +1,21 @@
-from PyQt6.QtBluetooth import (
-    QBluetoothSocket,
-    QBluetoothServiceInfo,
-    QBluetoothAddress,
-    QBluetoothUuid,
-)
-from PyQt6.QtCore import QCoreApplication, QObject, QByteArray, QTimer
+from PyQt6.QtCore import QByteArray
 import time
 from typing import List, Tuple
 
 
-class VescStateMsgRequester(QObject):
-    def __init__(self, state_request_time_duration_ms: int):
+class VescStateMsgRequester:
+    def __init__(self, socket):
         super().__init__()
-        self.socket = QBluetoothSocket(QBluetoothServiceInfo.Protocol.RfcommProtocol)
-        self.socket.connected.connect(self.on_connected)
-        self.socket.readyRead.connect(self.on_data_received)
-        self.socket.errorOccurred.connect(self.on_error_occurred)
-        self.socket.disconnected.connect(self.on_disconnected)
         self.in_data = QByteArray()
         self.state_msg_buffer: List[Tuple[int, QByteArray]] = []
-        self.state_request_time_duration_ms = state_request_time_duration_ms
+        self.socket = socket
+        socket.readyRead.connect(self.on_data_received)
+        self.state_msg_received = False
 
-    def connect_to_device(self, address):
-        SERIAL_PORT_PROFILE_UUID = "00001101-0000-1000-8000-00805F9B34FB"
-        self.socket.connectToService(
-            QBluetoothAddress(address),
-            QBluetoothUuid(SERIAL_PORT_PROFILE_UUID),
-        )
-
-    def on_connected(self):
-        QTimer.singleShot(self.state_request_time_duration_ms, self.socket.disconnectFromService)
-        self.start_time = int(time.time() * 1000)
+    def send_state_msg_request(self):
         # VESC state message request command
         bytes_sent = self.socket.write(self.packetize(bytearray([4])))
+        self.state_msg_received = False
 
     def on_data_received(self):
         if self.socket.bytesAvailable():
@@ -40,18 +23,10 @@ class VescStateMsgRequester(QObject):
         if len(self.in_data) == 79:
             id = int.from_bytes(self.in_data[2])
             assert id == 4
-            temp: Tuple[int, QByteArray] = (int(time.time() * 1000) - self.start_time, QByteArray(self.in_data))
+            temp: Tuple[int, QByteArray] = (int(time.time() * 1000), QByteArray(self.in_data))
             self.state_msg_buffer.append(temp)
             self.in_data.clear()
-            # VESC state message request command
-            bytes_sent = self.socket.write(self.packetize(bytearray([4])))
-
-    def on_error_occurred(self, error):
-        print(f"Error occurred: {error}")
-
-    def on_disconnected(self):
-        self.socket.close()
-        QCoreApplication.instance().quit()
+            self.state_msg_received = True
 
     def packetize(self, data: bytearray):
         packet = bytearray(256)
