@@ -56,7 +56,9 @@ class MotorController:
                 starting_erpm = self.__eks.erpm
             if starting_erpm == self.__target_erpm:
                 continue
-            erpm_step = self.__erpm_per_sec * self.__control_time_step_sec
+            erpm_step = round(self.__erpm_per_sec * self.__control_time_step_sec)
+            if erpm_step == 0:
+                erpm_step = 1
             erpm_step = erpm_step if starting_erpm < target_erpm else -erpm_step
             last_erpm_value = starting_erpm
             while (erpm_step > 0) == (last_erpm_value < target_erpm) and not self.__stop_event.is_set():
