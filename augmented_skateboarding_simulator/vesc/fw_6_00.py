@@ -72,7 +72,7 @@ class StateMessage:
         wh = int(self.__watt_hours * 10000.0)
         mc = int(self.__motor_current * 100.0)
         buffer[9:13] = struct.pack(">I", mc)
-        buffer[27:31] = struct.pack(">I", self.__rpm)
+        buffer[27:31] = struct.pack(">i", self.__rpm)
         buffer[41:45] = struct.pack(">I", wh)
         return bytes(buffer)
 
