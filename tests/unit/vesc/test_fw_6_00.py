@@ -65,7 +65,7 @@ class TestStateMessage:
         assert len(buffer) == 76  # Check buffer size
         # Decode specific fields to verify correct packing
         unpacked_mc = struct.unpack(">I", buffer[9:13])[0]
-        unpacked_rpm = struct.unpack(">I", buffer[27:31])[0]
+        unpacked_rpm = struct.unpack(">i", buffer[27:31])[0]
         unpacked_wh = struct.unpack(">I", buffer[41:45])[0]
 
         assert unpacked_mc == int(1.5 * 100)
