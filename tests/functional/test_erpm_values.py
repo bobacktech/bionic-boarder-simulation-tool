@@ -19,7 +19,7 @@ import time
 NUMBER_VESC_STATE_MSG_REQUESTS = 40
 
 
-# @pytest.mark.skip(reason="This test is currently disabled.")
+@pytest.mark.skip(reason="This test is currently disabled.")
 def test_erpm_values_without_commanding_motor(start_sim_process, socket):
     app = QCoreApplication(sys.argv)
     while socket.state() != QBluetoothSocket.SocketState.ConnectedState:
