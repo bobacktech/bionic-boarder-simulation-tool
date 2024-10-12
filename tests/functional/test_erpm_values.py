@@ -33,7 +33,12 @@ def test_erpm_values_without_commanding_motor(start_sim_process, socket):
             app.processEvents()
         vsmr.send_state_msg_request()
         count += 1
+    socket.disconnectFromService()
+    while socket.state() == QBluetoothSocket.SocketState.ConnectedState:
+        app.processEvents()
     socket.close()
+    while socket.state() == QBluetoothSocket.SocketState.ClosingState:
+        app.processEvents()
     app.quit()
     times = []
     erpms = []
@@ -41,7 +46,7 @@ def test_erpm_values_without_commanding_motor(start_sim_process, socket):
     for timestamp, byte_array in vsmr.state_msg_buffer:
         current = struct.unpack(">I", byte_array[12:16])[0]
         assert current == 0
-        erpms.append(struct.unpack(">I", byte_array[30:34])[0])
+        erpms.append(struct.unpack(">i", byte_array[30:34])[0])
         times.append(timestamp - start_time)
     assert len(times) == len(erpms)
     plt.figure(figsize=(10, 10))
