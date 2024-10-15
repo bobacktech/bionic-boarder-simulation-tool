@@ -1,8 +1,3 @@
-import sys
-from PyQt6.QtCore import QCoreApplication
-from PyQt6.QtBluetooth import QBluetoothSocket
-from .start_sim_fixture import start_sim_process
-from .bluetooth_socket_fixture import bluetooth_socket as socket
 from . import vesc_state_msg_requester
 import struct
 import pytest
@@ -31,11 +26,9 @@ def packetize(data: bytearray) -> bytes:
 
 
 @pytest.mark.skip(reason="This test is currently disabled.")
-def test_set_erpm_command(start_sim_process, socket):
-    app = QCoreApplication(sys.argv)
-    while socket.state() != QBluetoothSocket.SocketState.ConnectedState:
-        app.processEvents()
-    commanded_erpm: int = 99999
+def test_set_erpm_command(activate_sim_and_bluetooth_socket):
+    app, socket = activate_sim_and_bluetooth_socket
+    commanded_erpm: int = 50000
     command = bytearray([8]) + bytearray(commanded_erpm.to_bytes(4, "big"))
     socket.write(packetize(command))
     app.processEvents()
@@ -59,7 +52,3 @@ def test_set_erpm_command(start_sim_process, socket):
     assert all(erpm == e[0] for erpm in e)
     c = currents[-7:]
     assert all(current == c[0] for current in c)
-    socket.disconnectFromService()
-    app.processEvents()
-    socket.close()
-    app.quit()

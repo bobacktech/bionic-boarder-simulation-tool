@@ -3,10 +3,18 @@ import os
 import pytest
 import time
 from pyftdi.ftdi import Ftdi
+from PyQt6.QtBluetooth import (
+    QBluetoothSocket,
+    QBluetoothServiceInfo,
+    QBluetoothAddress,
+    QBluetoothUuid,
+)
+from PyQt6.QtCore import QCoreApplication
+import sys
 
 
-@pytest.fixture(scope="function")
-def start_sim_process():
+@pytest.fixture
+def activate_sim_and_bluetooth_socket():
     try:
         # List all connected FTDI devices
         devices = Ftdi.list_devices()
@@ -30,5 +38,22 @@ def start_sim_process():
     )
     while sim_process.poll() is not None:
         time.sleep(0.2)
-    yield sim_process
+
+    socket = QBluetoothSocket(QBluetoothServiceInfo.Protocol.RfcommProtocol)
+    mac_address = os.getenv("SIMHC06_MAC_ADDRESS")
+    if mac_address is None:
+        pytest.skip("Environment variable for SIMHC06 bluetooth module MAC address is not set. Test is skipped.")
+    SERIAL_PORT_PROFILE_UUID = "00001101-0000-1000-8000-00805F9B34FB"
+    socket.connectToService(
+        QBluetoothAddress(mac_address),
+        QBluetoothUuid(SERIAL_PORT_PROFILE_UUID),
+    )
+    app = QCoreApplication(sys.argv)
+    while socket.state() != QBluetoothSocket.SocketState.ConnectedState:
+        app.processEvents()
+    yield app, socket
+    socket.disconnectFromService()
+    while socket.state() == QBluetoothSocket.SocketState.ConnectedState:
+        app.processEvents()
+    socket.close()
     sim_process.kill()

@@ -1,25 +1,18 @@
-import sys
-from PyQt6.QtCore import QCoreApplication
 from . import vesc_imu_state_msg_requester
-from .start_sim_fixture import start_sim_process
-from .bluetooth_socket_fixture import bluetooth_socket as socket
 import struct
 import matplotlib.pyplot as plt
 import os
 from datetime import datetime
 import pytest
 import math
-from PyQt6.QtBluetooth import QBluetoothSocket
 import time
 
 NUMBER_VESC_IMU_STATE_MSG_REQUESTS = 30
 
 
 @pytest.mark.skip(reason="This test is currently disabled.")
-def test_x_axis_accel_and_pitch_values(start_sim_process, socket: QBluetoothSocket):
-    app = QCoreApplication(sys.argv)
-    while socket.state() != QBluetoothSocket.SocketState.ConnectedState:
-        app.processEvents()
+def test_x_axis_accel_and_pitch_values(activate_sim_and_bluetooth_socket):
+    app, socket = activate_sim_and_bluetooth_socket
     start_time = int(time.time() * 1000)
     vismr = vesc_imu_state_msg_requester.VescIMUStateMsgRequester(socket)
     vismr.send_imu_state_msg_request()
@@ -29,9 +22,6 @@ def test_x_axis_accel_and_pitch_values(start_sim_process, socket: QBluetoothSock
             app.processEvents()
         vismr.send_imu_state_msg_request()
         count += 1
-    socket.disconnectFromService()
-    socket.close()
-    app.quit()
     times = []
     x_accels = []
     pitchs = []
@@ -42,7 +32,6 @@ def test_x_axis_accel_and_pitch_values(start_sim_process, socket: QBluetoothSock
         times.append(timestamp - start_time)
     assert len(times) == len(pitchs)
     assert len(times) == len(x_accels)
-
     plt.figure(figsize=(10, 10))
     plt.plot(times, pitchs, marker="o")
     plt.title("Time vs Pitch")
