@@ -1,14 +1,4 @@
-import sys
-from PyQt6.QtCore import QCoreApplication
-from PyQt6.QtBluetooth import (
-    QBluetoothSocket,
-    QBluetoothServiceInfo,
-    QBluetoothAddress,
-    QBluetoothUuid,
-)
 from . import vesc_state_msg_requester
-from .start_sim_fixture import start_sim_process
-from .bluetooth_socket_fixture import bluetooth_socket as socket
 import struct
 import matplotlib.pyplot as plt
 import os
@@ -20,10 +10,8 @@ NUMBER_VESC_STATE_MSG_REQUESTS = 40
 
 
 @pytest.mark.skip(reason="This test is currently disabled.")
-def test_erpm_values_without_commanding_motor(start_sim_process, socket):
-    app = QCoreApplication(sys.argv)
-    while socket.state() != QBluetoothSocket.SocketState.ConnectedState:
-        app.processEvents()
+def test_erpm_values_without_commanding_motor(activate_sim_and_bluetooth_socket):
+    app, socket = activate_sim_and_bluetooth_socket
     start_time = int(time.time() * 1000)
     vsmr = vesc_state_msg_requester.VescStateMsgRequester(socket)
     vsmr.send_state_msg_request()
@@ -33,13 +21,6 @@ def test_erpm_values_without_commanding_motor(start_sim_process, socket):
             app.processEvents()
         vsmr.send_state_msg_request()
         count += 1
-    socket.disconnectFromService()
-    while socket.state() == QBluetoothSocket.SocketState.ConnectedState:
-        app.processEvents()
-    socket.close()
-    while socket.state() == QBluetoothSocket.SocketState.ClosingState:
-        app.processEvents()
-    app.quit()
     times = []
     erpms = []
     assert len(vsmr.state_msg_buffer) > 0
