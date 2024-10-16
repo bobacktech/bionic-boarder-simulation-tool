@@ -35,10 +35,10 @@ def test_vesc_imu_state_erpm_query_command_loop(activate_sim_and_bluetooth_socke
     socket.readyRead.disconnect(vsmr.on_data_received)
     vismr = vesc_imu_state_msg_requester.VescIMUStateMsgRequester(socket)
     socket.readyRead.disconnect(vismr.on_data_received)
-    last_erpm_value_after_erpm_command_sent: int = max_negative_64bit
-    commanded_erpm: int = 0
     erpm: int = 0
     x_accel: float = 0.0
+    last_x_accel_value_after_erpm_command_sent: float = 0.0
+    commanded_erpm: int = 0
     for i in range(30):
         socket.readyRead.connect(vsmr.on_data_received)
         vsmr.send_state_msg_request()
@@ -55,11 +55,10 @@ def test_vesc_imu_state_erpm_query_command_loop(activate_sim_and_bluetooth_socke
         erpm = struct.unpack(">i", state_data[30:34])[0]
         x_accel = struct.unpack(">f", imu_state_data[16:20])[0]
         if i == 9:
-            last_erpm_value_after_erpm_command_sent = erpm
+            last_x_accel_value_after_erpm_command_sent = x_accel
             commanded_erpm: int = erpm + 5000
             command = bytearray([8]) + bytearray(commanded_erpm.to_bytes(4, "big"))
             socket.write(packetize(command))
             app.processEvents()
-    x = x_accel
-    assert erpm > last_erpm_value_after_erpm_command_sent
+    assert x_accel > last_x_accel_value_after_erpm_command_sent
     assert abs(erpm - commanded_erpm) < 1000
