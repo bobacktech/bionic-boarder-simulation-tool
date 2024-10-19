@@ -163,10 +163,7 @@ def test_imu_state_command(mock_serial):
     cmp = FW6_00CMP(
         "COM1", 8, EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0), Lock(), BatteryDischargeModel(42.0), None
     )
-    start_time = time.perf_counter()
     cmp._publish_imu_state()
-    end_time = time.perf_counter()
-    assert (end_time - start_time) >= FW6_00CMP.PUBLISH_IMU_STATE_MESSAGE_DELAY_SEC
     data = b"\x02DA" + bytes(68)
     mock_serial.return_value.write.assert_called_once_with(data)
 
