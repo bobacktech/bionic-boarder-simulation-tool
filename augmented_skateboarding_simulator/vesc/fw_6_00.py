@@ -175,8 +175,6 @@ class IMUStateMessage:
 
 
 class FW6_00CMP(CommandMessageProcessor):
-    PUBLISH_IMU_STATE_MESSAGE_DELAY_SEC = 0.05
-
     def __init__(
         self,
         com_port,
@@ -232,9 +230,6 @@ class FW6_00CMP(CommandMessageProcessor):
             imu.rpy[1] = self.__eks.pitch * (math.pi / 180.0)
         msg_data = imu.buffer
         packet = self.__packet_header(65, len(msg_data)) + msg_data
-        start = time.perf_counter()
-        while time.perf_counter() - start < FW6_00CMP.PUBLISH_IMU_STATE_MESSAGE_DELAY_SEC:
-            pass
         self.serial.write(packet)
 
     def _publish_firmware(self):
