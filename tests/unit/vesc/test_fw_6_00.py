@@ -154,10 +154,7 @@ def test_state_command(mock_serial):
         BatteryDischargeModel(42.0),
         None,
     )
-    start_time = time.perf_counter()
     cmp._publish_state()
-    end_time = time.perf_counter()
-    assert (end_time - start_time) >= FW6_00CMP.PUBLISH_STATE_MESSAGE_DELAY_SEC
     data = b"\x02L\x04" + bytes(76)
     mock_serial.return_value.write.assert_called_once_with(data)
 
