@@ -134,6 +134,7 @@ def mock_serial(mocker):
 def test_firmware_command(mock_serial):
     cmp = FW6_00CMP(
         "COM1",
+        230400,
         8,
         None,
         None,
@@ -148,6 +149,7 @@ def test_firmware_command(mock_serial):
 def test_state_command(mock_serial):
     cmp = FW6_00CMP(
         "COM1",
+        230400,
         8,
         EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0),
         Lock(),
@@ -161,7 +163,7 @@ def test_state_command(mock_serial):
 
 def test_imu_state_command(mock_serial):
     cmp = FW6_00CMP(
-        "COM1", 8, EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0), Lock(), BatteryDischargeModel(42.0), None
+        "COM1", 230400, 8, EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0), Lock(), BatteryDischargeModel(42.0), None
     )
     cmp._publish_imu_state()
     data = b"\x02DA" + bytes(68)
@@ -188,7 +190,7 @@ def test_update_current(mock_serial):
     mc.control_time_step_ms = 20
     mc.start()
     eks.input_current = 45.0
-    cmp = FW6_00CMP("COM1", 8, eks, eks_lock, BatteryDischargeModel(42.0), mc)
+    cmp = FW6_00CMP("COM1", 230400, 8, eks, eks_lock, BatteryDischargeModel(42.0), mc)
     current = 0.0
     temp = int(current * 1000)
     command = bytes(3) + temp.to_bytes(4, "big")
@@ -219,7 +221,7 @@ def test_update_rpm(mock_serial):
     mc.control_time_step_ms = 20
     mc.start()
     assert eks.erpm == 0
-    cmp = FW6_00CMP("COM1", 8, eks, eks_lock, BatteryDischargeModel(42.0), mc)
+    cmp = FW6_00CMP("COM1", 230400, 8, eks, eks_lock, BatteryDischargeModel(42.0), mc)
 
     # Set the RPM to 1000 to create a speed increase
     rpm = 1000

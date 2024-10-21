@@ -103,6 +103,7 @@ if __name__ == "__main__":
     if app_input_arguments.vesc_fw == "6.00":
         vesc_command_message_processor = fw_6_00.FW6_00CMP(
             app_input_arguments.com_port,
+            app_input_arguments.baud_rate,
             256,
             eboard_kinematic_state,
             eboard_kinematic_state_lock,
