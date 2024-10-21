@@ -5,8 +5,8 @@ from augmented_skateboarding_simulator.vesc.command_message_processor import (
 
 
 class TestCommandMessageProcessor(CommandMessageProcessor):
-    def __init__(self, com_port, command_byte_size):
-        super().__init__(com_port, command_byte_size)
+    def __init__(self, com_port, baud_rate, command_byte_size):
+        super().__init__(com_port, baud_rate, command_byte_size)
         self.__cmd_id_name = {
             2: CommandMessageProcessor.CURRENT,
             3: CommandMessageProcessor.RPM,
@@ -50,7 +50,7 @@ def mock_serial(mocker):
 @pytest.fixture
 def processor(mock_serial):
     mock_serial.return_value.read.side_effect = [b"some_bytes", StopIteration()]
-    return TestCommandMessageProcessor("COM1", 8)
+    return TestCommandMessageProcessor("COM1", 230400, 8)
 
 
 def test_handle_command_current(processor, mocker):
