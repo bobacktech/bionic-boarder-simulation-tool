@@ -178,13 +178,14 @@ class FW6_00CMP(CommandMessageProcessor):
     def __init__(
         self,
         com_port,
+        baud_rate,
         command_byte_size,
         eks: EboardKinematicState,
         eks_lock: Lock,
         bdm: BatteryDischargeModel,
         mc: MotorController,
     ):
-        super().__init__(com_port, command_byte_size)
+        super().__init__(com_port, baud_rate, command_byte_size)
         self.__cmd_id_name = {
             6: CommandMessageProcessor.CURRENT,
             8: CommandMessageProcessor.RPM,

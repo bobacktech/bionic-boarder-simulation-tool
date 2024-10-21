@@ -38,6 +38,7 @@ class CommandMessageProcessor(ABC):
     def __init__(
         self,
         com_port,
+        baud_rate,
         command_byte_size,
     ):
         """
@@ -49,7 +50,7 @@ class CommandMessageProcessor(ABC):
         """
         self.serial = serial.Serial(
             port=com_port,
-            baudrate=230400,
+            baudrate=baud_rate,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
             bytesize=serial.EIGHTBITS,
