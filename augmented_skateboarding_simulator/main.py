@@ -7,6 +7,7 @@ from jsonschema import validate, ValidationError
 import os
 from augmented_skateboarding_simulator.riding import *
 from augmented_skateboarding_simulator.vesc import fw_6_00
+from .logger import Logger
 
 
 @dataclass(frozen=True)
@@ -50,11 +51,12 @@ class AppInputArguments:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("app_inputs_json", type=str, help="This is the path to the simulation app inputs file.")
+    parser.add_argument("--enable-logging", action="store_true", help="Enable logging if this flag is set.")
     args = parser.parse_args()
     if len(sys.argv) != 2:
         print("Error: Exactly one argument is required.")
         sys.exit(1)
-
+    Logger.enabled = args.enable_logging
     script_dir = os.path.dirname(__file__)
     schema_path = os.path.join(script_dir, "./app_input_arguments.schema.json")
     app_input_json = None
