@@ -7,7 +7,7 @@ from jsonschema import validate, ValidationError
 import os
 from augmented_skateboarding_simulator.riding import *
 from augmented_skateboarding_simulator.vesc import fw_6_00
-from .logger import Logger
+from augmented_skateboarding_simulator.logger import Logger
 
 
 @dataclass(frozen=True)
