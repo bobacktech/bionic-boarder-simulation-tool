@@ -20,26 +20,43 @@ class Logger:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(Logger, cls).__new__(cls)
-            cls._instance._configure()
+            if Logger.enabled:
+                cls._instance._configure()
+            else:
+                cls._instance._logger = NullLogger()
         return cls._instance
 
     def _configure(self):
+        # Create timestamp for the log file name
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         log_file_name = f"skateboard_sim_{timestamp}.log"
 
-        logging.basicConfig(
-            level=logging.INFO,  # Set the logging level
-            format="%(message)s",  # Define the log message format
-            handlers=[
-                logging.FileHandler(log_file_name),  # Log to a file named 'app.log'
-                logging.StreamHandler(),  # Optionally, also log to the console
-            ],
-        )
+        # Configure standard logging first
+        # Ensure configuration is applied with force=True
+        logging.basicConfig(level=logging.INFO, format="%(message)s", force=True)
 
+        # Create and configure file handler
+        file_handler = logging.FileHandler(log_file_name)
+        console_handler = logging.StreamHandler()
+
+        # Create formatter and add it to handlers
+        formatter = logging.Formatter("%(message)s")
+        file_handler.setFormatter(formatter)
+        console_handler.setFormatter(formatter)
+
+        # Get root logger and add handlers
+        root_logger = logging.getLogger()
+        root_logger.handlers = []  # Clear existing handlers
+        root_logger.addHandler(file_handler)
+        root_logger.addHandler(console_handler)
+
+        # Configure structlog
         structlog.configure(
             processors=[
-                structlog.processors.TimeStamper(fmt="iso"),  # Add timestamp to logs
-                structlog.processors.JSONRenderer(),  # Render logs as JSON
+                structlog.stdlib.add_log_level,
+                structlog.stdlib.PositionalArgumentsFormatter(),
+                structlog.processors.TimeStamper(fmt="iso"),
+                structlog.processors.JSONRenderer(indent=None),
             ],
             context_class=dict,
             logger_factory=structlog.stdlib.LoggerFactory(),
@@ -47,11 +64,7 @@ class Logger:
             cache_logger_on_first_use=True,
         )
 
-        # Create a logger
-        if Logger.enabled:
-            self._logger = structlog.get_logger()
-        else:
-            self._logger = NullLogger()
+        self._logger = structlog.get_logger()
 
     @property
     def logger(self):
