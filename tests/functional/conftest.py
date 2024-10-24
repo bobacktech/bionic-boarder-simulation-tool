@@ -32,6 +32,7 @@ def activate_sim_and_bluetooth_socket():
         "python",
         "main.py",
         os.path.expanduser("~/git/augmented-skateboarding-simulator/tests/app_input_arguments_example.json"),
+        "--enable-logging",
     ]
     sim_process = subprocess.Popen(
         command, cwd=os.path.expanduser("~/git/augmented-skateboarding-simulator/augmented_skateboarding_simulator")
