@@ -54,6 +54,7 @@ if __name__ == "__main__":
     parser.add_argument("--enable-logging", action="store_true", help="Enable logging if this flag is set.")
     args = parser.parse_args()
     Logger.enabled = args.enable_logging
+    logger = Logger().logger
     script_dir = os.path.dirname(__file__)
     schema_path = os.path.join(script_dir, "./app_input_arguments.schema.json")
     app_input_json = None
@@ -65,9 +66,8 @@ if __name__ == "__main__":
         try:
             validate(instance=app_input_json, schema=schema)
         except ValidationError as e:
-            print("Error: App inputs data file did not validate against the app input schema.")
+            logger.error("App inputs data file did not validate against the app input schema.")
             sys.exit(1)
-
     app_input_arguments = AppInputArguments(**app_input_json)
     eboard_kinematic_state = eboard_kinematic_state.EboardKinematicState()
     eboard_kinematic_state_lock = threading.Lock()
@@ -110,7 +110,7 @@ if __name__ == "__main__":
             motor_controller,
         )
     else:
-        print(f"Error: There is no VESC firmware version matching {app_input_arguments.vesc_fw}")
+        logger.error(f"There is no VESC firmware version matching {app_input_arguments.vesc_fw}")
         sys.exit(1)
 
     # Launch simulation threads
@@ -121,6 +121,7 @@ if __name__ == "__main__":
     vesc_command_message_processor_thread.start()
     motor_controller.start()
     kinematic_loop_thread.start()
+    logger.info("VESC CMP, motor controller, and kinematic loop threads are running.")
 
     kinematic_loop_thread.join()
     vesc_command_message_processor_thread.join()
