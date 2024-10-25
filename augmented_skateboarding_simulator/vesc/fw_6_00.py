@@ -7,6 +7,7 @@ import math
 from augmented_skateboarding_simulator.riding.battery_discharge_model import BatteryDischargeModel
 from augmented_skateboarding_simulator.riding.eboard_kinematic_state import EboardKinematicState
 from augmented_skateboarding_simulator.riding.motor_controller import MotorController
+from augmented_skateboarding_simulator.logger import Logger
 
 
 class FirmwareMessage:
@@ -223,6 +224,13 @@ class FW6_00CMP(CommandMessageProcessor):
         msg_data = sm.buffer
         packet = self.__packet_header(4, len(msg_data)) + msg_data
         self.serial.write(packet)
+        Logger().logger.info(
+            "Publishing state message",
+            rpm=sm.rpm,
+            motor_current=sm.motor_current,
+            watt_hours=sm.watt_hours,
+            CMP=self.__class__.__name__,
+        )
 
     def _publish_imu_state(self):
         imu = IMUStateMessage()
@@ -232,6 +240,9 @@ class FW6_00CMP(CommandMessageProcessor):
         msg_data = imu.buffer
         packet = self.__packet_header(65, len(msg_data)) + msg_data
         self.serial.write(packet)
+        Logger().logger.info(
+            "Publishing IMU state message", imu_acc=imu.acc, imu_rpy=imu.rpy, CMP=self.__class__.__name__
+        )
 
     def _publish_firmware(self):
         fw = FirmwareMessage()
@@ -245,6 +256,9 @@ class FW6_00CMP(CommandMessageProcessor):
             self.__mc.current_sem.release()
         except ValueError as e:
             pass
+        Logger().logger.info(
+            "Processing set current command", motor_current=motor_current_commanded, CMP=self.__class__.__name__
+        )
 
     def _update_rpm(self, command):
         erpm_commanded = int.from_bytes(command[3:7], byteorder="big")
@@ -253,3 +267,4 @@ class FW6_00CMP(CommandMessageProcessor):
             self.__mc.erpm_sem.release()
         except ValueError as e:
             pass
+        Logger().logger.info("Processing set ERPM command", erpm=erpm_commanded, CMP=self.__class__.__name__)
