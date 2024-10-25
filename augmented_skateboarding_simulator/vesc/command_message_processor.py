@@ -77,7 +77,7 @@ class CommandMessageProcessor(ABC):
             command_bytes = self.serial.read(self.__command_byte_size)
             command_id = self._get_command_id(command_bytes)
             command_name = self._command_id_name[command_id]
-            Logger().logger.info("VESC received command", value=command_name)
+            Logger().logger.info("VESC received command", command=command_name)
             handler[command_name]()
 
     @abstractmethod
