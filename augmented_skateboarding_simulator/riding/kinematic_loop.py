@@ -6,6 +6,7 @@ from .push_model import PushModel
 import time
 from threading import Lock
 import random
+from augmented_skateboarding_simulator.logger import Logger
 
 
 class KinematicLoop:
@@ -84,13 +85,13 @@ class KinematicLoop:
         self.__current_theta_slope_deg = self.__initial_theta_slope_deg
         theta_slope_time_step_sec = 0
         push_period_time_step_sec = 0
-
+        Logger().logger.info("Kinematic loop has started")
         while True:
             if not self.__loop_active:
                 break
             if self.__eks.input_current > 0:
                 """
-                This means that the electric motor is controlling the skateboard because a current is 
+                This means that the electric motor is controlling the skateboard because a current is
                 being injected into the motor. In this case, the skateboard's kinematics will not be
                 adjusted due to frictional forces, gravity, and/or a user's push. Instead, just skip to
                 next iteration of the loop after the fixed time step.
@@ -104,6 +105,9 @@ class KinematicLoop:
                         -self.__slope_range_bound_deg,
                         self.__slope_range_bound_deg,
                     )
+                    Logger().logger.info(
+                        "Calculated new theta slope value", theta_slope_deg=self.__current_theta_slope_deg
+                    )
                 else:
                     self.__current_theta_slope_deg = 0.0
                 theta_slope_time_step_sec = 0
@@ -115,6 +119,11 @@ class KinematicLoop:
                 force_push_x_N = random.uniform(force_1g_N, 2 * force_1g_N)
                 push_duration_ms = random.randint(400, 600)
                 self.__pm.setup(force_push_x_N, push_duration_ms)
+                Logger().logger.info(
+                    "Skateboard push initiated",
+                    force_x_of_the_push=force_push_x_N,
+                    duration_ms_of_the_push=push_duration_ms,
+                )
                 push_period_time_step_sec = 0
             push_period_time_step_sec += self.__fixed_time_step_ms / 1000.0
             self.__eks_lock.acquire()
