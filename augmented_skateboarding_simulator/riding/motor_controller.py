@@ -3,6 +3,7 @@ from threading import Lock, BoundedSemaphore, Thread, Event
 from .eboard import EBoard
 import math
 import time
+from augmented_skateboarding_simulator.logger import Logger
 
 
 class MotorController:
@@ -56,6 +57,11 @@ class MotorController:
                 starting_erpm = self.__eks.erpm
             if starting_erpm == self.__target_erpm:
                 continue
+            Logger().logger.info(
+                "Control loop activated to change motor's speed to target ERPM",
+                starting_erpm=starting_erpm,
+                target_erpm=self.__target_erpm,
+            )
             erpm_step = round(self.__erpm_per_sec * self.__control_time_step_sec)
             if erpm_step == 0:
                 erpm_step = 1
@@ -88,6 +94,9 @@ class MotorController:
                     with self.__eks_lock:
                         self.__eks.input_current = 0.0
                     break
+            Logger().logger.info(
+                "ERPM control loop deactivated", target_erpm=self.__target_erpm, last_computed_erpm=last_erpm_value
+            )
 
     def __current_control(self) -> None:
         """
@@ -99,6 +108,7 @@ class MotorController:
             self.__current_sem.acquire()
             if self.__target_current == 0.0:
                 self.__zero_current_flag = True
+                Logger().logger.info("Current control has set motor current to 0")
             else:
                 raise ValueError("Target Current must be set to 0.0")
             with self.__eks_lock:
