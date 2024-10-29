@@ -118,12 +118,12 @@ class KinematicLoop:
                 force_1g_N = self.__eb.total_weight_with_rider_kg * 9.81
                 force_push_x_N = random.uniform(force_1g_N, 2 * force_1g_N)
                 push_duration_ms = random.randint(400, 600)
-                self.__pm.setup(force_push_x_N, push_duration_ms)
                 Logger().logger.info(
                     "Skateboard push initiated",
                     force_x_of_the_push=force_push_x_N,
-                    duration_ms_of_the_push=push_duration_ms,
+                    duration_of_the_push_ms=push_duration_ms,
                 )
+                self.__pm.setup(force_push_x_N, push_duration_ms)
                 push_period_time_step_sec = 0
             push_period_time_step_sec += self.__fixed_time_step_ms / 1000.0
             self.__eks_lock.acquire()
