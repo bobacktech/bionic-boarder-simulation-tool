@@ -55,7 +55,7 @@ class Logger:
             processors=[
                 structlog.stdlib.add_log_level,
                 structlog.stdlib.PositionalArgumentsFormatter(),
-                structlog.processors.TimeStamper(fmt="iso"),
+                structlog.processors.TimeStamper(),
                 structlog.processors.JSONRenderer(indent=None),
             ],
             context_class=dict,
