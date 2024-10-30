@@ -110,6 +110,9 @@ class KinematicLoop:
                     )
                 else:
                     self.__current_theta_slope_deg = 0.0
+                    Logger().logger.info(
+                        "Theta slope value is set to 0.0", theta_slope_deg=self.__current_theta_slope_deg
+                    )
                 theta_slope_time_step_sec = 0
                 with self.__eks_lock:
                     self.__eks.pitch = self.__current_theta_slope_deg
