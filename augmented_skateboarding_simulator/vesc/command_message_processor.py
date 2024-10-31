@@ -75,10 +75,13 @@ class CommandMessageProcessor(ABC):
         }
         while True:
             command_bytes = self.serial.read(self.__command_byte_size)
-            command_id = self._get_command_id(command_bytes)
-            command_name = self._command_id_name[command_id]
-            Logger().logger.info("VESC received command", command=command_name)
-            handler[command_name]()
+            try:
+                command_id = self._get_command_id(command_bytes)
+                command_name = self._command_id_name[command_id]
+                Logger().logger.info("VESC received command", command=command_name)
+                handler[command_name]()
+            except Exception as e:
+                Logger().logger.error("Received command was not processed correctly", error=e, command=command_name)
 
     @abstractmethod
     def _get_command_id(self, command: bytes) -> int:
