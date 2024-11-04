@@ -20,9 +20,12 @@ class EboardStateRecorder:
         self.__start_time = time.time()
         self.__recording_thread.start()
 
-    @property.setter
-    def stop_recording(self, value: bool):
-        self.__stop_recording = value
+    def stop_recording(self):
+        self.__stop_recording = True
+
+    @property
+    def record_file_name(self) -> str:
+        return self.__record_file_name
 
     def record(self) -> None:
         f = open(self.__record_file_name, "wb")
