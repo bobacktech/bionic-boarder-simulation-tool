@@ -1,6 +1,5 @@
-import pytest
 from augmented_skateboarding_simulator.riding.eboard_state_recorder import EboardStateRecorder
-from threading import Thread, Lock
+from threading import Lock
 from augmented_skateboarding_simulator.riding.eboard_kinematic_state import EboardKinematicState
 import time
 import os
