@@ -8,6 +8,7 @@ import os
 from augmented_skateboarding_simulator.riding import *
 from augmented_skateboarding_simulator.vesc import fw_6_00
 from augmented_skateboarding_simulator.logger import Logger
+from augmented_skateboarding_simulator.riding.eboard_state_recorder import EboardStateRecorder
 
 
 @dataclass(frozen=True)
@@ -52,6 +53,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("app_inputs_json", type=str, help="This is the path to the simulation app inputs file.")
     parser.add_argument("--enable-logging", action="store_true", help="Enable logging if this flag is set.")
+    parser.add_argument(
+        "--enable-data-recording",
+        action="store_true",
+        help="Enable recording of electric skateboard simulation data if flag is set.",
+    )
     args = parser.parse_args()
     Logger.enabled = args.enable_logging
     logger = Logger().logger
@@ -122,8 +128,14 @@ if __name__ == "__main__":
     motor_controller.start()
     kinematic_loop_thread.start()
     logger.info("VESC CMP, motor controller, and kinematic loop threads are running.")
+    if args.enable_data_recording:
+        recording_period_ms = app_input_arguments.fixed_time_step_ms * 2
+        recorder = EboardStateRecorder(eboard_kinematic_state_lock, eboard_kinematic_state, recording_period_ms)
+        recorder.start_recording()
+        logger.info("Electric Skateboard sim data recorder thread is running.")
 
     kinematic_loop_thread.join()
     vesc_command_message_processor_thread.join()
+    recorder.stop_recording()
     motor_controller.stop()
     sys.exit(0)
