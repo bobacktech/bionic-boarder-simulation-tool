@@ -1,6 +1,8 @@
 import logging
 import structlog
+from typing import Any, Dict
 from datetime import datetime
+from .mission_elapsed_time import MissionElapsedTime
 
 
 class NullLogger:
@@ -11,6 +13,15 @@ class NullLogger:
             pass
 
         return method
+
+
+class MissionElapsedTimeStamper:
+    def __init__(self):
+        pass
+
+    def __call__(self, logger: Any, name: str, event_dict: Dict) -> Dict:
+        event_dict["timestamp"] = MissionElapsedTime().elapsed_time_sec
+        return event_dict
 
 
 class Logger:
@@ -55,7 +66,7 @@ class Logger:
             processors=[
                 structlog.stdlib.add_log_level,
                 structlog.stdlib.PositionalArgumentsFormatter(),
-                structlog.processors.TimeStamper(),
+                MissionElapsedTimeStamper(),
                 structlog.processors.JSONRenderer(indent=None),
             ],
             context_class=dict,
