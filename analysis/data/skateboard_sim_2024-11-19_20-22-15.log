@@ -1,0 +1,26 @@
+{"event": "Kinematic loop has started", "level": "info", "timestamp": 9.5367431640625e-07}
+{"event": "VESC CMP, motor controller, and kinematic loop threads are running.", "level": "info", "timestamp": 8.249282836914062e-05}
+{"event": "Electric Skateboard sim data recorder thread is running.", "level": "info", "timestamp": 0.0005095005035400391}
+{"theta_slope_deg": 14.623429073633023, "event": "Calculated new theta slope value", "level": "info", "timestamp": 5.14438271522522}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 10.284464597702026}
+{"theta_slope_deg": 9.214261755115565, "event": "Calculated new theta slope value", "level": "info", "timestamp": 15.424834728240967}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 20.56621503829956}
+{"theta_slope_deg": -13.047217377052114, "event": "Calculated new theta slope value", "level": "info", "timestamp": 25.70172691345215}
+{"force_x_of_the_push": 1084.1977868045376, "duration_of_the_push_ms": 521, "event": "Skateboard push initiated", "level": "info", "timestamp": 30.77976942062378}
+{"push_active": true, "initial_slowdown_duration_ms": 52.10000000000001, "rider_accel_ms2": 14.455970490727168, "event": "Skateboard push setup", "level": "info", "timestamp": 30.780168056488037}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 30.84094762802124}
+{"push_active": false, "event": "Skateboard push finished", "level": "info", "timestamp": 31.36323642730713}
+{"theta_slope_deg": -8.92822585423963, "event": "Calculated new theta slope value", "level": "info", "timestamp": 35.99029755592346}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 41.14392113685608}
+{"theta_slope_deg": 9.476328930962211, "event": "Calculated new theta slope value", "level": "info", "timestamp": 46.28784918785095}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 51.43177938461304}
+{"theta_slope_deg": -4.863696804791594, "event": "Calculated new theta slope value", "level": "info", "timestamp": 56.58303689956665}
+{"force_x_of_the_push": 759.4922797623691, "duration_of_the_push_ms": 545, "event": "Skateboard push initiated", "level": "info", "timestamp": 61.608975887298584}
+{"push_active": true, "initial_slowdown_duration_ms": 54.50000000000001, "rider_accel_ms2": 10.126563730164921, "event": "Skateboard push setup", "level": "info", "timestamp": 61.609524726867676}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 61.7318651676178}
+{"push_active": false, "event": "Skateboard push finished", "level": "info", "timestamp": 62.2145791053772}
+{"theta_slope_deg": -7.864496465964975, "event": "Calculated new theta slope value", "level": "info", "timestamp": 66.87093806266785}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 72.01386165618896}
+{"theta_slope_deg": 0.15792760571655862, "event": "Calculated new theta slope value", "level": "info", "timestamp": 77.15274000167847}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 82.28948664665222}
+{"theta_slope_deg": -8.320651080302271, "event": "Calculated new theta slope value", "level": "info", "timestamp": 87.42416644096375}

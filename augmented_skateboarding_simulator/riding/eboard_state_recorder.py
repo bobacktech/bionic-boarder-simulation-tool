@@ -3,6 +3,7 @@ from .eboard_kinematic_state import EboardKinematicState
 from threading import Lock, Thread
 import time
 import struct
+from augmented_skateboarding_simulator.mission_elapsed_time import MissionElapsedTime
 
 
 class EboardStateRecorder:
@@ -17,7 +18,6 @@ class EboardStateRecorder:
         self.__stop_recording = False
 
     def start_recording(self) -> None:
-        self.__start_time = time.time()
         self.__recording_thread.start()
 
     def stop_recording(self):
@@ -32,7 +32,7 @@ class EboardStateRecorder:
         while True:
             eks_bytes = None
             with self.__eks_lock:
-                timestamp = time.time() - self.__start_time
+                timestamp = MissionElapsedTime().elapsed_time_sec
                 eks_bytes = struct.pack(
                     "d f f f f f f f i f",
                     timestamp,
