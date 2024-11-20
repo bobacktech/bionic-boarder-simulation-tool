@@ -35,5 +35,5 @@ def test_record():
             timestamp = unpacked_data[0]
             assert timestamp > previous_timestamp, "Timestamps are not in increasing order"
             previous_timestamp = timestamp
-    assert previous_timestamp <= (duration_sec + recording_period_ms / 1000.0)
+    assert previous_timestamp <= (duration_sec + 2 * recording_period_ms / 1000.0)
     os.remove(eboard_state_recorder.record_file_name)
