@@ -63,7 +63,7 @@ if __name__ == "__main__":
     # Plot 3: Pitch vs Time
     ax3.plot(timestamps, pitches, "g-")
     ax3.set_xlabel("Time (ms)")
-    ax3.set_ylabel("Pitch (rad)")
+    ax3.set_ylabel("Pitch (deg)")
     ax3.grid(True)
 
     # Plot 4: ERPM vs Time
