@@ -43,9 +43,11 @@ if __name__ == "__main__":
     velocities = [packet["velocity"] for packet in data_packets]
     accelerations_x = [packet["acceleration_x"] for packet in data_packets]
     pitches = [packet["pitch"] for packet in data_packets]
+    erpms = [packet["erpm"] for packet in data_packets]
+    input_currents = [packet["input_current"] for packet in data_packets]
 
     # Create figure and subplots
-    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(10, 12), sharex=True)
+    fig, (ax1, ax2, ax3, ax4, ax5) = plt.subplots(5, 1, figsize=(10, 15), sharex=True)
     fig.suptitle("Vehicle Telemetry Data")
 
     # Plot 1: Velocity vs Time
@@ -61,8 +63,19 @@ if __name__ == "__main__":
     # Plot 3: Pitch vs Time
     ax3.plot(timestamps, pitches, "g-")
     ax3.set_xlabel("Time (ms)")
-    ax3.set_ylabel("Pitch (rad)")
+    ax3.set_ylabel("Pitch (deg)")
     ax3.grid(True)
+
+    # Plot 4: ERPM vs Time
+    ax4.plot(timestamps, erpms, "m-")
+    ax4.set_ylabel("ERPM")
+    ax4.grid(True)
+
+    # Plot 5: Input Current vs Time
+    ax5.plot(timestamps, input_currents, "c-")
+    ax5.set_xlabel("Time (ms)")
+    ax5.set_ylabel("Input Current (A)")
+    ax5.grid(True)
 
     # Adjust layout to prevent overlap
     plt.tight_layout()
