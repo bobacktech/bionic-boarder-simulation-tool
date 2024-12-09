@@ -2,6 +2,7 @@ import sys
 import os
 import argparse
 import struct
+import numpy as np
 
 
 if __name__ == "__main__":
@@ -39,4 +40,37 @@ if __name__ == "__main__":
             unpacked_data = struct.unpack(format_string, chunk)
             data_packet = dict(zip(keys, unpacked_data))
             data_packets.append(data_packet)
+    timestamps = [packet["timestamp"] for packet in data_packets]
     accelerations_x = [packet["acceleration_x"] for packet in data_packets]
+
+    # Use the median absolute deviation method to find the number of spike groups in the x acceleration values
+
+    # Calculate the median and MAD of the entire dataset
+    median = np.median(accelerations_x)
+    mad = np.median(np.abs(accelerations_x - median))
+
+    # Define a threshold for what constitutes a spike
+    # This threshold is the median plus a multiple of the MAD
+    # Adjust the multiplier as needed
+    multiplier = 10
+    threshold = median + multiplier * mad
+
+    # Identify data points above the threshold
+    spikes = np.array(accelerations_x) > threshold
+
+    spike_groups = []
+    current_group = []
+
+    for i, is_spike in enumerate(spikes):
+        if is_spike:
+            t = timestamps[i]
+            current_group.append((t, i))
+        else:
+            if current_group:
+                spike_groups.append(current_group)
+                current_group = []
+    if current_group:
+        spike_groups.append(current_group)
+
+    number_of_spikes = len(spike_groups)
+    print(f"Number of spikes in x acceleration values: {number_of_spikes}")
