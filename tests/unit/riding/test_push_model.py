@@ -1,6 +1,6 @@
 import pytest
-from augmented_skateboarding_simulator.riding.push_model import PushModel
-from augmented_skateboarding_simulator.riding.eboard import EBoard
+from bionic_boarder_simulation_tool.riding.push_model import PushModel
+from bionic_boarder_simulation_tool.riding.eboard import EBoard
 
 
 @pytest.fixture

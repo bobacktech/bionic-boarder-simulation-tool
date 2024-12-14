@@ -3,7 +3,7 @@ from .eboard_kinematic_state import EboardKinematicState
 from threading import Lock, Thread
 import time
 import struct
-from augmented_skateboarding_simulator.mission_elapsed_time import MissionElapsedTime
+from bionic_boarder_simulation_tool.mission_elapsed_time import MissionElapsedTime
 
 
 class EboardStateRecorder:

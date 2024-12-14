@@ -1,7 +1,7 @@
-from augmented_skateboarding_simulator.riding.frictional_deceleration_model import (
+from bionic_boarder_simulation_tool.riding.frictional_deceleration_model import (
     FrictionalDecelerationModel,
 )
-from augmented_skateboarding_simulator.riding.eboard import EBoard
+from bionic_boarder_simulation_tool.riding.eboard import EBoard
 
 
 class TestFrictionalDecelerationModel:

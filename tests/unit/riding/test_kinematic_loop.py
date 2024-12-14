@@ -1,10 +1,10 @@
 import pytest
-from augmented_skateboarding_simulator.riding.kinematic_loop import KinematicLoop
-from augmented_skateboarding_simulator.riding.eboard import EBoard
+from bionic_boarder_simulation_tool.riding.kinematic_loop import KinematicLoop
+from bionic_boarder_simulation_tool.riding.eboard import EBoard
 from unittest.mock import MagicMock
-from augmented_skateboarding_simulator.riding.frictional_deceleration_model import FrictionalDecelerationModel
-from augmented_skateboarding_simulator.riding.push_model import PushModel
-from augmented_skateboarding_simulator.riding.eboard_kinematic_state import EboardKinematicState
+from bionic_boarder_simulation_tool.riding.frictional_deceleration_model import FrictionalDecelerationModel
+from bionic_boarder_simulation_tool.riding.push_model import PushModel
+from bionic_boarder_simulation_tool.riding.eboard_kinematic_state import EboardKinematicState
 from threading import Lock
 import threading
 import time

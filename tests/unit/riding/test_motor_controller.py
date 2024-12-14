@@ -1,7 +1,7 @@
 import pytest
-from augmented_skateboarding_simulator.riding.motor_controller import MotorController
-from augmented_skateboarding_simulator.riding.eboard import EBoard
-from augmented_skateboarding_simulator.riding.eboard_kinematic_state import EboardKinematicState
+from bionic_boarder_simulation_tool.riding.motor_controller import MotorController
+from bionic_boarder_simulation_tool.riding.eboard import EBoard
+from bionic_boarder_simulation_tool.riding.eboard_kinematic_state import EboardKinematicState
 from threading import Lock
 import time
 

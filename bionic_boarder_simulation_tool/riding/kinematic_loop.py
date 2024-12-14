@@ -6,7 +6,7 @@ from .push_model import PushModel
 import time
 from threading import Lock
 import random
-from augmented_skateboarding_simulator.logger import Logger
+from bionic_boarder_simulation_tool.logger import Logger
 
 
 class KinematicLoop:

@@ -3,7 +3,7 @@ from threading import Lock, BoundedSemaphore, Thread, Event
 from .eboard import EBoard
 import math
 import time
-from augmented_skateboarding_simulator.logger import Logger
+from bionic_boarder_simulation_tool.logger import Logger
 
 
 class MotorController:

@@ -1,5 +1,5 @@
 import pytest
-from augmented_skateboarding_simulator.vesc.command_message_processor import (
+from bionic_boarder_simulation_tool.vesc.command_message_processor import (
     CommandMessageProcessor,
 )
 

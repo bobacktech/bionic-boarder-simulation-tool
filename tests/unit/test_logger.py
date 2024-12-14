@@ -1,4 +1,4 @@
-from augmented_skateboarding_simulator.logger import Logger, NullLogger
+from bionic_boarder_simulation_tool.logger import Logger, NullLogger
 import os
 
 

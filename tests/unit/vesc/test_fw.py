@@ -1,5 +1,5 @@
 import pytest
-from augmented_skateboarding_simulator.vesc import fw
+from bionic_boarder_simulation_tool.vesc import fw
 from math import ldexp
 import struct
 import math
@@ -39,6 +39,4 @@ def test_float32_to_bytes_and_back():
 
         # Assert the conversion back to float is accurate within an acceptable error margin
         # Note: Due to floating-point arithmetic precision, a direct comparison might not always work
-        assert math.isclose(
-            val, float_val, rel_tol=1e-6
-        ), f"Original: {val}, Converted: {float_val}"
+        assert math.isclose(val, float_val, rel_tol=1e-6), f"Original: {val}, Converted: {float_val}"

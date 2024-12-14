@@ -31,11 +31,11 @@ def activate_sim_and_bluetooth_socket():
         "run",
         "python",
         "main.py",
-        os.path.expanduser("~/git/augmented-skateboarding-simulator/tests/app_input_arguments_example.json"),
+        os.path.expanduser("~/git/bionic-boarder-simulation-tool/tests/app_input_arguments_example.json"),
         "--enable-logging",
     ]
     sim_process = subprocess.Popen(
-        command, cwd=os.path.expanduser("~/git/augmented-skateboarding-simulator/augmented_skateboarding_simulator")
+        command, cwd=os.path.expanduser("~/git/bionic-boarder-simulation-tool/bionic_boarder_simulation_tool")
     )
     while sim_process.poll() is not None:
         time.sleep(0.2)

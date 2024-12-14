@@ -3,7 +3,7 @@ from threading import Lock
 from threading import Timer
 import sys
 import serial
-from augmented_skateboarding_simulator.logger import Logger
+from bionic_boarder_simulation_tool.logger import Logger
 
 
 class CommandMessageProcessor(ABC):
