@@ -11,8 +11,8 @@ from bionic_boarder_simulation_tool.logger import Logger
 
 class KinematicLoop:
     """
-    This class implements the main loop for the kinematic model of the electric skateboard. It
-    moves the skateboard through time via the provided push model and frictional deceleration model.
+    This class implements the main loop for the kinematic model of the electric land paddle board. It
+    moves the land paddle board through time via the provided push model and frictional deceleration model.
     """
 
     def __init__(
@@ -91,8 +91,8 @@ class KinematicLoop:
                 break
             if self.__eks.input_current > 0:
                 """
-                This means that the electric motor is controlling the skateboard because a current is
-                being injected into the motor. In this case, the skateboard's kinematics will not be
+                This means that the electric motor is controlling the land paddle board because a current is
+                being injected into the motor. In this case, the land paddle board's kinematics will not be
                 adjusted due to frictional forces, gravity, and/or a user's push. Instead, just skip to
                 next iteration of the loop after the fixed time step.
                 """
@@ -122,7 +122,7 @@ class KinematicLoop:
                 force_push_x_N = random.uniform(force_1g_N, 2 * force_1g_N)
                 push_duration_ms = random.randint(400, 600)
                 Logger().logger.info(
-                    "Skateboard push initiated",
+                    "land paddle board push initiated",
                     force_x_of_the_push=force_push_x_N,
                     duration_of_the_push_ms=push_duration_ms,
                 )

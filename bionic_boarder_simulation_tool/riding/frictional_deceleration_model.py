@@ -6,7 +6,7 @@ class FrictionalDecelerationModel:
     Frictional deceleration model
 
     Provides the calculation to determine the velocity reduction due to friction and drag over a fixed time step
-    to subtract from current velocity of the skateboard.
+    to subtract from current velocity of the land paddle board.
     """
 
     GRAVITY = 9.81  # m/s^2
@@ -33,7 +33,7 @@ class FrictionalDecelerationModel:
     def decelerate(self, current_velocity_m_per_s: float, time_step_ms: float) -> tuple[float, float]:
         """
         Args:
-            current_velocity_m_per_s: current velocity of skateboarder in m/s
+            current_velocity_m_per_s: current velocity of land paddle board in m/s
             time_step_ms: time step in milliseconds that the force is applied over
         Return:
             acceleration in m/s^2 due to friction and drag

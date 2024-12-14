@@ -12,7 +12,7 @@ class EboardStateRecorder:
         self.__eks: EboardKinematicState = eks
         self.__eks_lock: Lock = eks_lock
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        self.__record_file_name = f"skateboard_sim_data_recording_{timestamp}.bin"
+        self.__record_file_name = f"sim_data_recording_{timestamp}.bin"
         self.__recording_period_s: float = recording_period_ms / 1000.0
         self.__recording_thread = Thread(target=self.record, daemon=True)
         self.__stop_recording = False

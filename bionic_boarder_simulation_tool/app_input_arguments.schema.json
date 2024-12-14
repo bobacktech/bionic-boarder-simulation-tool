@@ -4,47 +4,47 @@
     "properties": {
       "total_weight_with_rider_kg": {
         "type": "number",
-        "description": "Electric Skateboard Specifics"
+        "description": "Electric Land Paddle Board Specifics"
       },
       "frontal_area_of_rider_m2": {
         "type": "number",
-        "description": "Electric Skateboard Specifics"
+        "description": "Electric Land Paddle Board Specifics"
       },
       "wheel_diameter_m": {
         "type": "number",
-        "description": "Electric Skateboard Specifics"
+        "description": "Electric Land Paddle Board Specifics"
       },
       "battery_max_capacity_Ah": {
         "type": "number",
-        "description": "Electric Skateboard Specifics"
+        "description": "Electric Land Paddle Board Specifics"
       },
       "battery_max_voltage": {
         "type": "number",
-        "description": "Electric Skateboard Specifics"
+        "description": "Electric Land Paddle Board Specifics"
       },
       "gear_ratio": {
         "type": "number",
-        "description": "Electric Skateboard Specifics"
+        "description": "Electric Land Paddle Board Specifics"
       },
       "motor_kv": {
         "type": "integer",
-        "description": "Electric Skateboard Specifics"
+        "description": "Electric Land Paddle Board Specifics"
       },
       "motor_max_torque": {
         "type": "number",
-        "description": "Electric Skateboard Specifics"
+        "description": "Electric Land Paddle Board Specifics"
       },
       "motor_max_amps": {
         "type": "number",
-        "description": "Electric Skateboard Specifics"
+        "description": "Electric Land Paddle Board Specifics"
       },
       "motor_max_power_watts": {
         "type": "number",
-        "description": "Electric Skateboard Specifics"
+        "description": "Electric Land Paddle Board Specifics"
       },
       "motor_pole_pairs": {
         "type": "integer",
-        "description": "Electric Skateboard Specifics"
+        "description": "Electric Land Paddle Board Specifics"
       },
       "com_port": {
         "type": "string",
