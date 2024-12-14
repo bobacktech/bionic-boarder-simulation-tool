@@ -1,6 +1,6 @@
 {"event": "Kinematic loop has started", "level": "info", "timestamp": 1.1920928955078125e-06}
 {"event": "VESC CMP, motor controller, and kinematic loop threads are running.", "level": "info", "timestamp": 9.393692016601562e-05}
-{"event": "Electric Skateboard sim data recorder thread is running.", "level": "info", "timestamp": 0.0002987384796142578}
+{"event": "Sim data recorder thread is running.", "level": "info", "timestamp": 0.0002987384796142578}
 {"command": "STATE", "event": "VESC received command", "level": "info", "timestamp": 1.2341055870056152}
 {"rpm": 0, "motor_current": 0.0, "watt_hours": 0, "CMP": "FW6_00CMP", "event": "Publishing state message", "level": "info", "timestamp": 1.234283685684204}
 {"command": "RPM", "event": "VESC received command", "level": "info", "timestamp": 1.3275134563446045}

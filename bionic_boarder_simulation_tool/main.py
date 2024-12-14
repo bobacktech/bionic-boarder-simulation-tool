@@ -14,7 +14,7 @@ from bionic_boarder_simulation_tool.riding.eboard_state_recorder import EboardSt
 @dataclass(frozen=True)
 class AppInputArguments:
 
-    # Electric Skateboard Specifics
+    # Electric Land Paddle Board Specifics
     total_weight_with_rider_kg: float
     frontal_area_of_rider_m2: float
     wheel_diameter_m: float
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--enable-data-recording",
         action="store_true",
-        help="Enable recording of electric skateboard simulation data if flag is set.",
+        help="Enable recording of simulation data if flag is set.",
     )
     args = parser.parse_args()
     Logger.enabled = args.enable_logging
@@ -132,7 +132,7 @@ if __name__ == "__main__":
         recording_period_ms = app_input_arguments.fixed_time_step_ms * 2
         recorder = EboardStateRecorder(eboard_kinematic_state_lock, eboard_kinematic_state, recording_period_ms)
         recorder.start_recording()
-        logger.info("Electric Skateboard sim data recorder thread is running.")
+        logger.info("Sim data recorder thread is running.")
 
     kinematic_loop_thread.join()
     vesc_command_message_processor_thread.join()

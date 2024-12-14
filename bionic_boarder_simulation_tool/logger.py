@@ -40,7 +40,7 @@ class Logger:
     def _configure(self):
         # Create timestamp for the log file name
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        log_file_name = f"skateboard_sim_{timestamp}.log"
+        log_file_name = f"sim_{timestamp}.log"
 
         # Configure standard logging first
         # Ensure configuration is applied with force=True

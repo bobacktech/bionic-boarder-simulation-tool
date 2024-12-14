@@ -11,7 +11,7 @@ def test_log_messages_to_file():
     Logger._instance = None
     Logger.enabled = True
     logger = Logger().logger
-    log_files = [f for f in os.listdir(".") if f.startswith("skateboard_sim_") and f.endswith(".log")]
+    log_files = [f for f in os.listdir(".") if f.startswith("sim_") and f.endswith(".log")]
     assert len(log_files) > 0, "Log file was not created."
     logger.info("This is an info message")
     logger.info("Test message", value=42)
