@@ -1,5 +1,5 @@
 from .eboard import EBoard
-from augmented_skateboarding_simulator.logger import Logger
+from bionic_boarder_simulation_tool.logger import Logger
 
 
 class PushModel:

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "augmented-skateboarding-simulator"
+name = "bionic-boarder-simulation-tool"
 version = "0.1.0"
 description = ""
 authors = ["bobacktech <bobacktech@gmail.com>"]

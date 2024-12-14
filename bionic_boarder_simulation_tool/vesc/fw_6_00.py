@@ -4,10 +4,10 @@ import struct
 from threading import Lock
 import time
 import math
-from augmented_skateboarding_simulator.riding.battery_discharge_model import BatteryDischargeModel
-from augmented_skateboarding_simulator.riding.eboard_kinematic_state import EboardKinematicState
-from augmented_skateboarding_simulator.riding.motor_controller import MotorController
-from augmented_skateboarding_simulator.logger import Logger
+from bionic_boarder_simulation_tool.riding.battery_discharge_model import BatteryDischargeModel
+from bionic_boarder_simulation_tool.riding.eboard_kinematic_state import EboardKinematicState
+from bionic_boarder_simulation_tool.riding.motor_controller import MotorController
+from bionic_boarder_simulation_tool.logger import Logger
 
 
 class FirmwareMessage:

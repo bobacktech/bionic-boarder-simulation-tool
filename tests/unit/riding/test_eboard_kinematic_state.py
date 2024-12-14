@@ -1,5 +1,5 @@
 import pytest
-from augmented_skateboarding_simulator.riding.eboard_kinematic_state import (
+from bionic_boarder_simulation_tool.riding.eboard_kinematic_state import (
     EboardKinematicState,
 )
 

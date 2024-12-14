@@ -5,10 +5,10 @@ import sys
 import json
 from jsonschema import validate, ValidationError
 import os
-from augmented_skateboarding_simulator.riding import *
-from augmented_skateboarding_simulator.vesc import fw_6_00
-from augmented_skateboarding_simulator.logger import Logger
-from augmented_skateboarding_simulator.riding.eboard_state_recorder import EboardStateRecorder
+from bionic_boarder_simulation_tool.riding import *
+from bionic_boarder_simulation_tool.vesc import fw_6_00
+from bionic_boarder_simulation_tool.logger import Logger
+from bionic_boarder_simulation_tool.riding.eboard_state_recorder import EboardStateRecorder
 
 
 @dataclass(frozen=True)
