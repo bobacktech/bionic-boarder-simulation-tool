@@ -122,7 +122,7 @@ class KinematicLoop:
                 force_push_x_N = random.uniform(force_1g_N, 2 * force_1g_N)
                 push_duration_ms = random.randint(400, 600)
                 Logger().logger.info(
-                    "land paddle board push initiated",
+                    "Land paddle board push initiated",
                     force_x_of_the_push=force_push_x_N,
                     duration_of_the_push_ms=push_duration_ms,
                 )
