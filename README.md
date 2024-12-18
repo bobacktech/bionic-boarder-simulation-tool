@@ -1,6 +1,26 @@
-# Description
+# Bionic Boarder Simulation Tool
 
-This application simulates a person that is normally skateboarding or land paddling on a skateboard that is equipped with an electric motor, a VESC speed controller, and an IMU that is connected to the VESC. The VESC injects a very small amount of current to the motor to allow the skateboard to flow freely like a regular skateboard.  The simulated VESC communicates the motor state and the IMU state over Bluetooth (via a UART to Bluetooth adapter) to another application running on an Android device.  The VESC also receives commands from the other application through the Bluetooth channel to accelerate or decelerate the motor.  When the VESC is commanded to accelerate or decelerate the motor from the Android application, the simulator will not allow the "rider" to accelerate or decelerate the skateboard.
+This simulation is created for the purpose of supporting the development of the Bionic Boarder android application. See [Bionic Boarder](https://github.com/bobacktech/bionic-boarder).
+
+The tool simulates a person riding a land paddling board where the rider accelerates the board with a stick paddle.  In the simulation, the land paddle board is equipped with 
+an electric motor that is controlled by a [VESC speed controller](https://github.com/vedderb/bldc). The VESC also specifically has an integrated IMU on the controller that provides 
+orientation and acceleration data in real time. This application essentially is a 2DOF simulation that computes the acceleration along the long axis of the board and the pitch of the board as the person is paddling the board with a stick on a surface where the slope changes over time. Communication with the simulated VESC is done over bluetooth. The PC that the simulation executes
+on requires an HC-06 UART to classic Bluetooth module connected to the PC using an FTDI USB adapter.  The simulation processes these VESC messages: set current, set rpm, heartbeat, get firmware, get state, and get IMU state.
+
+
+## Software requirements
+
+This project is managed by the Poetry dependency management and packaging system.  All the dependencies for the application are in the pyproject.toml file.
+The minimum python version to use is 3.12.3.
+
+## Running the simulation
+
+*  **No logging:** <p> poetry run python main.py <path-to-app_input_arguments.json>
+
+*  **With logging:** <p> poetry run python main.py <path-to-app_input_arguments.json> --enable-logging
+
+*  **With data recording:** <p> poetry run python main.py <path-to-app_input_arguments.json> --enable-data-recording
+
 
 ## Documentation
 
