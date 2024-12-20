@@ -6,8 +6,7 @@ The tool simulates a person riding a land paddling board where the rider acceler
 an electric motor that is controlled by a [VESC speed controller](https://github.com/vedderb/bldc). The VESC specifically has an integrated IMU on the controller that provides 
 orientation and acceleration data in real time. This application essentially is a 2DOF simulation that computes the acceleration along the long axis of the board
 and the pitch of the board as the person is paddling the board with a stick on a surface where the slope changes over time. Communication with the simulated VESC is done over bluetooth. 
-The PC that the simulation executes on requires an HC-06 UART to classic Bluetooth module connected to the PC using an FTDI USB adapter.  
-The simulation processes these VESC messages from another application: set current, set rpm, heartbeat, get firmware, get state, and get IMU state.
+The PC that the simulation executes on requires an HC-06 UART to classic Bluetooth module connected to the PC using an FTDI USB adapter.  The simulation processes these VESC messages from another application: set current, set rpm, heartbeat, get firmware, get state, and get IMU state.
 
 ### Supported VESC BLDC firmware versions 
 * 6.00
