@@ -2,11 +2,15 @@
 
 This simulation is created for the purpose of supporting the development of the Bionic Boarder android application. See [Bionic Boarder](https://github.com/bobacktech/bionic-boarder).
 
-The tool simulates a person riding a land paddling board where the rider accelerates the board with a stick paddle.  In the simulation, the land paddle board is equipped with 
-an electric motor that is controlled by a [VESC speed controller](https://github.com/vedderb/bldc). The VESC also specifically has an integrated IMU on the controller that provides 
-orientation and acceleration data in real time. This application essentially is a 2DOF simulation that computes the acceleration along the long axis of the board and the pitch of the board as the person is paddling the board with a stick on a surface where the slope changes over time. Communication with the simulated VESC is done over bluetooth. The PC that the simulation executes
-on requires an HC-06 UART to classic Bluetooth module connected to the PC using an FTDI USB adapter.  The simulation processes these VESC messages: set current, set rpm, heartbeat, get firmware, get state, and get IMU state.
+The tool simulates a person riding a land paddling board where the rider accelerates the board with a stick paddle along a non flat terrain.  In the simulation, the land paddle board is equipped with 
+an electric motor that is controlled by a [VESC speed controller](https://github.com/vedderb/bldc). The VESC specifically has an integrated IMU on the controller that provides 
+orientation and acceleration data in real time. This application essentially is a 2DOF simulation that computes the acceleration along the long axis of the board
+and the pitch of the board as the person is paddling the board with a stick on a surface where the slope changes over time. Communication with the simulated VESC is done over bluetooth. 
+The PC that the simulation executes on requires an HC-06 UART to classic Bluetooth module connected to the PC using an FTDI USB adapter.  
+The simulation processes these VESC messages from another application: set current, set rpm, heartbeat, get firmware, get state, and get IMU state.
 
+### Supported VESC BLDC firmware versions 
+* 6.00
 
 ## Software requirements
 
@@ -21,6 +25,9 @@ The minimum python version to use is 3.12.3.
 
 *  **With data recording:** <p> poetry run python main.py <path-to-app_input_arguments.json> --enable-data-recording
 
+## Format for the required inputs to the simulation
+
+* [App Inputs JSON Schema](https://github.com/bobacktech/bionic-boarder-simulation-tool/blob/master/bionic_boarder_simulation_tool/app_input_arguments.schema.json)
 
 ## Documentation
 
