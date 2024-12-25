@@ -1,44 +1,28 @@
-## [2.0.0] - MM-DD-YYYY
+## [1.0.0] - 12-24-2024
+
 ### Added
-- Major new feature: [Description of the feature].
-- Support for [new platform or integration].
-
-### Changed
-- Breaking change: [Description of the breaking change].
-- Refactored [specific module or functionality].
-
-### Removed
-- Deprecated [specific feature or functionality].
-
----
-
-## [1.1.1] - MM-DD-YYYY
-### Fixed
-- Minor bug fix: [Description of the bug fix].
-- Addressed edge case in [specific functionality].
-
----
-
-## [1.1.0] - MM-DD-YYYY
-### Added
-- New feature: [Description of the new feature].
-- Support for [specific enhancement].
-
-### Changed
-- Improved performance of [specific functionality].
-- Updated documentation to reflect new changes.
-
-### Fixed
-- Resolved issue with [specific bug or issue].
-- Fixed compatibility with [specific environment or dependency].
-
----
-
-## [1.0.0] - MM-DD-YYYY
-### Added
-- Initial release of the software.
-- Core functionality implemented, including:
-  - Feature 1
-  - Feature 2
-  - Feature 3
-- Documentation for setup and usage.
+- **Initial release** of the Bionic Boarder Simulation Tool.
+- **Core functionality** includes:
+  - **Supported VESC BLDC messages**:
+    - `GET FIRMWARE`
+    - `GET STATE`
+    - `GET IMU STATE`
+    - `SET RPM`
+    - `SET CURRENT`
+    - `HEARTBEAT`
+  - **Supported VESC BLDC firmware versions**:
+    - Firmware version `6.00`
+  - **Motor control features**:
+    - RPM-based motor control.
+    - Motor current control, currently limited to setting motor current to zero for relinquishing the motor control from the board's wheel.
+  - **Terrain simulation**:
+    - A simple terrain model with a constant slope angle that periodically changes from downhill, flat, and to uphill and vice versa.
+  - **Push simulation**:
+    - A human-like push model to simulate rider acceleration using a stick paddle.
+  - **Environmental effects**:
+    - Basic air resistance and friction model, treating the board and rider as a single rigid body.
+  - **Data logging**:
+    - Kinematic data logging for detailed analysis.
+  - **Analysis scripts**:
+    - Plotting kinematic data from binary data log files.
+    - Detection of long axis acceleration spikes that arise from the rider pushing the board from the acceleration data.
