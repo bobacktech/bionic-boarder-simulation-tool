@@ -131,26 +131,26 @@ class IMUStateMessage:
         """
         buffer = bytearray(68)
 
-        buffer[1:5] = fw.float32_to_bytes(self.__rpy[0])
-        buffer[5:9] = fw.float32_to_bytes(self.__rpy[1])
-        buffer[9:13] = fw.float32_to_bytes(self.__rpy[2])
+        buffer[2:6] = fw.float32_to_bytes(self.__rpy[0])
+        buffer[6:10] = fw.float32_to_bytes(self.__rpy[1])
+        buffer[10:14] = fw.float32_to_bytes(self.__rpy[2])
 
-        buffer[13:17] = fw.float32_to_bytes(self.__acc[0])
-        buffer[17:21] = fw.float32_to_bytes(self.__acc[1])
-        buffer[21:25] = fw.float32_to_bytes(self.__acc[2])
+        buffer[14:18] = fw.float32_to_bytes(self.__acc[0])
+        buffer[18:22] = fw.float32_to_bytes(self.__acc[1])
+        buffer[22:26] = fw.float32_to_bytes(self.__acc[2])
 
-        buffer[25:29] = fw.float32_to_bytes(self.__gyro[0])
-        buffer[29:33] = fw.float32_to_bytes(self.__gyro[1])
-        buffer[33:37] = fw.float32_to_bytes(self.__gyro[2])
+        buffer[26:30] = fw.float32_to_bytes(self.__gyro[0])
+        buffer[30:34] = fw.float32_to_bytes(self.__gyro[1])
+        buffer[34:38] = fw.float32_to_bytes(self.__gyro[2])
 
-        buffer[37:41] = fw.float32_to_bytes(self.__mag[0])
-        buffer[41:45] = fw.float32_to_bytes(self.__mag[1])
-        buffer[45:49] = fw.float32_to_bytes(self.__mag[2])
+        buffer[38:42] = fw.float32_to_bytes(self.__mag[0])
+        buffer[42:46] = fw.float32_to_bytes(self.__mag[1])
+        buffer[46:50] = fw.float32_to_bytes(self.__mag[2])
 
-        buffer[49:53] = fw.float32_to_bytes(self.__q[0])
-        buffer[53:57] = fw.float32_to_bytes(self.__q[1])
-        buffer[57:61] = fw.float32_to_bytes(self.__q[2])
-        buffer[61:65] = fw.float32_to_bytes(self.__q[3])
+        buffer[50:54] = fw.float32_to_bytes(self.__q[0])
+        buffer[54:58] = fw.float32_to_bytes(self.__q[1])
+        buffer[58:62] = fw.float32_to_bytes(self.__q[2])
+        buffer[62:66] = fw.float32_to_bytes(self.__q[3])
 
         return bytes(buffer)
 
