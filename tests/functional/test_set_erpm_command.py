@@ -45,9 +45,9 @@ def test_set_erpm_command(activate_sim_and_bluetooth_socket):
     erpms = []
     currents = []
     for timestamp, byte_array in vsmr.state_msg_buffer:
-        current = (struct.unpack(">I", byte_array[12:16])[0]) / 100.0
+        current = (struct.unpack(">I", byte_array[7:11])[0]) / 100.0
         currents.append(current)
-        erpms.append(struct.unpack(">I", byte_array[30:34])[0])
+        erpms.append(struct.unpack(">I", byte_array[25:29])[0])
     e = erpms[-5:]
     assert all(erpm == e[0] for erpm in e)
     c = currents[-7:]
