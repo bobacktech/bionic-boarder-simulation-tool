@@ -69,12 +69,12 @@ class StateMessage:
             bytes: A bytes object representing the encoded state message, suitable for transmission or processing
                 in accordance with the "COMM_GET_VALUES" message specification of the VESC firmware.
         """
-        buffer = bytearray(76)
+        buffer = bytearray(74)
         wh = int(self.__watt_hours * 10000.0)
         mc = int(self.__motor_current * 100.0)
-        buffer[9:13] = struct.pack(">I", mc)
-        buffer[27:31] = struct.pack(">i", self.__rpm)
-        buffer[41:45] = struct.pack(">I", wh)
+        buffer[4:8] = struct.pack(">I", mc)
+        buffer[22:26] = struct.pack(">i", self.__rpm)
+        buffer[36:40] = struct.pack(">I", wh)
         return bytes(buffer)
 
     @property
