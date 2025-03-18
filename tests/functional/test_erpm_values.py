@@ -16,6 +16,7 @@ def test_erpm_values_without_commanding_motor(activate_sim_and_bluetooth_socket)
     vsmr = vesc_state_msg_requester.VescStateMsgRequester(socket)
     vsmr.send_state_msg_request()
     count = 0
+    time.sleep(5)
     while count < NUMBER_VESC_STATE_MSG_REQUESTS:
         while vsmr.state_msg_received == False:
             app.processEvents()
@@ -25,9 +26,9 @@ def test_erpm_values_without_commanding_motor(activate_sim_and_bluetooth_socket)
     erpms = []
     assert len(vsmr.state_msg_buffer) > 0
     for timestamp, byte_array in vsmr.state_msg_buffer:
-        current = struct.unpack(">I", byte_array[12:16])[0]
+        current = struct.unpack(">I", byte_array[7:11])[0]
         assert current == 0
-        erpms.append(struct.unpack(">i", byte_array[30:34])[0])
+        erpms.append(struct.unpack(">i", byte_array[25:29])[0])
         times.append(timestamp - start_time)
     assert len(times) == len(erpms)
     plt.figure(figsize=(10, 10))

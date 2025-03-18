@@ -35,7 +35,7 @@ def test_increase_decrease_motor_erpm(activate_sim_and_bluetooth_socket):
     while vsmr.state_msg_received == False:
         app.processEvents()
     state_data: QByteArray = vsmr.state_msg_buffer.pop(0)[1]
-    latest_erpm = struct.unpack(">i", state_data[30:34])[0]
+    latest_erpm = struct.unpack(">i", state_data[25:29])[0]
 
     target_erpm = latest_erpm + 20000
     command = bytearray([8]) + bytearray(target_erpm.to_bytes(4, "big"))

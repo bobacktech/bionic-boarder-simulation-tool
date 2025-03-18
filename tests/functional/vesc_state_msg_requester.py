@@ -20,7 +20,7 @@ class VescStateMsgRequester:
     def on_data_received(self):
         if self.socket.bytesAvailable():
             self.in_data += self.socket.readAll()
-        if len(self.in_data) == 79:
+        if len(self.in_data) == 77:
             id = int.from_bytes(self.in_data[2])
             assert id == 4
             temp: Tuple[int, QByteArray] = (int(time.time() * 1000), QByteArray(self.in_data))
