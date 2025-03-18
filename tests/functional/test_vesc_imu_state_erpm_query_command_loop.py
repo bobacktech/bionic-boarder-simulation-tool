@@ -53,7 +53,7 @@ def test_vesc_imu_state_erpm_query_command_loop(activate_sim_and_bluetooth_socke
         state_data: QByteArray = vsmr.state_msg_buffer.pop(0)[1]
         imu_state_data: QByteArray = vismr.imu_state_msg_buffer.pop(0)[1]
         erpm = struct.unpack(">i", state_data[25:29])[0]
-        x_accel = struct.unpack(">f", imu_state_data[16:20])[0]
+        x_accel = struct.unpack(">f", imu_state_data[17:21])[0]
         if i == 9:
             last_x_accel_value_after_erpm_command_sent = x_accel
             commanded_erpm: int = erpm + 5000

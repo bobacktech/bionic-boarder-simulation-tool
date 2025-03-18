@@ -27,8 +27,8 @@ def test_x_axis_accel_and_pitch_values(activate_sim_and_bluetooth_socket):
     pitchs = []
     assert len(vismr.imu_state_msg_buffer) > 0
     for timestamp, byte_array in vismr.imu_state_msg_buffer:
-        x_accels.append(struct.unpack(">f", byte_array[16:20])[0])
-        pitchs.append(struct.unpack(">f", byte_array[8:12])[0] * 180.0 / math.pi)
+        x_accels.append(struct.unpack(">f", byte_array[17:21])[0])
+        pitchs.append(struct.unpack(">f", byte_array[9:13])[0] * 180.0 / math.pi)
         times.append(timestamp - start_time)
     assert len(times) == len(pitchs)
     assert len(times) == len(x_accels)

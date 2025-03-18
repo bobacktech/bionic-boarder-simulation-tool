@@ -113,12 +113,12 @@ class TestIMUStateMessage:
 
         # Fetch the buffer
         buf = message.buffer
-        yaw = bytes_to_float32(struct.unpack(">I", buf[9:13])[0])
+        yaw = bytes_to_float32(struct.unpack(">I", buf[10:14])[0])
         assert yaw == message.rpy[2]
-        acc_z = bytes_to_float32(struct.unpack(">I", buf[21:25])[0])
+        acc_z = bytes_to_float32(struct.unpack(">I", buf[22:26])[0])
         assert math.isclose(acc_z, message.acc[2], rel_tol=1e-6)
-        q1 = bytes_to_float32(struct.unpack(">I", buf[49:53])[0])
-        assert math.isclose(q1, message.q[0], rel_tol=1e-6)
+        q0 = bytes_to_float32(struct.unpack(">I", buf[50:54])[0])
+        assert math.isclose(q0, message.q[0], rel_tol=1e-6)
 
 
 """ 
