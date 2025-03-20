@@ -32,3 +32,4 @@ class EboardKinematicState:
     """Electric Motor State"""
     erpm: int = 0
     input_current: float = 0.0
+    motor_current: float = 0.0
