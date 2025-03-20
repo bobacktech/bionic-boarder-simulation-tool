@@ -217,7 +217,7 @@ class FW6_00CMP(CommandMessageProcessor):
     def _publish_state(self):
         sm = StateMessage()
         self.__eks_lock.acquire()
-        sm.motor_current = self.__eks.input_current
+        sm.motor_current = self.__eks.motor_current
         sm.rpm = self.__eks.erpm
         self.__eks_lock.release()
         sm.watt_hours = self.__bdm.get_watt_hours_consumed()

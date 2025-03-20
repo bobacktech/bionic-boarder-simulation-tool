@@ -1,6 +1,7 @@
 import pytest
 from unittest import mock
 import struct
+from bionic_boarder_simulation_tool.riding.frictional_deceleration_model import FrictionalDecelerationModel
 from bionic_boarder_simulation_tool.vesc.fw_6_00 import (
     FirmwareMessage,
     StateMessage,
@@ -171,7 +172,7 @@ def test_imu_state_command(mock_serial):
 
 
 def test_update_current(mock_serial):
-    eks = EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0)
+    eks = EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     eks_lock = Lock()
     eb = EBoard(
         total_weight_with_rider_kg=80.0,
@@ -186,7 +187,8 @@ def test_update_current(mock_serial):
         motor_max_power_watts=500.0,
         motor_pole_pairs=7,
     )
-    mc = MotorController(eb, eks, eks_lock)
+    fdm = FrictionalDecelerationModel(mu_rolling=0.01, c_drag=0.8, eboard=eb)
+    mc = MotorController(eb, eks, eks_lock, fdm)
     mc.control_time_step_ms = 20
     mc.start()
     eks.input_current = 45.0
@@ -202,7 +204,7 @@ def test_update_current(mock_serial):
 
 
 def test_update_rpm(mock_serial):
-    eks = EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0)
+    eks = EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     eks_lock = Lock()
     eb = EBoard(
         total_weight_with_rider_kg=80.0,
@@ -217,7 +219,8 @@ def test_update_rpm(mock_serial):
         motor_max_power_watts=500.0,
         motor_pole_pairs=7,
     )
-    mc = MotorController(eb, eks, eks_lock)
+    fdm = FrictionalDecelerationModel(mu_rolling=0.01, c_drag=0.8, eboard=eb)
+    mc = MotorController(eb, eks, eks_lock, fdm)
     mc.control_time_step_ms = 20
     mc.start()
     assert eks.erpm == 0

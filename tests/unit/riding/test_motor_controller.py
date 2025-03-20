@@ -1,4 +1,5 @@
 import pytest
+from bionic_boarder_simulation_tool.riding.frictional_deceleration_model import FrictionalDecelerationModel
 from bionic_boarder_simulation_tool.riding.motor_controller import MotorController
 from bionic_boarder_simulation_tool.riding.eboard import EBoard
 from bionic_boarder_simulation_tool.riding.eboard_kinematic_state import EboardKinematicState
@@ -8,7 +9,7 @@ import time
 
 @pytest.fixture
 def eks():
-    return EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0)
+    return EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
 
 class TestMotorController:
@@ -26,7 +27,8 @@ class TestMotorController:
             motor_max_power_watts=500.0,
             motor_pole_pairs=7,
         )
-        mc = MotorController(eboard, eks, Lock())
+        fdm = FrictionalDecelerationModel(0.3, 0.5, eboard)
+        mc = MotorController(eboard, eks, Lock(), fdm)
         erpm_per_sec_1 = mc.erpm_per_sec
         assert mc.erpm_per_sec > 0
         eboard = EBoard(
@@ -42,7 +44,7 @@ class TestMotorController:
             motor_max_power_watts=500.0,
             motor_pole_pairs=7,
         )
-        mc = MotorController(eboard, eks, Lock())
+        mc = MotorController(eboard, eks, Lock(), fdm)
         erpm_per_sec_2 = mc.erpm_per_sec
         assert erpm_per_sec_1 < erpm_per_sec_2
 
@@ -60,7 +62,8 @@ class TestMotorController:
             motor_max_power_watts=500.0,
             motor_pole_pairs=7,
         )
-        mc = MotorController(eboard, eks, Lock())
+        fdm = FrictionalDecelerationModel(0.3, 0.5, eboard)
+        mc = MotorController(eboard, eks, Lock(), fdm)
         assert mc.current_sem._value == 1
         assert mc.erpm_sem._value == 1
         assert mc._MotorController__current_thread.is_alive() == False
@@ -84,7 +87,8 @@ class TestMotorController:
             motor_max_power_watts=500.0,
             motor_pole_pairs=7,
         )
-        mc = MotorController(eboard, eks, Lock())
+        fdm = FrictionalDecelerationModel(0.3, 0.5, eboard)
+        mc = MotorController(eboard, eks, Lock(), fdm)
         mc.control_time_step_ms = 20
         mc.start()
         time.sleep(0.1)
@@ -110,7 +114,8 @@ class TestMotorController:
             motor_pole_pairs=7,
         )
         eks_lock = Lock()
-        mc = MotorController(eboard, eks, eks_lock)
+        fdm = FrictionalDecelerationModel(0.3, 0.5, eboard)
+        mc = MotorController(eboard, eks, eks_lock, fdm)
         mc.control_time_step_ms = 20
         mc.start()
         mc.target_erpm = 2000
@@ -137,7 +142,8 @@ class TestMotorController:
             motor_pole_pairs=7,
         )
         eks_lock = Lock()
-        mc = MotorController(eboard, eks, eks_lock)
+        fdm = FrictionalDecelerationModel(0.3, 0.5, eboard)
+        mc = MotorController(eboard, eks, eks_lock, fdm)
         mc.control_time_step_ms = 20
         mc.start()
         mc.target_erpm = 2000
@@ -172,7 +178,8 @@ class TestMotorController:
             motor_pole_pairs=7,
         )
         eks_lock = Lock()
-        mc = MotorController(eboard, eks, eks_lock)
+        fdm = FrictionalDecelerationModel(0.3, 0.5, eboard)
+        mc = MotorController(eboard, eks, eks_lock, fdm)
         eks.input_current = 10.0
         mc.target_current = 0.0
         mc.start()

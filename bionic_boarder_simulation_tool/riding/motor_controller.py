@@ -1,3 +1,4 @@
+from bionic_boarder_simulation_tool.riding.frictional_deceleration_model import FrictionalDecelerationModel
 from .eboard_kinematic_state import EboardKinematicState
 from threading import Lock, BoundedSemaphore, Thread, Event
 from .eboard import EBoard
@@ -8,10 +9,16 @@ from bionic_boarder_simulation_tool.logger import Logger
 
 class MotorController:
 
-    def __init__(self, eb: EBoard, eks: EboardKinematicState, eks_lock: Lock) -> None:
+    def __init__(self, eb: EBoard, eks: EboardKinematicState, eks_lock: Lock, fdm: FrictionalDecelerationModel) -> None:
         self.__eks = eks
         self.__eks_lock = eks_lock
         self.__eb = eb
+        self.__fdm = fdm
+
+        # Specify motor efficiency. This is an estimate to be used for any motor setup.
+        self.__motor_efficiency = 0.90
+        # Specify controller efficiency. This is an estimate for the VESC controller
+        self.__controller_efficiency = 0.97
 
         # Compute max acceleration the motor can move this particular eboard in ERPM/sec
         wheel_radius = eb.wheel_diameter_m / 2
@@ -77,12 +84,24 @@ class MotorController:
                         (math.pi * self.__eb.wheel_diameter_m) / 60
                     )
                     mechanical_rpm = self.__eks.erpm / self.__eb.motor_pole_pairs
-                    mechanical_rad_per_sec = (mechanical_rpm * 2 * math.pi) / 60
+                    motor_angular_velocity_rad_per_sec = (mechanical_rpm * 2 * math.pi) / 60
                     wheel_radius_m = self.__eb.wheel_diameter_m / 2
+                    wheel_speed_m_per_sec = (motor_angular_velocity_rad_per_sec / self.__eb.gear_ratio) * wheel_radius_m
+                    total_resistive_force_N = (
+                        self.__fdm.decelerate(wheel_speed_m_per_sec, self.__control_time_step_sec * 1000.0)[0]
+                        * self.__eb.total_weight_with_rider_kg
+                    )
+                    wheel_torque_Nm = total_resistive_force_N * wheel_radius_m
+                    motor_torque_Nm = wheel_torque_Nm / self.__eb.gear_ratio
+                    motor_kt = 60 / (2 * math.pi * self.__eb.motor_kv)
+                    self.__eks.motor_current = motor_torque_Nm / motor_kt
+                    mechanical_power = motor_torque_Nm * motor_angular_velocity_rad_per_sec
+                    self.__eks.input_current = mechanical_power / (
+                        self.__eb.battery_max_voltage * self.__motor_efficiency * self.__controller_efficiency
+                    )
+
                     gravitational_force_N = self.__eb.total_weight_with_rider_kg * 9.81
                     torque_required_Nm = (gravitational_force_N * wheel_radius_m) / self.__eb.gear_ratio
-                    power_required_watts = torque_required_Nm * mechanical_rad_per_sec
-                    self.__eks.input_current = power_required_watts / self.__eb.battery_max_voltage
                     # Calculate linear acceleration in m/s^2
                     force_required_N = torque_required_Nm / wheel_radius_m
                     self.__eks.acceleration_x = force_required_N / self.__eb.total_weight_with_rider_kg
