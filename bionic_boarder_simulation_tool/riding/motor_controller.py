@@ -15,6 +15,11 @@ class MotorController:
         self.__eb = eb
         self.__fdm = fdm
 
+        # Specify motor efficiency. This is an estimate to be used for any motor setup.
+        self.__motor_efficiency = 0.90
+        # Specify controller efficiency. This is an estimate for the VESC controller
+        self.__controller_efficiency = 0.97
+
         # Compute max acceleration the motor can move this particular eboard in ERPM/sec
         wheel_radius = eb.wheel_diameter_m / 2
         torque_at_wheel = eb.motor_max_torque * eb.gear_ratio
@@ -90,10 +95,13 @@ class MotorController:
                     motor_torque_Nm = wheel_torque_Nm / self.__eb.gear_ratio
                     motor_kt = 60 / (2 * math.pi * self.__eb.motor_kv)
                     self.__eks.motor_current = motor_torque_Nm / motor_kt
+                    mechanical_power = motor_torque_Nm * motor_angular_velocity_rad_per_sec
+                    self.__eks.input_current = mechanical_power / (
+                        self.__eb.battery_max_voltage * self.__motor_efficiency * self.__controller_efficiency
+                    )
+
                     gravitational_force_N = self.__eb.total_weight_with_rider_kg * 9.81
                     torque_required_Nm = (gravitational_force_N * wheel_radius_m) / self.__eb.gear_ratio
-                    power_required_watts = torque_required_Nm * motor_angular_velocity_rad_per_sec
-                    self.__eks.input_current = power_required_watts / self.__eb.battery_max_voltage
                     # Calculate linear acceleration in m/s^2
                     force_required_N = torque_required_Nm / wheel_radius_m
                     self.__eks.acceleration_x = force_required_N / self.__eb.total_weight_with_rider_kg
