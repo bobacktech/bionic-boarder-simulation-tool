@@ -62,6 +62,7 @@ class MotorController:
             target_erpm = self.__target_erpm
             with self.__eks_lock:
                 starting_erpm = self.__eks.erpm
+                previous_velocity_m_per_s = self.__eks.velocity
             if starting_erpm == self.__target_erpm:
                 continue
             Logger().logger.info(
@@ -87,10 +88,10 @@ class MotorController:
                     motor_angular_velocity_rad_per_sec = (mechanical_rpm * 2 * math.pi) / 60
                     wheel_radius_m = self.__eb.wheel_diameter_m / 2
                     wheel_speed_m_per_sec = (motor_angular_velocity_rad_per_sec / self.__eb.gear_ratio) * wheel_radius_m
-                    total_resistive_force_N = (
-                        self.__fdm.decelerate(wheel_speed_m_per_sec, self.__control_time_step_sec * 1000.0)[0]
-                        * self.__eb.total_weight_with_rider_kg
-                    )
+                    frictional_acceleration_m_per_s2 = self.__fdm.decelerate(
+                        wheel_speed_m_per_sec, self.__control_time_step_sec * 1000.0
+                    )[0]
+                    total_resistive_force_N = frictional_acceleration_m_per_s2 * self.__eb.total_weight_with_rider_kg
                     wheel_torque_Nm = total_resistive_force_N * wheel_radius_m
                     motor_torque_Nm = wheel_torque_Nm / self.__eb.gear_ratio
                     motor_kt = 60 / (2 * math.pi * self.__eb.motor_kv)
@@ -99,12 +100,11 @@ class MotorController:
                     self.__eks.input_current = mechanical_power / (
                         self.__eb.battery_max_voltage * self.__motor_efficiency * self.__controller_efficiency
                     )
-
-                    gravitational_force_N = self.__eb.total_weight_with_rider_kg * 9.81
-                    torque_required_Nm = (gravitational_force_N * wheel_radius_m) / self.__eb.gear_ratio
-                    # Calculate linear acceleration in m/s^2
-                    force_required_N = torque_required_Nm / wheel_radius_m
-                    self.__eks.acceleration_x = force_required_N / self.__eb.total_weight_with_rider_kg
+                    motor_acceleration_m_per_s2 = (
+                        self.__eks.velocity - previous_velocity_m_per_s
+                    ) / self.__control_time_step_sec
+                    self.__eks.acceleration_x = motor_acceleration_m_per_s2 - frictional_acceleration_m_per_s2
+                    previous_velocity_m_per_s = self.__eks.velocity
                 last_erpm_value += erpm_step
                 if self.__target_erpm != target_erpm:
                     target_erpm = self.__target_erpm
