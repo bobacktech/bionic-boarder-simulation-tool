@@ -28,7 +28,7 @@ if __name__ == "__main__":
         "roll",
         "yaw",
         "erpm",
-        "input_current",
+        "motor_current",
     ]
     data_packets = []
 
