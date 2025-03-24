@@ -44,7 +44,7 @@ class EboardStateRecorder:
                     self.__eks.roll,
                     self.__eks.yaw,
                     self.__eks.erpm,
-                    self.__eks.input_current,
+                    self.__eks.motor_current,
                 )
             f.write(eks_bytes)
             if self.__stop_recording:
