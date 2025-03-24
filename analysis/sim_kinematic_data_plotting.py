@@ -26,7 +26,7 @@ if __name__ == "__main__":
         "roll",
         "yaw",
         "erpm",
-        "input_current",
+        "motor_current",
     ]
     data_packets = []
 
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     accelerations_x = [packet["acceleration_x"] for packet in data_packets]
     pitches = [packet["pitch"] for packet in data_packets]
     erpms = [packet["erpm"] for packet in data_packets]
-    input_currents = [packet["input_current"] for packet in data_packets]
+    input_currents = [packet["motor_current"] for packet in data_packets]
 
     # Create figure and subplots
     fig, (ax1, ax2, ax3, ax4, ax5) = plt.subplots(5, 1, figsize=(10, 15), sharex=True)
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     # Plot 5: Input Current vs Time
     ax5.plot(timestamps, input_currents, "c-")
     ax5.set_xlabel("Time (ms)")
-    ax5.set_ylabel("Input Current (A)")
+    ax5.set_ylabel("Motor Current (A)")
     ax5.grid(True)
 
     # Adjust layout to prevent overlap
