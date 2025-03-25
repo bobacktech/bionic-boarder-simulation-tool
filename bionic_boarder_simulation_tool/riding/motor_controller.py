@@ -131,8 +131,6 @@ class MotorController:
                 Logger().logger.info("Current control has set motor current to 0")
             else:
                 raise ValueError("Target Current must be set to 0.0")
-            with self.__eks_lock:
-                self.__eks.motor_current = self.__target_current
 
     @property
     def control_time_step_ms(self) -> int:
