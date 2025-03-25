@@ -155,11 +155,11 @@ class TestKinematicLoop:
         kloop.slope_range_bound_deg = 10
         kloop.push_period_sec = 0.1
         kloop.theta_slope_period_sec = 0.1
-        eks.input_current = 20.0
+        eks.motor_current = 20.0
         eks.velocity = 2.5
         t = threading.Thread(target=kloop.loop)
         t.start()
         time.sleep(0.3)
         kloop.stop()
         assert eks.velocity == 2.5
-        assert eks.input_current > 0
+        assert eks.motor_current > 0

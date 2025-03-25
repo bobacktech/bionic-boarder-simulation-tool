@@ -180,7 +180,7 @@ class TestMotorController:
         eks_lock = Lock()
         fdm = FrictionalDecelerationModel(0.3, 0.5, eboard)
         mc = MotorController(eboard, eks, eks_lock, fdm)
-        eks.input_current = 10.0
+        eks.motor_current = 10.0
         mc.target_current = 0.0
         mc.start()
         mc.current_sem.release()

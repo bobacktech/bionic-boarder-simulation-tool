@@ -191,15 +191,15 @@ def test_update_current(mock_serial):
     mc = MotorController(eb, eks, eks_lock, fdm)
     mc.control_time_step_ms = 20
     mc.start()
-    eks.input_current = 45.0
+    eks.motor_current = 45.0
     cmp = FW6_00CMP("COM1", 230400, 8, eks, eks_lock, BatteryDischargeModel(42.0), mc)
     current = 0.0
     temp = int(current * 1000)
     command = bytes(3) + temp.to_bytes(4, "big")
     cmp._update_current(command)
-    while eks.input_current > current:
+    while eks.motor_current > current:
         pass
-    assert eks.input_current == mc.target_current
+    assert eks.motor_current == mc.target_current
     mc.stop()
 
 

@@ -111,6 +111,7 @@ class MotorController:
                     erpm_step = erpm_step if last_erpm_value < target_erpm else -erpm_step
                 if self.__zero_current_flag:
                     with self.__eks_lock:
+                        self.__eks.motor_current = 0.0
                         self.__eks.input_current = 0.0
                     break
             Logger().logger.info(
@@ -131,7 +132,7 @@ class MotorController:
             else:
                 raise ValueError("Target Current must be set to 0.0")
             with self.__eks_lock:
-                self.__eks.input_current = self.__target_current
+                self.__eks.motor_current = self.__target_current
 
     @property
     def control_time_step_ms(self) -> int:

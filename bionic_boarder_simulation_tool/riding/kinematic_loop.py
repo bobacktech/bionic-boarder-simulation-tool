@@ -89,7 +89,7 @@ class KinematicLoop:
         while True:
             if not self.__loop_active:
                 break
-            if self.__eks.input_current > 0:
+            if self.__eks.motor_current > 0:
                 """
                 This means that the electric motor is controlling the land paddle board because a current is
                 being injected into the motor. In this case, the land paddle board's kinematics will not be
