@@ -12,7 +12,7 @@ if __name__ == "__main__":
         print(f"File {args.sim_data_file} does not exist.")
         sys.exit(1)
     # Define the format string used for packing the data
-    format_string = "d f f f f f f f i f"
+    format_string = "d f f f f f f f i f f"
     # Calculate the size of each data packet
     packet_size = struct.calcsize(format_string)
     # Define the keys for the dictionary
@@ -27,6 +27,7 @@ if __name__ == "__main__":
         "yaw",
         "erpm",
         "motor_current",
+        "input_current",
     ]
     data_packets = []
 
@@ -47,7 +48,7 @@ if __name__ == "__main__":
     input_currents = [packet["motor_current"] for packet in data_packets]
 
     # Create figure and subplots
-    fig, (ax1, ax2, ax3, ax4, ax5) = plt.subplots(5, 1, figsize=(10, 15), sharex=True)
+    fig, (ax1, ax2, ax3, ax4, ax5, ax6) = plt.subplots(6, 1, figsize=(10, 15), sharex=True)
     fig.suptitle("Vehicle Telemetry Data")
 
     # Plot 1: Velocity vs Time
@@ -71,11 +72,17 @@ if __name__ == "__main__":
     ax4.set_ylabel("ERPM")
     ax4.grid(True)
 
-    # Plot 5: Input Current vs Time
+    # Plot 5: Motor Current vs Time
     ax5.plot(timestamps, input_currents, "c-")
     ax5.set_xlabel("Time (ms)")
     ax5.set_ylabel("Motor Current (A)")
     ax5.grid(True)
+
+    # Plot 6: Input Current vs Time
+    ax6.plot(timestamps, input_currents, "c-")
+    ax6.set_xlabel("Time (ms)")
+    ax6.set_ylabel("Input Current (A)")
+    ax6.grid(True)
 
     # Adjust layout to prevent overlap
     plt.tight_layout()
