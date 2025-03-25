@@ -19,7 +19,7 @@ def test_record():
     eboard_state_recorder.stop_recording()
     time.sleep(0.02)
     assert os.path.exists(eboard_state_recorder.record_file_name)
-    format_string = "d f f f f f f f i f"
+    format_string = "d f f f f f f f i f f"
     previous_timestamp = 0.0
     with open(eboard_state_recorder.record_file_name, "rb") as file:
         while True:

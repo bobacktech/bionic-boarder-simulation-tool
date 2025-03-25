@@ -34,7 +34,7 @@ class EboardStateRecorder:
             with self.__eks_lock:
                 timestamp = MissionElapsedTime().elapsed_time_sec
                 eks_bytes = struct.pack(
-                    "d f f f f f f f i f",
+                    "d f f f f f f f i f f",
                     timestamp,
                     self.__eks.velocity,
                     self.__eks.acceleration_x,
@@ -45,6 +45,7 @@ class EboardStateRecorder:
                     self.__eks.yaw,
                     self.__eks.erpm,
                     self.__eks.motor_current,
+                    self.__eks.input_current,
                 )
             f.write(eks_bytes)
             if self.__stop_recording:
