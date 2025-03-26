@@ -1,4 +1,4 @@
-## [1.0.0] - TBD
+## [1.0.0] - 03/26/2025
 
 ### Added
 - **Initial release** of the Bionic Boarder Simulation Tool.
