@@ -14,7 +14,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # Define the format string used for packing the data
-    format_string = "d f f f f f f f i f"
+    format_string = "d f f f f f f f i f f"
     # Calculate the size of each data packet
     packet_size = struct.calcsize(format_string)
     # Define the keys for the dictionary
@@ -29,6 +29,7 @@ if __name__ == "__main__":
         "yaw",
         "erpm",
         "motor_current",
+        "input_current",
     ]
     data_packets = []
 
