@@ -1,0 +1,131 @@
+{"event": "Kinematic loop has started", "level": "info", "timestamp": 7.152557373046875e-07}
+{"event": "VESC CMP, motor controller, and kinematic loop threads are running.", "level": "info", "timestamp": 5.91278076171875e-05}
+{"event": "Sim data recorder thread is running.", "level": "info", "timestamp": 0.0002338886260986328}
+{"theta_slope_deg": -6.4923402852705685, "event": "Calculated new theta slope value", "level": "info", "timestamp": 5.0527729988098145}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 10.108550071716309}
+{"theta_slope_deg": 13.260500837607779, "event": "Calculated new theta slope value", "level": "info", "timestamp": 15.153398275375366}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 20.195119857788086}
+{"theta_slope_deg": 4.144732532504083, "event": "Calculated new theta slope value", "level": "info", "timestamp": 25.234647512435913}
+{"force_x_of_the_push": 822.1528224438256, "duration_of_the_push_ms": 590, "event": "Land paddle board push initiated", "level": "info", "timestamp": 30.223365783691406}
+{"push_active": true, "initial_slowdown_duration_ms": 59.0, "rider_accel_ms2": 10.962037632584341, "event": "Land paddle board push setup", "level": "info", "timestamp": 30.22347903251648}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 30.28370714187622}
+{"push_active": false, "event": "Land paddle board push finished", "level": "info", "timestamp": 30.867023706436157}
+{"theta_slope_deg": 3.139016900097097, "event": "Calculated new theta slope value", "level": "info", "timestamp": 35.327666997909546}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 40.37203669548035}
+{"theta_slope_deg": -5.463680903492747, "event": "Calculated new theta slope value", "level": "info", "timestamp": 45.41535234451294}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 50.46181344985962}
+{"theta_slope_deg": 4.755908386632381, "event": "Calculated new theta slope value", "level": "info", "timestamp": 55.50841665267944}
+{"force_x_of_the_push": 1159.570479317276, "duration_of_the_push_ms": 488, "event": "Land paddle board push initiated", "level": "info", "timestamp": 60.440831422805786}
+{"push_active": true, "initial_slowdown_duration_ms": 48.800000000000004, "rider_accel_ms2": 15.460939724230348, "event": "Land paddle board push setup", "level": "info", "timestamp": 60.44096112251282}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 60.56151556968689}
+{"push_active": false, "event": "Land paddle board push finished", "level": "info", "timestamp": 60.97417640686035}
+{"theta_slope_deg": -12.826048275352761, "event": "Calculated new theta slope value", "level": "info", "timestamp": 65.61501359939575}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 70.66781997680664}
+{"theta_slope_deg": 2.311116852438076, "event": "Calculated new theta slope value", "level": "info", "timestamp": 75.72294783592224}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 80.7744562625885}
+{"theta_slope_deg": -5.508225399978276, "event": "Calculated new theta slope value", "level": "info", "timestamp": 85.82088923454285}
+{"force_x_of_the_push": 1313.7270365106021, "duration_of_the_push_ms": 458, "event": "Land paddle board push initiated", "level": "info", "timestamp": 90.68965864181519}
+{"push_active": true, "initial_slowdown_duration_ms": 45.800000000000004, "rider_accel_ms2": 17.51636048680803, "event": "Land paddle board push setup", "level": "info", "timestamp": 90.68979907035828}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 90.87067294120789}
+{"push_active": false, "event": "Land paddle board push finished", "level": "info", "timestamp": 91.19253015518188}
+{"theta_slope_deg": 3.010735961787667, "event": "Calculated new theta slope value", "level": "info", "timestamp": 95.92075681686401}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 100.97364592552185}
+{"theta_slope_deg": 14.961765527460294, "event": "Calculated new theta slope value", "level": "info", "timestamp": 106.02089285850525}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 111.07534909248352}
+{"theta_slope_deg": -14.02760692354326, "event": "Calculated new theta slope value", "level": "info", "timestamp": 116.12450981140137}
+{"force_x_of_the_push": 1218.7457173888972, "duration_of_the_push_ms": 479, "event": "Land paddle board push initiated", "level": "info", "timestamp": 120.93268585205078}
+{"push_active": true, "initial_slowdown_duration_ms": 47.9, "rider_accel_ms2": 16.24994289851863, "event": "Land paddle board push setup", "level": "info", "timestamp": 120.93280744552612}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 121.1742422580719}
+{"push_active": false, "event": "Land paddle board push finished", "level": "info", "timestamp": 121.45625305175781}
+{"theta_slope_deg": 2.5165924942090356, "event": "Calculated new theta slope value", "level": "info", "timestamp": 126.22868466377258}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 131.27933812141418}
+{"theta_slope_deg": -7.703267972198119, "event": "Calculated new theta slope value", "level": "info", "timestamp": 136.32831001281738}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 141.3778440952301}
+{"theta_slope_deg": -7.135576048623226, "event": "Calculated new theta slope value", "level": "info", "timestamp": 146.42764449119568}
+{"force_x_of_the_push": 993.2632170317436, "duration_of_the_push_ms": 584, "event": "Land paddle board push initiated", "level": "info", "timestamp": 151.17540621757507}
+{"push_active": true, "initial_slowdown_duration_ms": 58.4, "rider_accel_ms2": 13.243509560423247, "event": "Land paddle board push setup", "level": "info", "timestamp": 151.17552256584167}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 151.47704887390137}
+{"push_active": false, "event": "Land paddle board push finished", "level": "info", "timestamp": 151.82034754753113}
+{"theta_slope_deg": 1.367428948846893, "event": "Calculated new theta slope value", "level": "info", "timestamp": 156.52761816978455}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 161.58024764060974}
+{"theta_slope_deg": -7.537348626012518, "event": "Calculated new theta slope value", "level": "info", "timestamp": 166.63134169578552}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 171.68512558937073}
+{"theta_slope_deg": 3.9181897426430226, "event": "Calculated new theta slope value", "level": "info", "timestamp": 176.73508071899414}
+{"force_x_of_the_push": 1388.2924463847626, "duration_of_the_push_ms": 600, "event": "Land paddle board push initiated", "level": "info", "timestamp": 181.4194633960724}
+{"push_active": true, "initial_slowdown_duration_ms": 60.0, "rider_accel_ms2": 18.510565951796835, "event": "Land paddle board push setup", "level": "info", "timestamp": 181.41957998275757}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 181.78155612945557}
+{"push_active": false, "event": "Land paddle board push finished", "level": "info", "timestamp": 182.07375645637512}
+{"theta_slope_deg": 11.160510592653782, "event": "Calculated new theta slope value", "level": "info", "timestamp": 186.83784937858582}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 191.89351344108582}
+{"theta_slope_deg": -2.533163128618517, "event": "Calculated new theta slope value", "level": "info", "timestamp": 196.94270205497742}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 201.99468636512756}
+{"theta_slope_deg": 2.587956613056111, "event": "Calculated new theta slope value", "level": "info", "timestamp": 207.05109238624573}
+{"force_x_of_the_push": 1373.7772430449995, "duration_of_the_push_ms": 506, "event": "Land paddle board push initiated", "level": "info", "timestamp": 211.67695665359497}
+{"push_active": true, "initial_slowdown_duration_ms": 50.60000000000001, "rider_accel_ms2": 18.31702990726666, "event": "Land paddle board push setup", "level": "info", "timestamp": 211.67708134651184}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 212.09935808181763}
+{"push_active": false, "event": "Land paddle board push finished", "level": "info", "timestamp": 212.23076033592224}
+{"theta_slope_deg": 3.327545187349294, "event": "Calculated new theta slope value", "level": "info", "timestamp": 217.14842534065247}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 222.20287585258484}
+{"theta_slope_deg": -11.306487913499872, "event": "Calculated new theta slope value", "level": "info", "timestamp": 227.2496554851532}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 232.30088877677917}
+{"theta_slope_deg": -8.198614830957116, "event": "Calculated new theta slope value", "level": "info", "timestamp": 237.3494188785553}
+{"force_x_of_the_push": 966.5283056992832, "duration_of_the_push_ms": 540, "event": "Land paddle board push initiated", "level": "info", "timestamp": 241.9178023338318}
+{"push_active": true, "initial_slowdown_duration_ms": 54.00000000000001, "rider_accel_ms2": 12.887044075990444, "event": "Land paddle board push setup", "level": "info", "timestamp": 241.91792106628418}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 242.4006860256195}
+{"push_active": false, "event": "Land paddle board push finished", "level": "info", "timestamp": 242.5112807750702}
+{"theta_slope_deg": 8.630487556547052, "event": "Calculated new theta slope value", "level": "info", "timestamp": 247.45458698272705}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 252.51136374473572}
+{"theta_slope_deg": -3.7404360856214147, "event": "Calculated new theta slope value", "level": "info", "timestamp": 257.56317257881165}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 262.6165614128113}
+{"theta_slope_deg": -13.404186109622898, "event": "Calculated new theta slope value", "level": "info", "timestamp": 267.6665847301483}
+{"force_x_of_the_push": 1214.891567908152, "duration_of_the_push_ms": 565, "event": "Land paddle board push initiated", "level": "info", "timestamp": 272.17332649230957}
+{"push_active": true, "initial_slowdown_duration_ms": 56.49999999999999, "rider_accel_ms2": 16.19855423877536, "event": "Land paddle board push setup", "level": "info", "timestamp": 272.1734530925751}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 272.71739077568054}
+{"push_active": false, "event": "Land paddle board push finished", "level": "info", "timestamp": 272.7978661060333}
+{"theta_slope_deg": -6.639933474051414, "event": "Calculated new theta slope value", "level": "info", "timestamp": 277.7689735889435}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 282.8188900947571}
+{"theta_slope_deg": 12.816908511138507, "event": "Calculated new theta slope value", "level": "info", "timestamp": 287.87143325805664}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 292.91928935050964}
+{"theta_slope_deg": -12.675391575731926, "event": "Calculated new theta slope value", "level": "info", "timestamp": 297.96607303619385}
+{"force_x_of_the_push": 1349.9614127389023, "duration_of_the_push_ms": 517, "event": "Land paddle board push initiated", "level": "info", "timestamp": 302.41200733184814}
+{"push_active": true, "initial_slowdown_duration_ms": 51.7, "rider_accel_ms2": 17.999485503185362, "event": "Land paddle board push setup", "level": "info", "timestamp": 302.4121298789978}
+{"push_active": false, "event": "Land paddle board push finished", "level": "info", "timestamp": 302.976820230484}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 303.01702308654785}
+{"theta_slope_deg": 7.389829880373753, "event": "Calculated new theta slope value", "level": "info", "timestamp": 308.06965231895447}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 313.1271560192108}
+{"theta_slope_deg": 10.297705723533706, "event": "Calculated new theta slope value", "level": "info", "timestamp": 318.17613911628723}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 323.2253477573395}
+{"theta_slope_deg": -9.128840901394417, "event": "Calculated new theta slope value", "level": "info", "timestamp": 328.2675325870514}
+{"force_x_of_the_push": 993.241256041538, "duration_of_the_push_ms": 590, "event": "Land paddle board push initiated", "level": "info", "timestamp": 332.6532893180847}
+{"push_active": true, "initial_slowdown_duration_ms": 59.0, "rider_accel_ms2": 13.243216747220506, "event": "Land paddle board push setup", "level": "info", "timestamp": 332.65341448783875}
+{"push_active": false, "event": "Land paddle board push finished", "level": "info", "timestamp": 333.29729294776917}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 333.31739711761475}
+{"theta_slope_deg": -2.6862809415294375, "event": "Calculated new theta slope value", "level": "info", "timestamp": 338.36729526519775}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 343.4230420589447}
+{"theta_slope_deg": -3.030120810710775, "event": "Calculated new theta slope value", "level": "info", "timestamp": 348.47414779663086}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 353.52676463127136}
+{"theta_slope_deg": -14.136317005435453, "event": "Calculated new theta slope value", "level": "info", "timestamp": 358.5777180194855}
+{"force_x_of_the_push": 1390.0468970842915, "duration_of_the_push_ms": 531, "event": "Land paddle board push initiated", "level": "info", "timestamp": 362.90469622612}
+{"push_active": true, "initial_slowdown_duration_ms": 53.10000000000001, "rider_accel_ms2": 18.533958627790554, "event": "Land paddle board push setup", "level": "info", "timestamp": 362.90481638908386}
+{"push_active": false, "event": "Land paddle board push finished", "level": "info", "timestamp": 363.48978900909424}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 363.63135957717896}
+{"theta_slope_deg": 14.266443812932366, "event": "Calculated new theta slope value", "level": "info", "timestamp": 368.68451619148254}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 373.7397472858429}
+{"theta_slope_deg": -7.283893757368328, "event": "Calculated new theta slope value", "level": "info", "timestamp": 378.7901017665863}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 383.84194803237915}
+{"theta_slope_deg": -13.897024866745152, "event": "Calculated new theta slope value", "level": "info", "timestamp": 388.89359641075134}
+{"force_x_of_the_push": 912.0676201297466, "duration_of_the_push_ms": 577, "event": "Land paddle board push initiated", "level": "info", "timestamp": 393.15512800216675}
+{"push_active": true, "initial_slowdown_duration_ms": 57.7, "rider_accel_ms2": 12.160901601729956, "event": "Land paddle board push setup", "level": "info", "timestamp": 393.1552517414093}
+{"push_active": false, "event": "Land paddle board push finished", "level": "info", "timestamp": 393.7893452644348}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 393.9406416416168}
+{"theta_slope_deg": 4.3120604396728694, "event": "Calculated new theta slope value", "level": "info", "timestamp": 398.9916536808014}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 404.04416823387146}
+{"theta_slope_deg": -13.964179419945001, "event": "Calculated new theta slope value", "level": "info", "timestamp": 409.09129571914673}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 414.14369916915894}
+{"theta_slope_deg": -1.7683207467235071, "event": "Calculated new theta slope value", "level": "info", "timestamp": 419.1902985572815}
+{"force_x_of_the_push": 1469.8450052188205, "duration_of_the_push_ms": 438, "event": "Land paddle board push initiated", "level": "info", "timestamp": 423.391813993454}
+{"push_active": true, "initial_slowdown_duration_ms": 43.800000000000004, "rider_accel_ms2": 19.597933402917604, "event": "Land paddle board push setup", "level": "info", "timestamp": 423.39193630218506}
+{"push_active": false, "event": "Land paddle board push finished", "level": "info", "timestamp": 423.87490940093994}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 424.2372009754181}
+{"theta_slope_deg": -8.711026926379745, "event": "Calculated new theta slope value", "level": "info", "timestamp": 429.2808835506439}
+{"theta_slope_deg": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 434.33336067199707}
