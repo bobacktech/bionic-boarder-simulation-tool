@@ -4,6 +4,7 @@ from threading import Timer
 import sys
 import serial
 from bionic_boarder_simulation_tool.logger import Logger
+import os
 
 
 class CommandMessageProcessor(ABC):
@@ -159,4 +160,8 @@ class CommandMessageProcessor(ABC):
         """
         If heartbeat message has not been received within the specified timeout, terminate the simulation.
         """
-        sys.exit()
+        Logger().logger.error(
+            "Heartbeat command was not received in time. Simulation has terminated.",
+            command=CommandMessageProcessor.HEARTBEAT,
+        )
+        os._exit(1)
