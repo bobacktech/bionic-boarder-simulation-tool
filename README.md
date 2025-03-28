@@ -1,15 +1,30 @@
 # Bionic Boarder Simulation Tool
 
-This simulation is created for the purpose of supporting the development of the Bionic Boarder android application. See [Bionic Boarder](https://github.com/bobacktech/bionic-boarder).
+This simulation tool's purpose is to support the ongoing development of the [Bionic Boarder](https://github.com/bobacktech/bionic-boarder) Android application.
 
-The tool simulates a person riding a land paddling board where the rider accelerates the board with a stick paddle along a non flat terrain.  In the simulation, the land paddle board is equipped with 
-an electric motor that is controlled by a [VESC speed controller](https://github.com/vedderb/bldc). The VESC specifically has an integrated IMU on the controller that provides 
-orientation and acceleration data in real time. This application essentially is a 2DOF simulation that computes the acceleration along the long axis of the board
-and the pitch of the board as the person is paddling the board with a stick on a surface where the slope changes over time. Communication with the simulated VESC is done over bluetooth. 
-The PC that the simulation executes on requires an HC-06 UART to classic Bluetooth module connected to the PC using an FTDI USB adapter.  The simulation processes these VESC messages from another application: set current, set rpm, heartbeat, get firmware, get state, and get IMU state.
+The simulation models a rider operating a land paddle board, where propulsion is achieved using a stick paddle across a dynamically varying terrain.  At the start of the simulation, the rider is stationary. The terrain slope changes randomly at periodic intervals, and the rider applies paddle strokes at regular intervals as well. Movement of the board is driven by a combination of gravitational force and rider input.
+
+Key parameters computed over time include the board’s velocity and acceleration along its longitudinal (nose-to-tail) axis, as well as the pitch angle relative to that axis.
+
+The simulated board is also equipped with an electric motor controlled by a [VESC speed controller](https://github.com/vedderb/bldc). The VESC includes an integrated IMU (Inertial Measurement Unit) that provides real-time orientation and acceleration data. In the simulation, the IMU is oriented such that the x-axis aligns with the board’s longitudinal axis, the y-axis spans the width of the board, and the z-axis points vertically through the board.
+
+The motor controller is emulated with a simplified ERPM (Electrical RPM) control scheme, allowing external applications to control the board’s speed in response to rider input. This enables testing and development of control strategies for the Bionic Boarder system.
+
+The simulation supports the following VESC communication commands:
+
+*  **COMM_FW_VERSION**
+*  **COMM_GET_VALUES**
+*  **COMM_GET_IMU_DATA**
+*  **COMM_SET_CURRENT**
+*  **COMM_SET_RPM**
+*  **COMM_ALIVE**
+
+See VESC BLDC [datatypes.h](https://github.com/vedderb/bldc/blob/release_6_00/datatypes.h) for more details about the above commands.
+
+Communication with the simulated VESC is done over classic Bluetooth. The PC that the simulation executes on requires an HC-06 (or equivalent) UART to classic Bluetooth module connected to the PC using an FTDI USB adapter.  
 
 ### Supported VESC BLDC firmware versions 
-* 6.00
+* [6.00](https://github.com/vedderb/bldc/tree/release_6_00)
 
 ## Software requirements
 
@@ -23,6 +38,8 @@ The minimum python version to use is 3.12.3.
 *  **With logging:** <p> poetry run python main.py <path-to-app_input_arguments.json> --enable-logging
 
 *  **With data recording:** <p> poetry run python main.py <path-to-app_input_arguments.json> --enable-data-recording
+
+*  **With data recording and logging:** <p> poetry run python main.py <path-to-app_input_arguments.json> --enable-data-recording --enable-logging
 
 ## Format for the required inputs to the simulation
 
