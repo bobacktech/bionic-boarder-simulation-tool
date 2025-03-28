@@ -1,13 +1,12 @@
 # Bionic Boarder Simulation Tool
 
-This simulation is created for the purpose of supporting the development of the Bionic Boarder android application. See [Bionic Boarder](https://github.com/bobacktech/bionic-boarder).
+This simulation is created for the purpose of supporting the development of the [Bionic Boarder](https://github.com/bobacktech/bionic-boarder) android application.
 
 The tool simulates a person riding a land paddle board where the rider accelerates the board with a stick paddle along a non flat terrain.  When the simulation starts, the rider is not moving. The slope of the terrain changes randomly and at a fixed frequency. The rider pushes the board with the stick paddle on a periodic basis.  Gravity and/or the rider is responsible
 for moving the board. The primary parameters that are computed over time from the rider and/or gravity moving the board are velocity along nose/long axis of the board, acceleration along the nose/long axis of the board, and the pitch relative to the long axis of the board.
 
 
-Additionally, in the simulation, the land paddle board is equipped with an electric motor that is controlled by a [VESC speed controller](https://github.com/vedderb/bldc). The VESC specifically has an integrated IMU on the controller that provides orientation and acceleration data in real time. The IMU is situated on the board such that the x-axis is along the nose/long axis of the board, the y-axis is along the width of the board, and the z-axis is up through the board itself.  The emulation of the VESC controller has a simplified motor controller that provides ERPM control to change the speed 
-of the motor. The purpose for the VESC in the simulation is to allow for an external application to control board's movement as the rider paddles the board. 
+Additionally, in the simulation, the land paddle board is equipped with an electric motor that is controlled by a [VESC speed controller](https://github.com/vedderb/bldc). The VESC specifically has an integrated IMU on the controller that provides orientation and acceleration data in real time. The IMU is situated on the board such that the x-axis is along the nose/long axis of the board, the y-axis is along the width of the board, and the z-axis is up through the board itself.  The emulation of the VESC controller has a simplified motor controller that provides ERPM control to change the speed of the motor. The purpose for the VESC in the simulation is to allow for an external application to control the board's movement as the rider paddles the board. 
 
 The following VESC commands are processed by the simulation:
 
