@@ -1,15 +1,15 @@
-## [1.0.0] - 03/26/2025
+## [1.0.0] - 03/29/2025
 
 ### Added
 - **Initial release** of the Bionic Boarder Simulation Tool.
 - **Core functionality** includes:
-  - **Supported VESC BLDC messages**:
-    - `GET FIRMWARE`
-    - `GET STATE`
-    - `GET IMU STATE`
-    - `SET RPM`
-    - `SET CURRENT`
-    - `HEARTBEAT`
+  - **Supported VESC BLDC commands**:
+    - `COMM_FW_VERSION`
+    - `COMM_GET_VALUES`
+    - `COMM_GET_IMU_DATA`
+    - `COMM_SET_RPM`
+    - `COMM_SET_CURRENT`
+    - `COMM_ALIVE`
   - **Supported VESC BLDC firmware versions**:
     - Firmware version `6.00`
   - **Motor control features**:
