@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
-from threading import Lock
 from threading import Timer
-import sys
 import serial
 from bionic_boarder_simulation_tool.logger import Logger
 import os
@@ -25,6 +23,7 @@ class CommandMessageProcessor(ABC):
     FIRMWARE = "FIRMWARE"
     STATE = "STATE"
     IMU_STATE = "IMU STATE"
+    BIONIC_BOARDER = "BIONIC BOARDER"
 
     @property
     @abstractmethod
@@ -69,6 +68,7 @@ class CommandMessageProcessor(ABC):
         handler = {
             CommandMessageProcessor.STATE: lambda: self._publish_state(),
             CommandMessageProcessor.IMU_STATE: lambda: self._publish_imu_state(),
+            CommandMessageProcessor.BIONIC_BOARDER: lambda: self._publish_bionic_boarder(),
             CommandMessageProcessor.FIRMWARE: lambda: self._publish_firmware(),
             CommandMessageProcessor.CURRENT: lambda: self._update_current(command_bytes),
             CommandMessageProcessor.RPM: lambda: self._update_rpm(command_bytes),
@@ -108,6 +108,13 @@ class CommandMessageProcessor(ABC):
     def _publish_imu_state(self):
         """
         Abstract method to publish the 'IMU state' message.
+        """
+        pass
+
+    @abstractmethod
+    def _publish_bionic_boarder(self):
+        """
+        Abstract method to publish the 'bionic boarder' message.
         """
         pass
 
