@@ -32,6 +32,9 @@ class TestCommandMessageProcessor(CommandMessageProcessor):
     def _publish_imu_state(self):
         pass
 
+    def _publish_bionic_boarder(self):
+        pass
+
     def _publish_firmware(self):
         pass
 

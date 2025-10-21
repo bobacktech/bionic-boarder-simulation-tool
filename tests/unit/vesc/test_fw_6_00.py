@@ -6,6 +6,7 @@ from bionic_boarder_simulation_tool.vesc.fw_6_00 import (
     FirmwareMessage,
     StateMessage,
     IMUStateMessage,
+    BionicBoarderMessage,
     FW6_00CMP,
 )
 from math import ldexp
@@ -120,6 +121,34 @@ class TestIMUStateMessage:
         assert math.isclose(acc_z, message.acc[2], rel_tol=1e-6)
         q0 = bytes_to_float32(struct.unpack(">I", buf[50:54])[0])
         assert math.isclose(q0, message.q[0], rel_tol=1e-6)
+
+
+class TestBionicBoarderMessage:
+    def test_buffer_property(self):
+        """Test the buffer property to ensure correct byte structure."""
+        message = BionicBoarderMessage()
+
+        message.motor_current = 12.34
+        message.duty_cycle = 0.567
+        message.rpm = 1500
+        message.acc[0] = 0.1
+        message.acc[1] = 0.2
+        message.acc[2] = 0.3
+        message.rpy[0] = 1.0
+        message.rpy[1] = 2.0
+        message.rpy[2] = 3.0
+
+        buf = message.buffer
+        motor_current = struct.unpack(">i", buf[0:4])[0] / 100.0
+        assert math.isclose(motor_current, message.motor_current, rel_tol=1e-6)
+        duty_cycle = struct.unpack(">h", buf[4:6])[0] / 1000.0
+        assert math.isclose(duty_cycle, message.duty_cycle, rel_tol=1e-6)
+        rpm = struct.unpack(">i", buf[6:10])[0]
+        assert rpm == message.rpm
+        acc_z = bytes_to_float32(struct.unpack(">I", buf[18:22])[0])
+        assert math.isclose(acc_z, message.acc[2], rel_tol=1e-6)
+        yaw = bytes_to_float32(struct.unpack(">I", buf[30:34])[0])
+        assert math.isclose(yaw, message.rpy[2], rel_tol=1e-6)
 
 
 """ 

@@ -2,7 +2,6 @@ from . import fw
 from .command_message_processor import CommandMessageProcessor
 import struct
 from threading import Lock
-import time
 import math
 from bionic_boarder_simulation_tool.riding.battery_discharge_model import BatteryDischargeModel
 from bionic_boarder_simulation_tool.riding.eboard_kinematic_state import EboardKinematicState
@@ -175,6 +174,83 @@ class IMUStateMessage:
         return self.__q
 
 
+class BionicBoarderMessage:
+    """
+    See the "COMM_BIONIC_BOARDER_DATA" message specification in [commands.c](https://github.com/vedderb/bldc/blob/6.00/comm/commands.c)
+    in VESC bldc-6.00 source code on Github.
+
+    Note: This message is not defined yet in the VESC BLDC firmware; this class is created for simulation purposes, for now.
+    """
+
+    def __init__(self) -> None:
+        # Motor Dynamics Data
+        self.__motor_current: float = 0
+        self.__duty_cycle: float = 0.0
+        self.__rpm: int = 0
+
+        # IMU Data
+        self.__rpy = [0.0, 0.0, 0.0]  # Roll, pitch, yaw in radians
+        self.__acc = [0.0, 0.0, 0.0]  # Accelerometer data (x, y, z) in m/s^2
+
+    @property
+    def buffer(self) -> bytes:
+        """
+        Serializes the Bionic Boarder message into a bytes object.
+
+        This serialization includes motor dynamics data (motor current, duty cycle, RPM)
+        and IMU data (roll, pitch, yaw, accelerometer data), formatted according to the
+        specifications in the VESC bldc-6.00 source code.
+
+        Returns:
+            bytes: A bytes object containing the serialized Bionic Boarder message data.
+        """
+        buffer = bytearray(34)
+        mc = int(self.__motor_current * 100.0)
+        buffer[0:4] = struct.pack(">i", mc)
+        dc = int(self.__duty_cycle * 1000.0)
+        buffer[4:6] = struct.pack(">h", dc)
+        buffer[6:10] = struct.pack(">i", self.__rpm)
+        buffer[10:14] = fw.float32_to_bytes(self.__acc[0])
+        buffer[14:18] = fw.float32_to_bytes(self.__acc[1])
+        buffer[18:22] = fw.float32_to_bytes(self.__acc[2])
+        buffer[22:26] = fw.float32_to_bytes(self.__rpy[0])
+        buffer[26:30] = fw.float32_to_bytes(self.__rpy[1])
+        buffer[30:34] = fw.float32_to_bytes(self.__rpy[2])
+        return bytes(buffer)
+
+    @property
+    def rpm(self) -> int:
+        return self.__rpm
+
+    @rpm.setter
+    def rpm(self, value: int) -> None:
+        self.__rpm = value
+
+    @property
+    def motor_current(self) -> float:
+        return self.__motor_current
+
+    @motor_current.setter
+    def motor_current(self, value: float) -> None:
+        self.__motor_current = value
+
+    @property
+    def duty_cycle(self) -> float:
+        return self.__duty_cycle
+
+    @duty_cycle.setter
+    def duty_cycle(self, value: float) -> None:
+        self.__duty_cycle = value
+
+    @property
+    def rpy(self):
+        return self.__rpy
+
+    @property
+    def acc(self):
+        return self.__acc
+
+
 class FW6_00CMP(CommandMessageProcessor):
     def __init__(
         self,
@@ -194,6 +270,7 @@ class FW6_00CMP(CommandMessageProcessor):
             0: CommandMessageProcessor.FIRMWARE,
             4: CommandMessageProcessor.STATE,
             65: CommandMessageProcessor.IMU_STATE,
+            164: CommandMessageProcessor.BIONIC_BOARDER,
         }
         self.__packet_header = lambda id, l: int.to_bytes(2) + int.to_bytes(l) + int.to_bytes(id)
         self.__eks = eks
@@ -242,6 +319,26 @@ class FW6_00CMP(CommandMessageProcessor):
         self.serial.write(packet)
         Logger().logger.info(
             "Publishing IMU state message", imu_acc=imu.acc, imu_rpy=imu.rpy, CMP=self.__class__.__name__
+        )
+
+    def _publish_bionic_boarder(self):
+        bb = BionicBoarderMessage()
+        with self.__eks_lock:
+            bb.motor_current = self.__eks.motor_current
+            bb.rpm = self.__eks.erpm
+            bb.acc[0] = self.__eks.acceleration_x
+            bb.rpy[1] = self.__eks.pitch * (math.pi / 180.0)
+        msg_data = bb.buffer
+        packet = self.__packet_header(66, len(msg_data)) + msg_data
+        self.serial.write(packet)
+        Logger().logger.info(
+            "Publishing Bionic Boarder message",
+            motor_current=bb.motor_current,
+            duty_cycle=bb.duty_cycle,
+            rpm=bb.rpm,
+            imu_acc=bb.acc,
+            imu_rpy=bb.rpy,
+            CMP=self.__class__.__name__,
         )
 
     def _publish_firmware(self):
