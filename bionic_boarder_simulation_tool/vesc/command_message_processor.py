@@ -22,7 +22,6 @@ class CommandMessageProcessor(ABC):
     # Message request commands
     FIRMWARE = "FIRMWARE"
     STATE = "STATE"
-    IMU_STATE = "IMU STATE"
     BIONIC_BOARDER = "BIONIC BOARDER"
 
     @property
@@ -67,7 +66,6 @@ class CommandMessageProcessor(ABC):
         command_bytes = None
         handler = {
             CommandMessageProcessor.STATE: lambda: self._publish_state(),
-            CommandMessageProcessor.IMU_STATE: lambda: self._publish_imu_state(),
             CommandMessageProcessor.BIONIC_BOARDER: lambda: self._publish_bionic_boarder(),
             CommandMessageProcessor.FIRMWARE: lambda: self._publish_firmware(),
             CommandMessageProcessor.CURRENT: lambda: self._update_current(command_bytes),
@@ -101,13 +99,6 @@ class CommandMessageProcessor(ABC):
     def _publish_state(self):
         """
         Abstract method to publish the 'state' message.
-        """
-        pass
-
-    @abstractmethod
-    def _publish_imu_state(self):
-        """
-        Abstract method to publish the 'IMU state' message.
         """
         pass
 
