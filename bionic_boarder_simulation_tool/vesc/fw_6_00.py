@@ -101,79 +101,6 @@ class StateMessage:
         self.__watt_hours = value
 
 
-class IMUStateMessage:
-    """
-    See the "COMM_GET_IMU_DATA" message specification in [commands.c](https://github.com/vedderb/bldc/blob/6.00/comm/commands.c)
-    in VESC bldc-6.00 source code on Github.
-    """
-
-    def __init__(self) -> None:
-        self.__rpy = [0.0, 0.0, 0.0]  # Roll, pitch, yaw
-        self.__acc = [0.0, 0.0, 0.0]  # Accelerometer data
-        self.__gyro = [0.0, 0.0, 0.0]  # Gyroscope data
-        self.__mag = [0.0, 0.0, 0.0]  # Magnetometer data
-        self.__q = [0.0, 0.0, 0.0, 0.0]  # Quaternion data
-
-    @property
-    def buffer(self) -> bytes:
-        """
-        Serializes the IMU state into a bytes object.
-
-        The serialization format includes roll, pitch, yaw, accelerometer data,
-        gyroscope data, magnetometer data, and quaternion data, each converted
-        to bytes using the floating-point to bytes conversion method provided
-        by the `fw` module. This format is compliant with the "COMM_GET_IMU_DATA"
-        message specification in the VESC bldc-6.00 source code.
-
-        Returns:
-            bytes: A bytes object containing the serialized IMU state data.
-        """
-        buffer = bytearray(68)
-
-        buffer[2:6] = fw.float32_to_bytes(self.__rpy[0])
-        buffer[6:10] = fw.float32_to_bytes(self.__rpy[1])
-        buffer[10:14] = fw.float32_to_bytes(self.__rpy[2])
-
-        buffer[14:18] = fw.float32_to_bytes(self.__acc[0])
-        buffer[18:22] = fw.float32_to_bytes(self.__acc[1])
-        buffer[22:26] = fw.float32_to_bytes(self.__acc[2])
-
-        buffer[26:30] = fw.float32_to_bytes(self.__gyro[0])
-        buffer[30:34] = fw.float32_to_bytes(self.__gyro[1])
-        buffer[34:38] = fw.float32_to_bytes(self.__gyro[2])
-
-        buffer[38:42] = fw.float32_to_bytes(self.__mag[0])
-        buffer[42:46] = fw.float32_to_bytes(self.__mag[1])
-        buffer[46:50] = fw.float32_to_bytes(self.__mag[2])
-
-        buffer[50:54] = fw.float32_to_bytes(self.__q[0])
-        buffer[54:58] = fw.float32_to_bytes(self.__q[1])
-        buffer[58:62] = fw.float32_to_bytes(self.__q[2])
-        buffer[62:66] = fw.float32_to_bytes(self.__q[3])
-
-        return bytes(buffer)
-
-    @property
-    def rpy(self):
-        return self.__rpy
-
-    @property
-    def acc(self):
-        return self.__acc
-
-    @property
-    def gyro(self):
-        return self.__gyro
-
-    @property
-    def mag(self):
-        return self.__mag
-
-    @property
-    def q(self):
-        return self.__q
-
-
 class BionicBoarderMessage:
     """
     See the "COMM_BIONIC_BOARDER_DATA" message specification in [commands.c](https://github.com/vedderb/bldc/blob/6.00/comm/commands.c)
@@ -269,7 +196,6 @@ class FW6_00CMP(CommandMessageProcessor):
             30: CommandMessageProcessor.HEARTBEAT,
             0: CommandMessageProcessor.FIRMWARE,
             4: CommandMessageProcessor.STATE,
-            65: CommandMessageProcessor.IMU_STATE,
             164: CommandMessageProcessor.BIONIC_BOARDER,
         }
         self.__packet_header = lambda id, l: int.to_bytes(2) + int.to_bytes(l) + int.to_bytes(id)
@@ -307,18 +233,6 @@ class FW6_00CMP(CommandMessageProcessor):
             motor_current=sm.motor_current,
             watt_hours=sm.watt_hours,
             CMP=self.__class__.__name__,
-        )
-
-    def _publish_imu_state(self):
-        imu = IMUStateMessage()
-        with self.__eks_lock:
-            imu.acc[0] = self.__eks.acceleration_x
-            imu.rpy[1] = self.__eks.pitch * (math.pi / 180.0)
-        msg_data = imu.buffer
-        packet = self.__packet_header(65, len(msg_data)) + msg_data
-        self.serial.write(packet)
-        Logger().logger.info(
-            "Publishing IMU state message", imu_acc=imu.acc, imu_rpy=imu.rpy, CMP=self.__class__.__name__
         )
 
     def _publish_bionic_boarder(self):

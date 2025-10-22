@@ -13,7 +13,6 @@ class TestCommandMessageProcessor(CommandMessageProcessor):
             4: CommandMessageProcessor.HEARTBEAT,
             5: CommandMessageProcessor.FIRMWARE,
             6: CommandMessageProcessor.STATE,
-            7: CommandMessageProcessor.IMU_STATE,
         }
 
     @property
@@ -27,9 +26,6 @@ class TestCommandMessageProcessor(CommandMessageProcessor):
         return 1  # Mocked to always return a specific command ID
 
     def _publish_state(self):
-        pass
-
-    def _publish_imu_state(self):
         pass
 
     def _publish_bionic_boarder(self):
@@ -96,18 +92,9 @@ def test_handle_command_state(processor, mocker):
     processor._publish_state.assert_called_once()
 
 
-def test_handle_command_imu_state(processor, mocker):
-    mocker.patch.object(processor, "_publish_imu_state", autospec=True)
-    mocker.patch.object(processor, "_get_command_id", return_value=7)
-    with pytest.raises(StopIteration):
-        processor.handle_command()
-    processor._publish_imu_state.assert_called_once()
-
-
 def test_command_id_names(processor):
     assert processor._command_id_name[2] == CommandMessageProcessor.CURRENT
     assert processor._command_id_name[3] == CommandMessageProcessor.RPM
     assert processor._command_id_name[4] == CommandMessageProcessor.HEARTBEAT
     assert processor._command_id_name[5] == CommandMessageProcessor.FIRMWARE
     assert processor._command_id_name[6] == CommandMessageProcessor.STATE
-    assert processor._command_id_name[7] == CommandMessageProcessor.IMU_STATE

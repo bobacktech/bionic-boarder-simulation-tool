@@ -1,11 +1,9 @@
 import pytest
-from unittest import mock
 import struct
 from bionic_boarder_simulation_tool.riding.frictional_deceleration_model import FrictionalDecelerationModel
 from bionic_boarder_simulation_tool.vesc.fw_6_00 import (
     FirmwareMessage,
     StateMessage,
-    IMUStateMessage,
     BionicBoarderMessage,
     FW6_00CMP,
 )
@@ -13,7 +11,6 @@ from math import ldexp
 import struct
 import math
 from threading import Lock
-import time
 from bionic_boarder_simulation_tool.riding.battery_discharge_model import BatteryDischargeModel
 from bionic_boarder_simulation_tool.riding.eboard_kinematic_state import EboardKinematicState
 from bionic_boarder_simulation_tool.riding.motor_controller import MotorController
@@ -91,38 +88,6 @@ def bytes_to_float32(res: int) -> float:
     return ldexp(sig, e)
 
 
-class TestIMUStateMessage:
-    def test_buffer_property(self):
-        """Test the buffer property to ensure correct byte structure."""
-        message = IMUStateMessage()
-
-        message.rpy[0] = 1.0
-        message.rpy[1] = 2.0
-        message.rpy[2] = 3.0
-        message.acc[0] = 0.1
-        message.acc[1] = 0.2
-        message.acc[2] = 0.3
-        message.gyro[0] = 0.01
-        message.gyro[1] = 0.02
-        message.gyro[2] = 0.03
-        message.mag[0] = 0.4
-        message.mag[1] = 0.5
-        message.mag[2] = 0.6
-        message.q[0] = 1.25
-        message.q[1] = 0
-        message.q[2] = 0
-        message.q[3] = 0
-
-        # Fetch the buffer
-        buf = message.buffer
-        yaw = bytes_to_float32(struct.unpack(">I", buf[10:14])[0])
-        assert yaw == message.rpy[2]
-        acc_z = bytes_to_float32(struct.unpack(">I", buf[22:26])[0])
-        assert math.isclose(acc_z, message.acc[2], rel_tol=1e-6)
-        q0 = bytes_to_float32(struct.unpack(">I", buf[50:54])[0])
-        assert math.isclose(q0, message.q[0], rel_tol=1e-6)
-
-
 class TestBionicBoarderMessage:
     def test_buffer_property(self):
         """Test the buffer property to ensure correct byte structure."""
@@ -188,15 +153,6 @@ def test_state_command(mock_serial):
     )
     cmp._publish_state()
     data = b"\x02J\x04" + bytes(74)
-    mock_serial.return_value.write.assert_called_once_with(data)
-
-
-def test_imu_state_command(mock_serial):
-    cmp = FW6_00CMP(
-        "COM1", 230400, 8, EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0), Lock(), BatteryDischargeModel(42.0), None
-    )
-    cmp._publish_imu_state()
-    data = b"\x02DA" + bytes(68)
     mock_serial.return_value.write.assert_called_once_with(data)
 
 
