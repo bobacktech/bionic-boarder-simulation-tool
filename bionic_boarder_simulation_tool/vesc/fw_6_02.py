@@ -165,6 +165,14 @@ class StateMessage:
         self.__duty_cycle_now = value
 
     @property
+    def rpm(self) -> int:
+        return self.__rpm
+
+    @rpm.setter
+    def rpm(self, value: int) -> None:
+        self.__rpm = value
+
+    @property
     def vin(self) -> float:
         return self.__vin
 
@@ -187,6 +195,14 @@ class StateMessage:
     @amp_hours_charged.setter
     def amp_hours_charged(self, value: float) -> None:
         self.__amp_hours_charged = value
+
+    @property
+    def watt_hours(self) -> float:
+        return self.__watt_hours
+
+    @watt_hours.setter
+    def watt_hours(self, value: float) -> None:
+        self.__watt_hours = value
 
     @property
     def watt_hours_charged(self) -> float:
@@ -357,9 +373,17 @@ class BionicBoarderMessage:
     def rpy(self):
         return self.__rpy
 
+    @rpy.setter
+    def rpy(self, value):
+        self.__rpy = value
+
     @property
     def acc(self):
         return self.__acc
+
+    @acc.setter
+    def acc(self, value):
+        self.__acc = value
 
 
 class FW6_02CMP(CommandMessageProcessor):
