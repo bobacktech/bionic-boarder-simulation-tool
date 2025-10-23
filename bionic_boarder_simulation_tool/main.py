@@ -8,6 +8,7 @@ import os
 from bionic_boarder_simulation_tool.riding import *
 from bionic_boarder_simulation_tool.vesc import fw_6_00
 from bionic_boarder_simulation_tool.vesc import fw_6_02
+from bionic_boarder_simulation_tool.vesc import fw_6_05
 from bionic_boarder_simulation_tool.logger import Logger
 from bionic_boarder_simulation_tool.riding.eboard_state_recorder import EboardStateRecorder
 
@@ -120,6 +121,16 @@ if __name__ == "__main__":
         )
     elif app_input_arguments.vesc_fw == "6.02":
         vesc_command_message_processor = fw_6_02.FW6_02CMP(
+            app_input_arguments.com_port,
+            app_input_arguments.baud_rate,
+            256,
+            eboard_kinematic_state,
+            eboard_kinematic_state_lock,
+            battery_discharge_model,
+            motor_controller,
+        )
+    elif app_input_arguments.vesc_fw == "6.05":
+        vesc_command_message_processor = fw_6_05.FW6_05CMP(
             app_input_arguments.com_port,
             app_input_arguments.baud_rate,
             256,
