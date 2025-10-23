@@ -386,7 +386,7 @@ class BionicBoarderMessage:
         self.__acc = value
 
 
-class FW6_02CMP(CommandMessageProcessor):
+class FW6_05CMP(CommandMessageProcessor):
     def __init__(
         self,
         com_port,
