@@ -19,9 +19,7 @@ The simulation supports the following VESC communication commands:
 *  **COMM_ALIVE**
 *  **COMM_BIONIC_BOARDER** - Custom Command
 
-See VESC BLDC [datatypes.h](https://github.com/vedderb/bldc/blob/release_6_00/datatypes.h) for more details about the above commands.
-
-Communication with the simulated VESC is done over classic Bluetooth. The PC that the simulation executes on requires an HC-06 (or equivalent) UART to classic Bluetooth module connected to the PC using an FTDI USB adapter.  
+Communication with the simulated VESC is done over a serial connection. A serial device must be available on the PC for the simulation to execute.
 
 ### Supported VESC BLDC firmware versions 
 * [6.00](https://github.com/vedderb/bldc/tree/release_6_00)
@@ -46,7 +44,3 @@ The minimum python version to use is 3.12.3.
 ## Format for the required inputs to the simulation
 
 * [App Inputs JSON Schema](https://github.com/bobacktech/bionic-boarder-simulation-tool/blob/master/bionic_boarder_simulation_tool/app_input_arguments.schema.json)
-
-## Documentation
-
-* [HC-06 Classic Bluetooth to UART module Setup](https://docs.google.com/presentation/d/1iqZNpbXgkZIJNUv7u3ZKozi3m8eBVSuuvXjyms1xasU/edit?usp=sharing)
