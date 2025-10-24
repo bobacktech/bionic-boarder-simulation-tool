@@ -14,10 +14,10 @@ The simulation supports the following VESC communication commands:
 
 *  **COMM_FW_VERSION**
 *  **COMM_GET_VALUES**
-*  **COMM_GET_IMU_DATA**
 *  **COMM_SET_CURRENT**
 *  **COMM_SET_RPM**
 *  **COMM_ALIVE**
+*  **COMM_BIONIC_BOARDER** - Custom Command
 
 See VESC BLDC [datatypes.h](https://github.com/vedderb/bldc/blob/release_6_00/datatypes.h) for more details about the above commands.
 
@@ -25,6 +25,8 @@ Communication with the simulated VESC is done over classic Bluetooth. The PC tha
 
 ### Supported VESC BLDC firmware versions 
 * [6.00](https://github.com/vedderb/bldc/tree/release_6_00)
+* [6.02](https://github.com/vedderb/bldc/tree/release_6_02)
+* [6.05](https://github.com/vedderb/bldc/tree/release_6_05)
 
 ## Software requirements
 
