@@ -444,7 +444,7 @@ class FW6_05CMP(CommandMessageProcessor):
             bb.acc[0] = self.__eks.acceleration_x
             bb.rpy[1] = self.__eks.pitch * (math.pi / 180.0)
         msg_data = bb.buffer
-        packet = self.__packet_header(66, len(msg_data)) + msg_data
+        packet = self.__packet_header(164, len(msg_data)) + msg_data
         self.serial.write(packet)
         Logger().logger.info(
             "Publishing Bionic Boarder message",
