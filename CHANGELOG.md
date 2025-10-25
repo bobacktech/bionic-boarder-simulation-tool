@@ -1,3 +1,10 @@
+## [1.1.0] - 
+- Added a custom VESC command that returns a response which groups motor speed data with IMU data. The name of the command is **Bionic Boarder**.
+- Removed the GET IMU Data command from the VESC interface.
+- VESC Firmware versions added:
+  - 6.02
+  - 6.05
+
 ## [1.0.0] - 03/29/2025
 
 ### Added
