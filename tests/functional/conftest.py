@@ -96,6 +96,7 @@ async def activate_sim_and_ble_client():
         pytest.fail("UART service not found on the BLE device.")
     if client._backend.__class__.__name__ == "BleakClientBlueZDBus":
         await client._backend._acquire_mtu()
+    assert client.mtu_size > 256
     yield client
     await client.disconnect()
     sim_process.kill()
