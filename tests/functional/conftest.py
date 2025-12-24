@@ -1,16 +1,6 @@
 import subprocess
 import os
-import pytest
 import time
-from pyftdi.ftdi import Ftdi
-from PyQt6.QtBluetooth import (
-    QBluetoothSocket,
-    QBluetoothServiceInfo,
-    QBluetoothAddress,
-    QBluetoothUuid,
-)
-from PyQt6.QtCore import QCoreApplication
-import sys
 import pytest
 from bleak import BleakScanner, BleakClient
 

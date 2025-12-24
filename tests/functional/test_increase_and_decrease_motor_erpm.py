@@ -29,7 +29,7 @@ def packetize(data: bytearray) -> bytes:
 @pytest.mark.asyncio
 async def test_increase_decrease_motor_erpm_BLE(activate_sim_and_ble_client):
     client = activate_sim_and_ble_client
-    bb_requester = bionic_boarder_msg_requester.VescBionicBoarderMsgRequesterBLE(client)
+    bb_requester = bionic_boarder_msg_requester.VescBionicBoarderMsgRequester(client)
     await bb_requester.set_up_response_handler()
     await bb_requester.send_command()
     while bb_requester.response_received == False:

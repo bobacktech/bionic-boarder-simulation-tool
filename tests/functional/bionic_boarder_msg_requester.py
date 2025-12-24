@@ -4,7 +4,7 @@ from bleak.backends.characteristic import BleakGATTCharacteristic
 from .conftest import UART_RX_CHAR_UUID, UART_TX_CHAR_UUID
 
 
-class VescBionicBoarderMsgRequesterBLE:
+class VescBionicBoarderMsgRequester:
     def __init__(self, client):
         self.client = client
         self.response_buffer: List[Tuple[int, bytearray]] = []
