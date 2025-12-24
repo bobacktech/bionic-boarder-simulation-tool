@@ -1,8 +1,11 @@
+from tests.functional import bionic_boarder_msg_requester
+from tests.functional.conftest import UART_RX_CHAR_UUID
 from . import vesc_state_msg_requester
 import struct
 import pytest
 import time
 from PyQt6.QtCore import QByteArray
+import asyncio
 
 
 def packetize(data: bytearray) -> bytes:
@@ -47,3 +50,36 @@ def test_increase_decrease_motor_erpm(activate_sim_and_bluetooth_socket):
     socket.write(packetize(command))
     app.processEvents()
     time.sleep(5.0)
+
+
+@pytest.mark.asyncio
+async def test_increase_decrease_motor_erpm_BLE(activate_sim_and_ble_client):
+    client = activate_sim_and_ble_client
+    bb_requester = bionic_boarder_msg_requester.VescBionicBoarderMsgRequesterBLE(client)
+    await bb_requester.set_up_response_handler()
+    await bb_requester.send_command()
+    while bb_requester.response_received == False:
+        await asyncio.sleep(0.1)
+    bb_data = bb_requester.response_buffer.pop(0)[1]
+    latest_erpm = struct.unpack(">i", bb_data[9:13])[0]
+    assert latest_erpm == 0
+    target_erpm = 20000
+    command = bytearray([8]) + bytearray(target_erpm.to_bytes(4, "big"))
+    await client.write_gatt_char(UART_RX_CHAR_UUID, packetize(command), response=False)
+    await asyncio.sleep(3.0)
+    await bb_requester.send_command()
+    while bb_requester.response_received == False:
+        await asyncio.sleep(0.1)
+    bb_data = bb_requester.response_buffer.pop(0)[1]
+    latest_erpm = struct.unpack(">i", bb_data[9:13])[0]
+    assert latest_erpm == target_erpm
+    target_erpm = 1000
+    command = bytearray([8]) + bytearray(target_erpm.to_bytes(4, "big"))
+    await client.write_gatt_char(UART_RX_CHAR_UUID, packetize(command), response=False)
+    await asyncio.sleep(3.0)
+    await bb_requester.send_command()
+    while bb_requester.response_received == False:
+        await asyncio.sleep(0.1)
+    bb_data = bb_requester.response_buffer.pop(0)[1]
+    latest_erpm = struct.unpack(">i", bb_data[9:13])[0]
+    assert latest_erpm >= target_erpm - 100 and latest_erpm <= target_erpm + 100
