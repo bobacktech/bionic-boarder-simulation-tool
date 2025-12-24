@@ -7,9 +7,9 @@ NUMBER_VESC_STATE_MSG_REQUESTS = 10
 
 
 @pytest.mark.asyncio
-async def test_bionic_boarder_command_response_ble(activate_sim_and_ble_client):
+async def test_bionic_boarder_command_response(activate_sim_and_ble_client):
     client = activate_sim_and_ble_client
-    vs_requester = vesc_state_msg_requester.VescStateMsgRequesterBLE(client)
+    vs_requester = vesc_state_msg_requester.VescStateMsgRequester(client)
     await vs_requester.set_up_response_handler()
     await vs_requester.send_command()
     i = 0
