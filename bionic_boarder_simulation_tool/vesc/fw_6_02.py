@@ -40,6 +40,54 @@ class FirmwareMessage:
         return bytes(self.__buffer)
 
 
+class MotorControllerConfigurationMessage:
+    """
+    See the "COMM_GET_MCCONF" message specification in [commands.c](https://github.com/vedderb/bldc/blob/6.02/comm/commands.c)
+    in VESC bldc-6.02 source code on Github.
+    """
+
+    BYTE_LENGTH = 696
+
+    def __init__(self) -> None:
+        self.__buffer = bytearray(MotorControllerConfigurationMessage.BYTE_LENGTH)
+        self.si_wheel_diameter: float = 0.0
+        self.si_battery_ah: float = 0.0
+        self.si_gear_ratio: float = 0.0
+        self.si_motor_poles: int = 0
+        self.l_current_max: float = 0.0
+        self.l_watt_max: float = 0.0
+        self.l_max_vin: float = 0.0
+        self.foc_motor_flux_linkage: float = 0.0
+
+    @property
+    def buffer(self) -> bytes:
+        """
+        Generates a byte representation of the motor controller configuration message based on the current properties of the object.
+
+        Byte Positions:
+            l_current_max: 0-3
+            l_max_vin: 44-47
+            l_watt_max: 85-88
+            foc_motor_flux_linkage: 222-225
+            si_motor_poles: 644
+            si_gear_ratio: 645-648
+            si_wheel_diameter: 649-652
+            si_battery_ah: 661-664
+
+        Returns:
+            bytes: A bytes object representing the encoded motor controller configuration message.
+        """
+        self.__buffer[0:4] = struct.pack(">f", self.l_current_max)
+        self.__buffer[44:48] = struct.pack(">f", self.l_max_vin)
+        self.__buffer[85:89] = struct.pack(">f", self.l_watt_max)
+        self.__buffer[222:226] = struct.pack(">f", self.foc_motor_flux_linkage)
+        self.__buffer[644] = self.si_motor_poles
+        self.__buffer[645:649] = struct.pack(">f", self.si_gear_ratio)
+        self.__buffer[649:653] = struct.pack(">f", self.si_wheel_diameter)
+        self.__buffer[661:665] = struct.pack(">f", self.si_battery_ah)
+        return bytes(self.__buffer)
+
+
 class StateMessage:
     """
     See the "COMM_GET_VALUES" message specification in [commands.c](https://github.com/vedderb/bldc/blob/release_6_02/comm/commands.c)
