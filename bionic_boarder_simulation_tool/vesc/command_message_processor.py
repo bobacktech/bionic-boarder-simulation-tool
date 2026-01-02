@@ -21,6 +21,7 @@ class CommandMessageProcessor(ABC):
 
     # Message request commands
     FIRMWARE = "FIRMWARE"
+    MOTOR_CONTROLLER_CONFIGURATION = "MOTOR CONTROLLER CONFIGURATION"
     STATE = "STATE"
     BIONIC_BOARDER = "BIONIC BOARDER"
 
@@ -68,6 +69,7 @@ class CommandMessageProcessor(ABC):
             CommandMessageProcessor.STATE: lambda: self._publish_state(),
             CommandMessageProcessor.BIONIC_BOARDER: lambda: self._publish_bionic_boarder(),
             CommandMessageProcessor.FIRMWARE: lambda: self._publish_firmware(),
+            CommandMessageProcessor.MOTOR_CONTROLLER_CONFIGURATION: lambda: self._publish_motor_controller_configuration(),
             CommandMessageProcessor.CURRENT: lambda: self._update_current(command_bytes),
             CommandMessageProcessor.RPM: lambda: self._update_rpm(command_bytes),
             CommandMessageProcessor.HEARTBEAT: lambda: self.heartbeat(),
@@ -113,6 +115,13 @@ class CommandMessageProcessor(ABC):
     def _publish_firmware(self):
         """
         Abstract method to publish the 'firmware' message.
+        """
+        pass
+
+    @abstractmethod
+    def _publish_motor_controller_configuration(self):
+        """
+        Abstract method to publish the 'motor controller configuration' message.
         """
         pass
 

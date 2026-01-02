@@ -243,6 +243,7 @@ class FW6_00CMP(CommandMessageProcessor):
             8: CommandMessageProcessor.RPM,
             30: CommandMessageProcessor.HEARTBEAT,
             0: CommandMessageProcessor.FIRMWARE,
+            14: CommandMessageProcessor.MOTOR_CONTROLLER_CONFIGURATION,
             4: CommandMessageProcessor.STATE,
             164: CommandMessageProcessor.BIONIC_BOARDER,
         }
@@ -307,6 +308,9 @@ class FW6_00CMP(CommandMessageProcessor):
         fw = FirmwareMessage()
         packet = self.__packet_header(0, FirmwareMessage.BYTE_LENGTH) + fw.buffer
         self.serial.write(packet)
+
+    def _publish_motor_controller_configuration(self):
+        pass
 
     def _update_current(self, command):
         motor_current_commanded = int.from_bytes(command[3:7], byteorder="big") / 1000.0

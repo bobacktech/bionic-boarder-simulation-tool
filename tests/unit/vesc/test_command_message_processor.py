@@ -13,6 +13,7 @@ class TestCommandMessageProcessor(CommandMessageProcessor):
             4: CommandMessageProcessor.HEARTBEAT,
             5: CommandMessageProcessor.FIRMWARE,
             6: CommandMessageProcessor.STATE,
+            8: CommandMessageProcessor.MOTOR_CONTROLLER_CONFIGURATION,
         }
 
     @property
@@ -32,6 +33,9 @@ class TestCommandMessageProcessor(CommandMessageProcessor):
         pass
 
     def _publish_firmware(self):
+        pass
+
+    def _publish_motor_controller_configuration(self):
         pass
 
     def _update_current(self, command):
@@ -84,6 +88,14 @@ def test_handle_command_firmware(processor, mocker):
     processor._publish_firmware.assert_called_once()
 
 
+def test_handle_command_motor_controller_configuration(processor, mocker):
+    mocker.patch.object(processor, "_publish_motor_controller_configuration", autospec=True)
+    mocker.patch.object(processor, "_get_command_id", return_value=8)
+    with pytest.raises(StopIteration):
+        processor.handle_command()
+    processor._publish_motor_controller_configuration.assert_called_once()
+
+
 def test_handle_command_state(processor, mocker):
     mocker.patch.object(processor, "_publish_state", autospec=True)
     mocker.patch.object(processor, "_get_command_id", return_value=6)
@@ -98,3 +110,4 @@ def test_command_id_names(processor):
     assert processor._command_id_name[4] == CommandMessageProcessor.HEARTBEAT
     assert processor._command_id_name[5] == CommandMessageProcessor.FIRMWARE
     assert processor._command_id_name[6] == CommandMessageProcessor.STATE
+    assert processor._command_id_name[8] == CommandMessageProcessor.MOTOR_CONTROLLER_CONFIGURATION
