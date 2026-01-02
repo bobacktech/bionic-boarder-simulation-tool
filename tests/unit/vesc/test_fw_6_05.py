@@ -2,6 +2,7 @@ import pytest
 from bionic_boarder_simulation_tool.riding.frictional_deceleration_model import FrictionalDecelerationModel
 from bionic_boarder_simulation_tool.vesc.fw_6_05 import (
     FirmwareMessage,
+    MotorControllerConfigurationMessage,
     StateMessage,
     BionicBoarderMessage,
     FW6_05CMP,
@@ -12,6 +13,7 @@ from bionic_boarder_simulation_tool.riding.motor_controller import MotorControll
 from bionic_boarder_simulation_tool.riding.eboard import EBoard
 from math import ldexp
 from threading import Lock
+import struct
 
 
 class TestFirmwareMessage:
@@ -196,6 +198,75 @@ class TestBionicBoarderMessage:
         assert bytes_to_float32(int.from_bytes(msg.buffer[30:34])) == pytest.approx(
             3.0, rel=1e-5
         ), "Yaw bytes incorrect."
+
+
+class TestMotorControllerConfigurationMessage:
+    def test_buffer_property(self):
+        """
+        Verifies that the buffer property returns a bytes object of the correct length.
+        """
+        message = MotorControllerConfigurationMessage()
+        buffer = message.buffer
+        assert isinstance(buffer, bytes), "Buffer property should return a bytes object."
+        assert (
+            len(buffer) == MotorControllerConfigurationMessage.BYTE_LENGTH
+        ), f"Buffer length should be {MotorControllerConfigurationMessage.BYTE_LENGTH}, got {len(buffer)}."
+
+    def test_buffer_encoding(self):
+        """
+        Verifies that setting properties on the object results in the correct
+        byte sequences at the specific offsets defined in the class.
+        """
+        message = MotorControllerConfigurationMessage()
+
+        # 1. Set arbitrary test values
+        test_current_max = 123.45
+        test_max_vin = 56.78
+        test_watt_max = 999.99
+        test_flux_linkage = 0.0025
+        test_motor_poles = 14  # Integer
+        test_gear_ratio = 3.5
+        test_wheel_diameter = 0.083
+        test_battery_ah = 12.5
+
+        message.l_current_max = test_current_max
+        message.l_max_vin = test_max_vin
+        message.l_watt_max = test_watt_max
+        message.foc_motor_flux_linkage = test_flux_linkage
+        message.si_motor_poles = test_motor_poles
+        message.si_gear_ratio = test_gear_ratio
+        message.si_wheel_diameter = test_wheel_diameter
+        message.si_battery_ah = test_battery_ah
+
+        # 2. Generate the buffer
+        buf = message.buffer
+
+        # 3. Assert that the bytes at specific offsets match the struct.pack expectation
+        # Note: The class uses Big-Endian (>f) for floats
+
+        # l_current_max: 0-3
+        assert buf[0:4] == struct.pack(">f", test_current_max), "l_current_max encoding failed"
+
+        # l_max_vin: 44-47
+        assert buf[44:48] == struct.pack(">f", test_max_vin), "l_max_vin encoding failed"
+
+        # l_watt_max: 85-88
+        assert buf[85:89] == struct.pack(">f", test_watt_max), "l_watt_max encoding failed"
+
+        # foc_motor_flux_linkage: 222-225
+        assert buf[222:226] == struct.pack(">f", test_flux_linkage), "foc_motor_flux_linkage encoding failed"
+
+        # si_motor_poles: 644 (Single byte integer)
+        assert buf[644] == test_motor_poles, "si_motor_poles encoding failed"
+
+        # si_gear_ratio: 645-648
+        assert buf[645:649] == struct.pack(">f", test_gear_ratio), "si_gear_ratio encoding failed"
+
+        # si_wheel_diameter: 649-652
+        assert buf[649:653] == struct.pack(">f", test_wheel_diameter), "si_wheel_diameter encoding failed"
+
+        # si_battery_ah: 661-664
+        assert buf[661:665] == struct.pack(">f", test_battery_ah), "si_battery_ah encoding failed"
 
 
 @pytest.fixture
