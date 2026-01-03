@@ -212,6 +212,22 @@ def test_firmware_command(mock_serial):
     mock_serial.return_value.write.assert_called_once_with(data)
 
 
+def test_motor_controller_configuration_command(mock_serial):
+    cmp = FW6_00CMP(
+        "COM1",
+        230400,
+        8,
+        EBoard(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        None,
+        None,
+        None,
+        None,
+    )
+    cmp._publish_motor_controller_configuration()
+    data = b"\x03\x02\xb8\x0e" + bytes(696)
+    mock_serial.return_value.write.assert_called_once_with(data)
+
+
 def test_state_command(mock_serial):
     cmp = FW6_00CMP(
         "COM1",
