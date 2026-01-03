@@ -7,6 +7,7 @@ from bionic_boarder_simulation_tool.riding.battery_discharge_model import Batter
 from bionic_boarder_simulation_tool.riding.eboard_kinematic_state import EboardKinematicState
 from bionic_boarder_simulation_tool.riding.motor_controller import MotorController
 from bionic_boarder_simulation_tool.logger import Logger
+from bionic_boarder_simulation_tool.riding.eboard import EBoard
 
 
 class FirmwareMessage:
@@ -440,6 +441,7 @@ class FW6_05CMP(CommandMessageProcessor):
         com_port,
         baud_rate,
         command_byte_size,
+        eboard: EBoard,
         eks: EboardKinematicState,
         eks_lock: Lock,
         bdm: BatteryDischargeModel,
@@ -451,6 +453,7 @@ class FW6_05CMP(CommandMessageProcessor):
             8: CommandMessageProcessor.RPM,
             30: CommandMessageProcessor.HEARTBEAT,
             0: CommandMessageProcessor.FIRMWARE,
+            14: CommandMessageProcessor.MOTOR_CONTROLLER_CONFIGURATION,
             4: CommandMessageProcessor.STATE,
             164: CommandMessageProcessor.BIONIC_BOARDER,
         }
@@ -459,6 +462,7 @@ class FW6_05CMP(CommandMessageProcessor):
         self.__eks_lock = eks_lock
         self.__bdm = bdm
         self.__mc = mc
+        self.__eboard = eboard
 
     @property
     def _command_id_name(self):
@@ -508,6 +512,35 @@ class FW6_05CMP(CommandMessageProcessor):
         fw = FirmwareMessage()
         packet = self.__packet_header(0, FirmwareMessage.BYTE_LENGTH) + fw.buffer
         self.serial.write(packet)
+
+    def _publish_motor_controller_configuration(self):
+        mcc = MotorControllerConfigurationMessage()
+        mcc.si_wheel_diameter = self.__eboard.wheel_diameter_m
+        mcc.si_battery_ah = self.__eboard.battery_max_capacity_Ah
+        mcc.si_gear_ratio = self.__eboard.gear_ratio
+        mcc.si_motor_poles = self.__eboard.motor_pole_pairs * 2
+        mcc.l_current_max = self.__eboard.motor_max_amps
+        mcc.l_watt_max = self.__eboard.motor_max_power_watts
+        mcc.l_max_vin = self.__eboard.battery_max_voltage
+        msg_data = mcc.buffer
+        packet = (
+            int.to_bytes(3)
+            + int.to_bytes(MotorControllerConfigurationMessage.BYTE_LENGTH, 2)
+            + int.to_bytes(14)
+            + msg_data
+        )
+        self.serial.write(packet)
+        Logger().logger.info(
+            "Publishing motor controller configuration message",
+            wheel_diameter_m=mcc.si_wheel_diameter,
+            battery_capacity_Ah=mcc.si_battery_ah,
+            gear_ratio=mcc.si_gear_ratio,
+            motor_poles=mcc.si_motor_poles,
+            current_max=mcc.l_current_max,
+            watt_max=mcc.l_watt_max,
+            max_vin=mcc.l_max_vin,
+            CMP=self.__class__.__name__,
+        )
 
     def _update_current(self, command):
         motor_current_commanded = int.from_bytes(command[3:7], byteorder="big") / 1000.0

@@ -205,9 +205,26 @@ def test_firmware_command(mock_serial):
         None,
         None,
         None,
+        None,
     )
     cmp._publish_firmware()
     data = b"\x02@\x00\x06\x00HardwareName" + bytes(50)
+    mock_serial.return_value.write.assert_called_once_with(data)
+
+
+def test_motor_controller_configuration_command(mock_serial):
+    cmp = FW6_00CMP(
+        "COM1",
+        230400,
+        8,
+        EBoard(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        None,
+        None,
+        None,
+        None,
+    )
+    cmp._publish_motor_controller_configuration()
+    data = b"\x03\x02\xb8\x0e" + bytes(696)
     mock_serial.return_value.write.assert_called_once_with(data)
 
 
@@ -216,6 +233,7 @@ def test_state_command(mock_serial):
         "COM1",
         230400,
         8,
+        None,
         EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0),
         Lock(),
         BatteryDischargeModel(42.0),
@@ -247,7 +265,7 @@ def test_update_rpm(mock_serial):
     mc.control_time_step_ms = 20
     mc.start()
     assert eks.erpm == 0
-    cmp = FW6_00CMP("COM1", 230400, 8, eks, eks_lock, BatteryDischargeModel(42.0), mc)
+    cmp = FW6_00CMP("COM1", 230400, 8, None, eks, eks_lock, BatteryDischargeModel(42.0), mc)
 
     # Set the RPM to 1000 to create a speed increase
     rpm = 1000
