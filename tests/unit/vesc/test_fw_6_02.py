@@ -284,6 +284,7 @@ class TestFW6_02CMP:
             None,
             None,
             None,
+            None,
         )
         cmp._publish_firmware()
         assert mock_serial.return_value.write.called, "Firmware command did not write to serial port."
@@ -297,6 +298,7 @@ class TestFW6_02CMP:
             None,
             None,
             None,
+            None,
         )
         cmp._publish_state()
         assert mock_serial.return_value.write.called, "State command did not write to serial port."
@@ -306,6 +308,7 @@ class TestFW6_02CMP:
             "COM1",
             230400,
             8,
+            None,
             EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0),
             Lock(),
             None,
@@ -335,7 +338,7 @@ class TestFW6_02CMP:
         mc.control_time_step_ms = 20
         mc.start()
         assert eks.erpm == 0
-        cmp = FW6_02CMP("COM1", 230400, 8, eks, eks_lock, BatteryDischargeModel(42.0), mc)
+        cmp = FW6_02CMP("COM1", 230400, 8, None, eks, eks_lock, BatteryDischargeModel(42.0), mc)
 
         # Set the RPM to 1000 to create a speed increase
         rpm = 1000
