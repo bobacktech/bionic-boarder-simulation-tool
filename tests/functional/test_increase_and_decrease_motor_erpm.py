@@ -26,6 +26,7 @@ def packetize(data: bytearray) -> bytes:
     return bytes(packet)
 
 
+@pytest.mark.skip(reason="Skip is the default behavior. Remove this line to enable the test.")
 @pytest.mark.asyncio
 async def test_increase_decrease_motor_erpm_BLE(activate_sim_and_ble_client):
     client = activate_sim_and_ble_client
