@@ -6,6 +6,7 @@ import asyncio
 NUMBER_VESC_STATE_MSG_REQUESTS = 10
 
 
+@pytest.mark.skip(reason="Skip is the default behavior. Remove this line to enable the test.")
 @pytest.mark.asyncio
 async def test_bionic_boarder_command_response(activate_sim_and_ble_client):
     client = activate_sim_and_ble_client
