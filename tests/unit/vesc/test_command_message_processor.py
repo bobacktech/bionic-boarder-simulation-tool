@@ -13,6 +13,7 @@ class TestCommandMessageProcessor(CommandMessageProcessor):
             4: CommandMessageProcessor.HEARTBEAT,
             5: CommandMessageProcessor.FIRMWARE,
             6: CommandMessageProcessor.STATE,
+            7: CommandMessageProcessor.BIONIC_BOARDER,
             8: CommandMessageProcessor.MOTOR_CONTROLLER_CONFIGURATION,
         }
 
@@ -94,6 +95,14 @@ def test_handle_command_motor_controller_configuration(processor, mocker):
     with pytest.raises(StopIteration):
         processor.handle_command()
     processor._publish_motor_controller_configuration.assert_called_once()
+
+
+def test_handle_command_bionic_boarder(processor, mocker):
+    mocker.patch.object(processor, "_publish_bionic_boarder", autospec=True)
+    mocker.patch.object(processor, "_get_command_id", return_value=7)
+    with pytest.raises(StopIteration):
+        processor.handle_command()
+    processor._publish_bionic_boarder.assert_called_once()
 
 
 def test_handle_command_state(processor, mocker):
