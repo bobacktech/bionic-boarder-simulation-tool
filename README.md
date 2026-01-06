@@ -1,6 +1,6 @@
 # Bionic Boarder Simulation Tool
 
-This simulation tool's purpose is to support the ongoing development of the [Bionic Boarder](https://github.com/bobacktech/bionic-boarder) Android application.
+This simulation tool's purpose is to support the ongoing development of the [Bionic Boarder](https://bionic-boarder.web.app/) Android application.
 
 The simulation models a rider operating a land paddle board, where propulsion is achieved using a stick paddle across a dynamically varying terrain.  At the start of the simulation, the rider is stationary. The terrain slope changes randomly at periodic intervals, and the rider applies paddle strokes at regular intervals as well. Movement of the board is driven by a combination of gravitational force and rider input.
 
@@ -13,7 +13,8 @@ The motor controller is emulated with a simplified ERPM (Electrical RPM) control
 The simulation supports the following VESC communication commands:
 
 *  **COMM_FW_VERSION**
-*  **COMM_GET_VALUES**
+*  **COMM_GET_MCCONF**
+*  **COMM_GET_VALUES_SETUP**
 *  **COMM_SET_CURRENT**
 *  **COMM_SET_RPM**
 *  **COMM_ALIVE**
