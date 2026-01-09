@@ -1,4 +1,4 @@
-# [1.2.0] - 01/09/2026
+## [1.2.0] - 01/09/2026
 - Added the capability to process the VESC command for the Motor Controller Configuration response to all supported VESC firmware versions in the simulation. The response only contains the fields that are germane to the purpose of the simulation.  All other data items in the response are set to zero.
 - **Latest Set of Supported VESC BLDC Commands**:
     - `COMM_FW_VERSION`
