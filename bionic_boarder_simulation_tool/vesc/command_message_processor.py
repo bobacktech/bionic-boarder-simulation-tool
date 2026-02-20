@@ -17,7 +17,6 @@ class CommandMessageProcessor(ABC):
     CURRENT = "CURRENT"
     RPM = "RPM"
     HEARTBEAT = "HEARTBEAT"
-    HEARTBEAT_TIMEOUT_SEC = 1.5
 
     # Message request commands
     FIRMWARE = "FIRMWARE"
@@ -58,6 +57,15 @@ class CommandMessageProcessor(ABC):
         )
         self.__command_byte_size = command_byte_size
         self.__heartbeat_timer = None
+
+    def set_heartbeat_timeout_sec(self, timeout_sec):
+        """
+        Set the heartbeat timeout duration.
+
+        Args:
+            timeout_sec (float): The duration in seconds for the heartbeat timeout.
+        """
+        self.__heartbeat_timeout_sec = timeout_sec
 
     def handle_command(self):
         """
@@ -151,14 +159,14 @@ class CommandMessageProcessor(ABC):
         """
         if self.__heartbeat_timer == None:
             self.__heartbeat_timer = Timer(
-                CommandMessageProcessor.HEARTBEAT_TIMEOUT_SEC,
+                self.__heartbeat_timeout_sec,
                 self.__heartbeat_not_receieved,
             )
             self.__heartbeat_timer.start()
         else:
             self.__heartbeat_timer.cancel()
             self.__heartbeat_timer = Timer(
-                CommandMessageProcessor.HEARTBEAT_TIMEOUT_SEC,
+                self.__heartbeat_timeout_sec,
                 self.__heartbeat_not_receieved,
             )
             self.__heartbeat_timer.start()

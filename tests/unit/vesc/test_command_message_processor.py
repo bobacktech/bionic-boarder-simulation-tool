@@ -57,6 +57,11 @@ def processor(mock_serial):
     return TestCommandMessageProcessor("COM1", 230400, 8)
 
 
+def test_set_heartbeat_timeout_sec(processor):
+    processor.set_heartbeat_timeout_sec(2.0)
+    assert processor._CommandMessageProcessor__heartbeat_timeout_sec == 2.0
+
+
 def test_handle_command_current(processor, mocker):
     mocker.patch.object(processor, "_update_current", autospec=True)
     mocker.patch.object(processor, "_get_command_id", return_value=2)
