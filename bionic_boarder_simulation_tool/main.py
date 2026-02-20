@@ -146,6 +146,8 @@ if __name__ == "__main__":
         logger.error(f"There is no VESC firmware version matching {app_input_arguments.vesc_fw}")
         sys.exit(1)
 
+    vesc_command_message_processor.set_heartbeat_timeout_sec(app_input_arguments.heartbeat_timeout_sec)
+
     # Launch simulation threads
     kinematic_loop_thread = threading.Thread(target=kinematic_loop.loop)
     kinematic_loop_thread.daemon = True
