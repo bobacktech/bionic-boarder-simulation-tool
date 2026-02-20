@@ -1,3 +1,7 @@
+## [1.2.1] - 02/20/2026
+- This is primarily a bug fix release.
+- The heartbeat timeout value in the VESC command message processor is now set from the application input arguments at startup. 
+
 ## [1.2.0] - 01/09/2026
 - Added the capability to process the VESC command for the Motor Controller Configuration response to all supported VESC firmware versions in the simulation. The response only contains the fields that are germane to the purpose of the simulation.  All other data items in the response are set to zero.
 - **Latest Set of Supported VESC BLDC Commands**:
