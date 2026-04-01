@@ -455,7 +455,7 @@ class FW6_02CMP(CommandMessageProcessor):
             0: CommandMessageProcessor.FIRMWARE,
             14: CommandMessageProcessor.MOTOR_CONTROLLER_CONFIGURATION,
             4: CommandMessageProcessor.STATE,
-            164: CommandMessageProcessor.BIONIC_BOARDER,
+            152: CommandMessageProcessor.BIONIC_BOARDER,
         }
         self.__packet_header = lambda id, l: int.to_bytes(2) + int.to_bytes(l) + int.to_bytes(id)
         self.__eks = eks
