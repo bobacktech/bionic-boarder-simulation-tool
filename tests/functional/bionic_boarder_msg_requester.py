@@ -17,13 +17,13 @@ class VescBionicBoarderMsgRequester:
     def on_data_received(self, sender: BleakGATTCharacteristic, data: bytearray):
         if len(data) == 37:
             id = data[2]
-            assert id == 164
+            assert id == 152
             temp: Tuple[int, bytearray] = (int(time.time() * 1000), data)
             self.response_buffer.append(temp)
             self.response_received = True
 
     async def send_command(self):
-        data = self.packetize(bytearray([164]))
+        data = self.packetize(bytearray([152]))
         await self.client.write_gatt_char(UART_RX_CHAR_UUID, data, response=False)
         self.response_received = False
 
