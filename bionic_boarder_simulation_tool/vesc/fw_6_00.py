@@ -16,7 +16,7 @@ class FirmwareMessage:
     in VESC bldc-6.00 source code on Github.
     """
 
-    BYTE_LENGTH = 64
+    ID = 0
 
     def __init__(self) -> None:
         """
@@ -25,7 +25,7 @@ class FirmwareMessage:
         Sets up the firmware message buffer according to the specified format.
         The buffer is initialized with predefined values, and a section is filled with an encoded string.
         """
-        self.__buffer = bytearray(FirmwareMessage.BYTE_LENGTH)
+        self.__buffer = bytearray(64)
         self.__buffer[0] = 6
         self.__buffer[1] = 0
         self.__buffer[2:14] = "HardwareName".encode("utf-8")
@@ -38,7 +38,7 @@ class FirmwareMessage:
         Returns:
             bytes: An immutable bytes object representing the current state of the firmware message buffer.
         """
-        return bytes(self.__buffer)
+        return FirmwareMessage.ID.to_bytes(1) + bytes(self.__buffer)
 
 
 class MotorControllerConfigurationMessage:
@@ -95,6 +95,8 @@ class StateMessage:
     in VESC bldc-6.00 source code on Github.
     """
 
+    ID = 4
+
     def __init__(self) -> None:
         self.__rpm: int = 0
         self.__motor_current: float = 0
@@ -123,7 +125,7 @@ class StateMessage:
         buffer[4:8] = struct.pack(">I", mc)
         buffer[22:26] = struct.pack(">i", self.__rpm)
         buffer[36:40] = struct.pack(">I", wh)
-        return bytes(buffer)
+        return StateMessage.ID.to_bytes(1) + bytes(buffer)
 
     @property
     def rpm(self) -> int:
@@ -157,6 +159,8 @@ class BionicBoarderMessage:
 
     Note: This message is not defined yet in the VESC BLDC firmware; this class is created for simulation purposes, for now.
     """
+
+    ID = 152
 
     def __init__(self) -> None:
         # Motor Dynamics Data
@@ -192,7 +196,7 @@ class BionicBoarderMessage:
         buffer[22:26] = fw.float32_to_bytes(self.__rpy[0])
         buffer[26:30] = fw.float32_to_bytes(self.__rpy[1])
         buffer[30:34] = fw.float32_to_bytes(self.__rpy[2])
-        return bytes(buffer)
+        return BionicBoarderMessage.ID.to_bytes(1) + bytes(buffer)
 
     @property
     def rpm(self) -> int:
@@ -249,7 +253,11 @@ class FW6_00CMP(CommandMessageProcessor):
             4: CommandMessageProcessor.STATE,
             152: CommandMessageProcessor.BIONIC_BOARDER,
         }
-        self.__packet_header = lambda id, l: int.to_bytes(2) + int.to_bytes(l) + int.to_bytes(id)
+        self.__packet_header = lambda l: int.to_bytes(2) + int.to_bytes(l)
+        # The 2 byte CRC is not implemented in the in this VESC simulation, so we set it to 0 for now.
+        crc_bytes = int.to_bytes(0x00, 2)
+        end_byte = int.to_bytes(0x03)
+        self.__packet_footer = crc_bytes + end_byte
         self.__eks = eks
         self.__eks_lock = eks_lock
         self.__bdm = bdm
@@ -277,7 +285,7 @@ class FW6_00CMP(CommandMessageProcessor):
         self.__eks_lock.release()
         sm.watt_hours = self.__bdm.get_watt_hours_consumed()
         msg_data = sm.buffer
-        packet = self.__packet_header(4, len(msg_data)) + msg_data
+        packet = self.__packet_header(len(msg_data)) + msg_data + self.__packet_footer
         self.serial.write(packet)
         Logger().logger.info(
             "Publishing state message",
@@ -295,7 +303,7 @@ class FW6_00CMP(CommandMessageProcessor):
             bb.acc[0] = self.__eks.acceleration_x
             bb.rpy[1] = self.__eks.pitch * (math.pi / 180.0)
         msg_data = bb.buffer
-        packet = self.__packet_header(164, len(msg_data)) + msg_data
+        packet = self.__packet_header(len(msg_data)) + msg_data + self.__packet_footer
         self.serial.write(packet)
         Logger().logger.info(
             "Publishing Bionic Boarder message",
@@ -309,7 +317,7 @@ class FW6_00CMP(CommandMessageProcessor):
 
     def _publish_firmware(self):
         fw = FirmwareMessage()
-        packet = self.__packet_header(0, FirmwareMessage.BYTE_LENGTH) + fw.buffer
+        packet = self.__packet_header(len(fw.buffer)) + fw.buffer + self.__packet_footer
         self.serial.write(packet)
 
     def _publish_motor_controller_configuration(self):
@@ -327,6 +335,7 @@ class FW6_00CMP(CommandMessageProcessor):
             + int.to_bytes(MotorControllerConfigurationMessage.BYTE_LENGTH, 2)
             + int.to_bytes(14)
             + msg_data
+            + self.__packet_footer
         )
         self.serial.write(packet)
         Logger().logger.info(
