@@ -390,12 +390,12 @@ class BionicBoarderMessage:
         dc = int(self.__duty_cycle * 1000.0)
         buffer[4:6] = struct.pack(">h", dc)
         buffer[6:10] = struct.pack(">i", self.__rpm)
-        buffer[10:14] = fw.float32_to_bytes(self.__acc[0])
-        buffer[14:18] = fw.float32_to_bytes(self.__acc[1])
-        buffer[18:22] = fw.float32_to_bytes(self.__acc[2])
-        buffer[22:26] = fw.float32_to_bytes(self.__rpy[0])
-        buffer[26:30] = fw.float32_to_bytes(self.__rpy[1])
-        buffer[30:34] = fw.float32_to_bytes(self.__rpy[2])
+        buffer[10:14] = struct.pack(">f", self.__rpy[0])
+        buffer[14:18] = struct.pack(">f", self.__rpy[1])
+        buffer[18:22] = struct.pack(">f", self.__rpy[2])
+        buffer[22:26] = struct.pack(">f", self.__acc[0])
+        buffer[26:30] = struct.pack(">f", self.__acc[1])
+        buffer[30:34] = struct.pack(">f", self.__acc[2])
         return BionicBoarderMessage.ID.to_bytes(1) + bytes(buffer)
 
     @property
@@ -461,7 +461,7 @@ class FW6_05CMP(CommandMessageProcessor):
             4: CommandMessageProcessor.STATE,
             152: CommandMessageProcessor.BIONIC_BOARDER,
         }
-        self.__packet_header = lambda id, l: int.to_bytes(2) + int.to_bytes(l) + int.to_bytes(id)
+        self.__packet_header = lambda l: int.to_bytes(2) + int.to_bytes(l)
         # The 2 byte CRC is not implemented in the in this VESC simulation, so we set it to 0 for now.
         crc_bytes = int.to_bytes(0x00, 2)
         end_byte = int.to_bytes(0x03)

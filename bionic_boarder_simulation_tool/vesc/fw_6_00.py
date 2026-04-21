@@ -190,12 +190,12 @@ class BionicBoarderMessage:
         dc = int(self.__duty_cycle * 1000.0)
         buffer[4:6] = struct.pack(">h", dc)
         buffer[6:10] = struct.pack(">i", self.__rpm)
-        buffer[10:14] = fw.float32_to_bytes(self.__acc[0])
-        buffer[14:18] = fw.float32_to_bytes(self.__acc[1])
-        buffer[18:22] = fw.float32_to_bytes(self.__acc[2])
-        buffer[22:26] = fw.float32_to_bytes(self.__rpy[0])
-        buffer[26:30] = fw.float32_to_bytes(self.__rpy[1])
-        buffer[30:34] = fw.float32_to_bytes(self.__rpy[2])
+        buffer[10:14] = struct.pack(">f", self.__rpy[0])
+        buffer[14:18] = struct.pack(">f", self.__rpy[1])
+        buffer[18:22] = struct.pack(">f", self.__rpy[2])
+        buffer[22:26] = struct.pack(">f", self.__acc[0])
+        buffer[26:30] = struct.pack(">f", self.__acc[1])
+        buffer[30:34] = struct.pack(">f", self.__acc[2])
         return BionicBoarderMessage.ID.to_bytes(1) + bytes(buffer)
 
     @property
