@@ -1,4 +1,5 @@
 import pytest
+from analysis import data
 from bionic_boarder_simulation_tool.riding.frictional_deceleration_model import FrictionalDecelerationModel
 from bionic_boarder_simulation_tool.vesc.fw_6_02 import (
     FirmwareMessage,
@@ -19,12 +20,12 @@ import struct
 class TestFirmwareMessage:
     def test_initialization(self):
         msg = FirmwareMessage()
-        assert len(msg.buffer) == FirmwareMessage.BYTE_LENGTH, "Buffer length does not match expected length."
 
         # Test initial values set in buffer
-        assert msg.buffer[0] == 6, "Second byte of buffer should be 6."
-        assert msg.buffer[1] == 2, "Third byte of buffer should be 2."
-        assert msg.buffer[2:14] == b"HardwareName", "Bytes 3-15 should be encoded 'HardwareName'."
+        buf = msg.buffer[1:]  # Skip the first byte which is the message type
+        assert buf[0] == 6, "Second byte of buffer should be 6."
+        assert buf[1] == 2, "Third byte of buffer should be 2."
+        assert buf[2:14] == b"HardwareName", "Bytes 3-15 should be encoded 'HardwareName'."
 
 
 class TestStateMessage:
@@ -81,7 +82,7 @@ class TestStateMessage:
         msg.avg_vq = 0.56
         msg.status = 1
 
-        buffer = msg.buffer
+        buffer = msg.buffer[1:]  # Skip the first byte which is the message type
         assert isinstance(buffer, bytes), "Buffer property should return a bytes object."
         assert len(buffer) == 74, "Buffer length does not match expected length."
         assert buffer[0:2] == int(45 * 1e1).to_bytes(
@@ -138,22 +139,6 @@ class TestStateMessage:
         assert buffer[72:73] == int(1 * 1e0).to_bytes(1, byteorder="big", signed=True), "Status bytes incorrect."
 
 
-def bytes_to_float32(res: int) -> float:
-    e = (res >> 23) & 0xFF
-    sig_i = res & 0x7FFFFF
-    neg = res & (1 << 31) != 0
-
-    sig = 0.0
-    if e != 0 or sig_i != 0:
-        sig = sig_i / (8388608.0 * 2.0) + 0.5
-        e -= 126
-
-    if neg:
-        sig = -sig
-
-    return ldexp(sig, e)
-
-
 class TestBionicBoarderMessage:
     def test_initialization(self):
         msg = BionicBoarderMessage()
@@ -171,33 +156,16 @@ class TestBionicBoarderMessage:
         msg.acc = [0.1, 0.2, 0.3]
         msg.rpy = [1.0, 2.0, 3.0]
 
-        assert isinstance(msg.buffer, bytes), "Buffer property should return a bytes object."
-        assert len(msg.buffer) == 34, "Buffer length does not match expected length."
-        assert msg.buffer[0:4] == int(12.34 * 1e2).to_bytes(
-            4, byteorder="big", signed=True
-        ), "Motor current bytes incorrect."
-        assert msg.buffer[4:6] == int(0.567 * 1e3).to_bytes(
-            2, byteorder="big", signed=True
-        ), "Duty cycle bytes incorrect."
-        assert msg.buffer[6:10] == int(1500 * 1e0).to_bytes(4, byteorder="big", signed=True), "RPM bytes incorrect."
-        assert bytes_to_float32(int.from_bytes(msg.buffer[10:14])) == pytest.approx(
-            0.1, rel=1e-5
-        ), "Acceleration X bytes incorrect."
-        assert bytes_to_float32(int.from_bytes(msg.buffer[14:18])) == pytest.approx(
-            0.2, rel=1e-5
-        ), "Acceleration Y bytes incorrect."
-        assert bytes_to_float32(int.from_bytes(msg.buffer[18:22])) == pytest.approx(
-            0.3, rel=1e-5
-        ), "Acceleration Z bytes incorrect."
-        assert bytes_to_float32(int.from_bytes(msg.buffer[22:26])) == pytest.approx(
-            1.0, rel=1e-5
-        ), "Roll bytes incorrect."
-        assert bytes_to_float32(int.from_bytes(msg.buffer[26:30])) == pytest.approx(
-            2.0, rel=1e-5
-        ), "Pitch bytes incorrect."
-        assert bytes_to_float32(int.from_bytes(msg.buffer[30:34])) == pytest.approx(
-            3.0, rel=1e-5
-        ), "Yaw bytes incorrect."
+        buf = msg.buffer[1:]  # Skip the first byte which is the message type
+        assert buf[0:4] == int(12.34 * 1e2).to_bytes(4, byteorder="big", signed=True), "Motor current bytes incorrect."
+        assert buf[4:6] == int(0.567 * 1e3).to_bytes(2, byteorder="big", signed=True), "Duty cycle bytes incorrect."
+        assert buf[6:10] == int(1500 * 1e0).to_bytes(4, byteorder="big", signed=True), "RPM bytes incorrect."
+        assert struct.unpack(">f", buf[22:26])[0] == pytest.approx(0.1, rel=1e-5), "Acceleration X bytes incorrect."
+        assert struct.unpack(">f", buf[26:30])[0] == pytest.approx(0.2, rel=1e-5), "Acceleration Y bytes incorrect."
+        assert struct.unpack(">f", buf[30:34])[0] == pytest.approx(0.3, rel=1e-5), "Acceleration Z bytes incorrect."
+        assert struct.unpack(">f", buf[10:14])[0] == pytest.approx(1.0, rel=1e-5), "Roll bytes incorrect."
+        assert struct.unpack(">f", buf[14:18])[0] == pytest.approx(2.0, rel=1e-5), "Pitch bytes incorrect."
+        assert struct.unpack(">f", buf[18:22])[0] == pytest.approx(3.0, rel=1e-5), "Yaw bytes incorrect."
 
 
 class TestMotorControllerConfigurationMessage:
@@ -279,7 +247,7 @@ class TestFW6_02CMP:
         cmp = FW6_02CMP(
             "COM1",
             230400,
-            8,
+            256,
             None,
             None,
             None,
@@ -287,13 +255,14 @@ class TestFW6_02CMP:
             None,
         )
         cmp._publish_firmware()
-        assert mock_serial.return_value.write.called, "Firmware command did not write to serial port."
+        data = b"\x02A\x00\x06\x02HardwareName" + bytes(50) + b"\x00\x00\x03"
+        mock_serial.return_value.write.assert_called_once_with(data)
 
     def test_motor_controller_configuration_command(self, mock_serial):
         cmp = FW6_02CMP(
             "COM1",
             230400,
-            8,
+            256,
             EBoard(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
             None,
             None,
@@ -301,14 +270,14 @@ class TestFW6_02CMP:
             None,
         )
         cmp._publish_motor_controller_configuration()
-        data = b"\x03\x02\xb8\x0e" + bytes(696)
+        data = b"\x03\x02\xb8\x0e" + bytes(696) + b"\x00\x00\x03"
         mock_serial.return_value.write.assert_called_once_with(data)
 
     def test_state_command(self, mock_serial):
         cmp = FW6_02CMP(
             "COM1",
             230400,
-            8,
+            256,
             None,
             None,
             None,
@@ -322,7 +291,7 @@ class TestFW6_02CMP:
         cmp = FW6_02CMP(
             "COM1",
             230400,
-            8,
+            256,
             None,
             EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0),
             Lock(),

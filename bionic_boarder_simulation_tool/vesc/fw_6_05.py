@@ -461,7 +461,7 @@ class FW6_05CMP(CommandMessageProcessor):
             4: CommandMessageProcessor.STATE,
             152: CommandMessageProcessor.BIONIC_BOARDER,
         }
-        self.__packet_header = lambda id, l: int.to_bytes(2) + int.to_bytes(l) + int.to_bytes(id)
+        self.__packet_header = lambda l: int.to_bytes(2) + int.to_bytes(l)
         # The 2 byte CRC is not implemented in the in this VESC simulation, so we set it to 0 for now.
         crc_bytes = int.to_bytes(0x00, 2)
         end_byte = int.to_bytes(0x03)

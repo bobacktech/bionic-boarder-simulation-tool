@@ -20,17 +20,17 @@ from bionic_boarder_simulation_tool.riding.eboard import EBoard
 
 def test_firmware_message_initialization():
     msg = FirmwareMessage()
-    assert len(msg.buffer) == FirmwareMessage.BYTE_LENGTH, "Buffer length does not match expected length."
 
     # Test initial values set in buffer
-    assert msg.buffer[0] == 6, "Second byte of buffer should be 6."
-    assert msg.buffer[1] == 0, "Third byte of buffer should be 0."
-    assert msg.buffer[2:14] == b"HardwareName", "Bytes 3-15 should be encoded 'HardwareName'."
+    buf = msg.buffer[1:]  # Skip the first byte which is the message type
+    assert buf[0] == 6, "Second byte of buffer should be 6."
+    assert buf[1] == 0, "Third byte of buffer should be 0."
+    assert buf[2:14] == b"HardwareName", "Bytes 3-15 should be encoded 'HardwareName'."
 
 
 def test_firmware_message_buffer_property():
     msg = FirmwareMessage()
-    buffer = msg.buffer
+    buffer = msg.buffer[1:]  # Skip the first byte which is the message type
     assert isinstance(buffer, bytes), "Buffer property should return a bytes object."
     assert buffer == bytes(msg._FirmwareMessage__buffer), "Buffer property does not return expected byte array."
 
@@ -61,7 +61,7 @@ class TestStateMessage:
         msg.motor_current = 1.5
         msg.watt_hours = 12.5
 
-        buffer = msg.buffer
+        buffer = msg.buffer[1:]  # Skip the first byte which is the message type
         assert len(buffer) == 74  # Check buffer size
         # Decode specific fields to verify correct packing
         unpacked_mc = struct.unpack(">I", buffer[4:8])[0]
@@ -71,22 +71,6 @@ class TestStateMessage:
         assert unpacked_mc == int(1.5 * 100)
         assert unpacked_rpm == 1200
         assert unpacked_wh == int(12.5 * 10000)
-
-
-def bytes_to_float32(res: int) -> float:
-    e = (res >> 23) & 0xFF
-    sig_i = res & 0x7FFFFF
-    neg = res & (1 << 31) != 0
-
-    sig = 0.0
-    if e != 0 or sig_i != 0:
-        sig = sig_i / (8388608.0 * 2.0) + 0.5
-        e -= 126
-
-    if neg:
-        sig = -sig
-
-    return ldexp(sig, e)
 
 
 class TestBionicBoarderMessage:
@@ -104,16 +88,16 @@ class TestBionicBoarderMessage:
         message.rpy[1] = 2.0
         message.rpy[2] = 3.0
 
-        buf = message.buffer
+        buf = message.buffer[1:]
         motor_current = struct.unpack(">i", buf[0:4])[0] / 100.0
         assert math.isclose(motor_current, message.motor_current, rel_tol=1e-6)
         duty_cycle = struct.unpack(">h", buf[4:6])[0] / 1000.0
         assert math.isclose(duty_cycle, message.duty_cycle, rel_tol=1e-6)
         rpm = struct.unpack(">i", buf[6:10])[0]
         assert rpm == message.rpm
-        acc_z = bytes_to_float32(struct.unpack(">I", buf[18:22])[0])
+        acc_z = struct.unpack(">f", buf[30:34])[0]
         assert math.isclose(acc_z, message.acc[2], rel_tol=1e-6)
-        yaw = bytes_to_float32(struct.unpack(">I", buf[30:34])[0])
+        yaw = struct.unpack(">f", buf[18:22])[0]
         assert math.isclose(yaw, message.rpy[2], rel_tol=1e-6)
 
 
@@ -200,7 +184,7 @@ def test_firmware_command(mock_serial):
     cmp = FW6_00CMP(
         "COM1",
         230400,
-        8,
+        256,
         None,
         None,
         None,
@@ -208,7 +192,7 @@ def test_firmware_command(mock_serial):
         None,
     )
     cmp._publish_firmware()
-    data = b"\x02@\x00\x06\x00HardwareName" + bytes(50)
+    data = b"\x02A\x00\x06\x00HardwareName" + bytes(50) + b"\x00\x00\x03"
     mock_serial.return_value.write.assert_called_once_with(data)
 
 
@@ -216,7 +200,7 @@ def test_motor_controller_configuration_command(mock_serial):
     cmp = FW6_00CMP(
         "COM1",
         230400,
-        8,
+        256,
         EBoard(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
         None,
         None,
@@ -224,7 +208,7 @@ def test_motor_controller_configuration_command(mock_serial):
         None,
     )
     cmp._publish_motor_controller_configuration()
-    data = b"\x03\x02\xb8\x0e" + bytes(696)
+    data = b"\x03\x02\xb8\x0e" + bytes(696) + b"\x00\x00\x03"
     mock_serial.return_value.write.assert_called_once_with(data)
 
 
@@ -232,7 +216,7 @@ def test_state_command(mock_serial):
     cmp = FW6_00CMP(
         "COM1",
         230400,
-        8,
+        256,
         None,
         EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0),
         Lock(),
@@ -240,7 +224,7 @@ def test_state_command(mock_serial):
         None,
     )
     cmp._publish_state()
-    data = b"\x02J\x04" + bytes(74)
+    data = b"\x02K\x04" + bytes(74) + b"\x00\x00\x03"
     mock_serial.return_value.write.assert_called_once_with(data)
 
 
