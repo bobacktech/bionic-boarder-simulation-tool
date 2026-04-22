@@ -3,6 +3,7 @@ from threading import Timer
 import serial
 from bionic_boarder_simulation_tool.logger import Logger
 import os
+from functools import reduce
 
 
 class CommandMessageProcessor(ABC):
@@ -23,6 +24,32 @@ class CommandMessageProcessor(ABC):
     MOTOR_CONTROLLER_CONFIGURATION = "MOTOR CONTROLLER CONFIGURATION"
     STATE = "STATE"
     BIONIC_BOARDER = "BIONIC BOARDER"
+
+    # CRC-16-CCITT (XMODEM) table for VESC
+    CRC16_TABLE = (
+        lambda: [
+            reduce(
+                lambda c, _: ((c << 1) ^ 0x1021) & 0xFFFF if (c & 0x8000) else (c << 1) & 0xFFFF,
+                range(8),
+                i << 8,
+            )
+            for i in range(256)
+        ]
+    )()
+
+    def crc16(self, data: bytes) -> int:
+        """
+        Calculate the CRC-16-CCITT (XMODEM) checksum for the given data.
+
+        Args:
+            data (bytes): The input data for which to calculate the CRC.
+        Returns:
+            int: The calculated CRC-16 checksum.
+        """
+        crc = 0
+        for byte in data:
+            crc = ((crc << 8) ^ self.CRC16_TABLE[((crc >> 8) ^ byte) & 0xFF]) & 0xFFFF
+        return crc
 
     @property
     @abstractmethod
