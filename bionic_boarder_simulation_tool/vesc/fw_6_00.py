@@ -254,10 +254,8 @@ class FW6_00CMP(CommandMessageProcessor):
             152: CommandMessageProcessor.BIONIC_BOARDER,
         }
         self.__packet_header = lambda l: int.to_bytes(2) + int.to_bytes(l)
-        # The 2 byte CRC is not implemented in the in this VESC simulation, so we set it to 0 for now.
-        crc_bytes = int.to_bytes(0x00, 2)
-        end_byte = int.to_bytes(0x03)
-        self.__packet_footer = crc_bytes + end_byte
+        # crc value + end_byte
+        self.__packet_footer = lambda payload: int.to_bytes(self.crc16(payload), 2) + int.to_bytes(0x03)
         self.__eks = eks
         self.__eks_lock = eks_lock
         self.__bdm = bdm
@@ -285,7 +283,7 @@ class FW6_00CMP(CommandMessageProcessor):
         self.__eks_lock.release()
         sm.watt_hours = self.__bdm.get_watt_hours_consumed()
         msg_data = sm.buffer
-        packet = self.__packet_header(len(msg_data)) + msg_data + self.__packet_footer
+        packet = self.__packet_header(len(msg_data)) + msg_data + self.__packet_footer(msg_data)
         self.serial.write(packet)
         Logger().logger.info(
             "Publishing state message",
@@ -303,7 +301,7 @@ class FW6_00CMP(CommandMessageProcessor):
             bb.acc[0] = self.__eks.acceleration_x
             bb.rpy[1] = self.__eks.pitch * (math.pi / 180.0)
         msg_data = bb.buffer
-        packet = self.__packet_header(len(msg_data)) + msg_data + self.__packet_footer
+        packet = self.__packet_header(len(msg_data)) + msg_data + self.__packet_footer(msg_data)
         self.serial.write(packet)
         Logger().logger.info(
             "Publishing Bionic Boarder message",
@@ -317,7 +315,7 @@ class FW6_00CMP(CommandMessageProcessor):
 
     def _publish_firmware(self):
         fw = FirmwareMessage()
-        packet = self.__packet_header(len(fw.buffer)) + fw.buffer + self.__packet_footer
+        packet = self.__packet_header(len(fw.buffer)) + fw.buffer + self.__packet_footer(fw.buffer)
         self.serial.write(packet)
 
     def _publish_motor_controller_configuration(self):
@@ -335,7 +333,7 @@ class FW6_00CMP(CommandMessageProcessor):
             + int.to_bytes(MotorControllerConfigurationMessage.BYTE_LENGTH, 2)
             + int.to_bytes(14)
             + msg_data
-            + self.__packet_footer
+            + self.__packet_footer(msg_data)
         )
         self.serial.write(packet)
         Logger().logger.info(
