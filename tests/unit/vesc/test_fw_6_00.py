@@ -191,8 +191,10 @@ def test_firmware_command(mock_serial):
         None,
         None,
     )
+    buffer = FirmwareMessage().buffer
+    crc = cmp.crc16(buffer)
     cmp._publish_firmware()
-    data = b"\x02A\x00\x06\x00HardwareName" + bytes(50) + b"\x00\x00\x03"
+    data = int.to_bytes(2) + int.to_bytes(len(buffer)) + buffer + int.to_bytes(crc, 2) + int.to_bytes(0x03)
     mock_serial.return_value.write.assert_called_once_with(data)
 
 
@@ -223,8 +225,10 @@ def test_state_command(mock_serial):
         BatteryDischargeModel(42.0),
         None,
     )
+    buffer = StateMessage().buffer
+    crc = cmp.crc16(buffer)
     cmp._publish_state()
-    data = b"\x02K\x04" + bytes(74) + b"\x00\x00\x03"
+    data = int.to_bytes(2) + int.to_bytes(len(buffer)) + buffer + int.to_bytes(crc, 2) + int.to_bytes(0x03)
     mock_serial.return_value.write.assert_called_once_with(data)
 
 

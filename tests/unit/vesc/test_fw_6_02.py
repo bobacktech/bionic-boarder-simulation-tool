@@ -254,8 +254,10 @@ class TestFW6_02CMP:
             None,
             None,
         )
+        buffer = FirmwareMessage().buffer
+        crc = cmp.crc16(buffer)
         cmp._publish_firmware()
-        data = b"\x02A\x00\x06\x02HardwareName" + bytes(50) + b"\x00\x00\x03"
+        data = int.to_bytes(2) + int.to_bytes(len(buffer)) + buffer + int.to_bytes(crc, 2) + int.to_bytes(0x03)
         mock_serial.return_value.write.assert_called_once_with(data)
 
     def test_motor_controller_configuration_command(self, mock_serial):
@@ -284,8 +286,11 @@ class TestFW6_02CMP:
             None,
             None,
         )
+        buffer = StateMessage().buffer
+        crc = cmp.crc16(buffer)
         cmp._publish_state()
-        assert mock_serial.return_value.write.called, "State command did not write to serial port."
+        data = int.to_bytes(2) + int.to_bytes(len(buffer)) + buffer + int.to_bytes(crc, 2) + int.to_bytes(0x03)
+        mock_serial.return_value.write.assert_called_once_with(data)
 
     def test_bionic_boarder_command(self, mock_serial):
         cmp = FW6_02CMP(
@@ -298,8 +303,11 @@ class TestFW6_02CMP:
             None,
             None,
         )
+        buffer = BionicBoarderMessage().buffer
+        crc = cmp.crc16(buffer)
         cmp._publish_bionic_boarder()
-        assert mock_serial.return_value.write.called, "Bionic Boarder command did not write to serial port."
+        data = int.to_bytes(2) + int.to_bytes(len(buffer)) + buffer + int.to_bytes(crc, 2) + int.to_bytes(0x03)
+        mock_serial.return_value.write.assert_called_once_with(data)
 
     def test_update_rpm(self, mock_serial):
         eks = EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)

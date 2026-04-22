@@ -333,7 +333,7 @@ class FW6_00CMP(CommandMessageProcessor):
             + int.to_bytes(MotorControllerConfigurationMessage.BYTE_LENGTH, 2)
             + int.to_bytes(14)
             + msg_data
-            + self.__packet_footer
+            + self.__packet_footer(msg_data)
         )
         self.serial.write(packet)
         Logger().logger.info(

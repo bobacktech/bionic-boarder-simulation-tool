@@ -487,7 +487,7 @@ class FW6_05CMP(CommandMessageProcessor):
         sm = StateMessage()
         # Create the state message in the future. It's TBD for now.
         msg_data = sm.buffer
-        packet = self.__packet_header(len(msg_data)) + msg_data + self.__packet_footer
+        packet = self.__packet_header(len(msg_data)) + msg_data + self.__packet_footer(msg_data)
         self.serial.write(packet)
         Logger().logger.info(
             "Publishing state message",
@@ -502,7 +502,7 @@ class FW6_05CMP(CommandMessageProcessor):
             bb.acc[0] = self.__eks.acceleration_x
             bb.rpy[1] = self.__eks.pitch * (math.pi / 180.0)
         msg_data = bb.buffer
-        packet = self.__packet_header(len(msg_data)) + msg_data + self.__packet_footer
+        packet = self.__packet_header(len(msg_data)) + msg_data + self.__packet_footer(msg_data)
         self.serial.write(packet)
         Logger().logger.info(
             "Publishing Bionic Boarder message",
@@ -516,7 +516,7 @@ class FW6_05CMP(CommandMessageProcessor):
 
     def _publish_firmware(self):
         fw = FirmwareMessage()
-        packet = self.__packet_header(len(fw.buffer)) + fw.buffer + self.__packet_footer
+        packet = self.__packet_header(len(fw.buffer)) + fw.buffer + self.__packet_footer(fw.buffer)
         self.serial.write(packet)
 
     def _publish_motor_controller_configuration(self):
@@ -534,7 +534,7 @@ class FW6_05CMP(CommandMessageProcessor):
             + int.to_bytes(MotorControllerConfigurationMessage.BYTE_LENGTH, 2)
             + int.to_bytes(14)
             + msg_data
-            + self.__packet_footer
+            + self.__packet_footer(msg_data)
         )
         self.serial.write(packet)
         Logger().logger.info(
