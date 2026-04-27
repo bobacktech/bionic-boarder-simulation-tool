@@ -78,7 +78,7 @@ class TestBionicBoarderMessage:
         """Test the buffer property to ensure correct byte structure."""
         message = BionicBoarderMessage()
 
-        message.motor_current = 12.34
+        message.avg_motor_current = 12.34
         message.duty_cycle = 0.567
         message.rpm = 1500
         message.acc[0] = 0.1
@@ -89,15 +89,15 @@ class TestBionicBoarderMessage:
         message.rpy[2] = 3.0
 
         buf = message.buffer[1:]
-        motor_current = struct.unpack(">i", buf[0:4])[0] / 100.0
-        assert math.isclose(motor_current, message.motor_current, rel_tol=1e-6)
-        duty_cycle = struct.unpack(">h", buf[4:6])[0] / 1000.0
+        motor_current = struct.unpack(">i", buf[4:8])[0] / 100.0
+        assert math.isclose(motor_current, message.avg_motor_current, rel_tol=1e-6)
+        duty_cycle = struct.unpack(">h", buf[20:22])[0] / 1000.0
         assert math.isclose(duty_cycle, message.duty_cycle, rel_tol=1e-6)
-        rpm = struct.unpack(">i", buf[6:10])[0]
+        rpm = struct.unpack(">i", buf[22:26])[0]
         assert rpm == message.rpm
-        acc_z = struct.unpack(">f", buf[30:34])[0]
+        acc_z = struct.unpack(">f", buf[73:77])[0]
         assert math.isclose(acc_z, message.acc[2], rel_tol=1e-6)
-        yaw = struct.unpack(">f", buf[18:22])[0]
+        yaw = struct.unpack(">f", buf[85:89])[0]
         assert math.isclose(yaw, message.rpy[2], rel_tol=1e-6)
 
 

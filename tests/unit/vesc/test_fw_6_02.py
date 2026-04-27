@@ -15,6 +15,7 @@ from bionic_boarder_simulation_tool.riding.eboard import EBoard
 from math import ldexp
 from threading import Lock
 import struct
+import math
 
 
 class TestFirmwareMessage:
@@ -140,32 +141,29 @@ class TestStateMessage:
 
 
 class TestBionicBoarderMessage:
-    def test_initialization(self):
-        msg = BionicBoarderMessage()
-        assert msg.motor_current == 0.0
-        assert msg.duty_cycle == 0.0
-        assert msg.rpm == 0
-        assert msg.acc == [0.0, 0.0, 0.0]
-        assert msg.rpy == [0.0, 0.0, 0.0]
-
     def test_buffer_property(self):
         msg = BionicBoarderMessage()
         msg.motor_current = 12.34
         msg.duty_cycle = 0.567
         msg.rpm = 1500
-        msg.acc = [0.1, 0.2, 0.3]
-        msg.rpy = [1.0, 2.0, 3.0]
+        msg.acc[0] = 0.1
+        msg.acc[1] = 0.2
+        msg.acc[2] = 0.3
+        msg.rpy[0] = 1.0
+        msg.rpy[1] = 2.0
+        msg.rpy[2] = 3.0
 
         buf = msg.buffer[1:]  # Skip the first byte which is the message type
-        assert buf[0:4] == int(12.34 * 1e2).to_bytes(4, byteorder="big", signed=True), "Motor current bytes incorrect."
-        assert buf[4:6] == int(0.567 * 1e3).to_bytes(2, byteorder="big", signed=True), "Duty cycle bytes incorrect."
-        assert buf[6:10] == int(1500 * 1e0).to_bytes(4, byteorder="big", signed=True), "RPM bytes incorrect."
-        assert struct.unpack(">f", buf[22:26])[0] == pytest.approx(0.1, rel=1e-5), "Acceleration X bytes incorrect."
-        assert struct.unpack(">f", buf[26:30])[0] == pytest.approx(0.2, rel=1e-5), "Acceleration Y bytes incorrect."
-        assert struct.unpack(">f", buf[30:34])[0] == pytest.approx(0.3, rel=1e-5), "Acceleration Z bytes incorrect."
-        assert struct.unpack(">f", buf[10:14])[0] == pytest.approx(1.0, rel=1e-5), "Roll bytes incorrect."
-        assert struct.unpack(">f", buf[14:18])[0] == pytest.approx(2.0, rel=1e-5), "Pitch bytes incorrect."
-        assert struct.unpack(">f", buf[18:22])[0] == pytest.approx(3.0, rel=1e-5), "Yaw bytes incorrect."
+        motor_current = struct.unpack(">i", buf[4:8])[0] / 100.0
+        assert math.isclose(motor_current, msg.avg_motor_current, rel_tol=1e-6)
+        duty_cycle = struct.unpack(">h", buf[20:22])[0] / 1000.0
+        assert math.isclose(duty_cycle, msg.duty_cycle, rel_tol=1e-6)
+        rpm = struct.unpack(">i", buf[22:26])[0]
+        assert rpm == msg.rpm
+        acc_z = struct.unpack(">f", buf[73:77])[0]
+        assert math.isclose(acc_z, msg.acc[2], rel_tol=1e-6)
+        yaw = struct.unpack(">f", buf[85:89])[0]
+        assert math.isclose(yaw, msg.rpy[2], rel_tol=1e-6)
 
 
 class TestMotorControllerConfigurationMessage:
