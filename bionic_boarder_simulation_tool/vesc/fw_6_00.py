@@ -89,69 +89,6 @@ class MotorControllerConfigurationMessage:
         return bytes(self.__buffer)
 
 
-class StateMessage:
-    """
-    See the "COMM_GET_VALUES" message specification in [commands.c](https://github.com/vedderb/bldc/blob/6.00/comm/commands.c)
-    in VESC bldc-6.00 source code on Github.
-    """
-
-    ID = 4
-
-    def __init__(self) -> None:
-        self.__rpm: int = 0
-        self.__motor_current: float = 0
-        self.__watt_hours: float = 0
-
-    @property
-    def buffer(self) -> bytes:
-        """
-        Generates a byte representation of the state message based on the current properties of the object.
-
-        The state message is structured as a 76-byte array, with specific portions of the array dedicated to
-        representing the input voltage, motor current, and RPM, encoded in specific formats.
-
-        The encoding is as follows:
-        - Motor current (mc) is stored from bytes 9 to 12, represented as an unsigned int (">I"), scaled by 100.
-        - RPM is stored from bytes 27 to 30, represented directly as an unsigned int (">I") without scaling.
-        - Watt hours (Wh) is stored from bytes 41 to 44, represented as an unsigned short (">H"), scaled by 10000.
-
-        Returns:
-            bytes: A bytes object representing the encoded state message, suitable for transmission or processing
-                in accordance with the "COMM_GET_VALUES" message specification of the VESC firmware.
-        """
-        buffer = bytearray(74)
-        wh = int(self.__watt_hours * 10000.0)
-        mc = int(self.__motor_current * 100.0)
-        buffer[4:8] = struct.pack(">I", mc)
-        buffer[22:26] = struct.pack(">i", self.__rpm)
-        buffer[36:40] = struct.pack(">I", wh)
-        return StateMessage.ID.to_bytes(1) + bytes(buffer)
-
-    @property
-    def rpm(self) -> int:
-        return self.__rpm
-
-    @rpm.setter
-    def rpm(self, value: int) -> None:
-        self.__rpm = value
-
-    @property
-    def motor_current(self) -> float:
-        return self.__motor_current
-
-    @motor_current.setter
-    def motor_current(self, value: float) -> None:
-        self.__motor_current = value
-
-    @property
-    def watt_hours(self) -> float:
-        return self.__watt_hours
-
-    @watt_hours.setter
-    def watt_hours(self, value: float) -> None:
-        self.__watt_hours = value
-
-
 class BionicBoarderMessage:
     """
     See the "COMM_BIONIC_BOARDER_DATA" message specification in [commands.c](https://github.com/vedderb/bldc/blob/6.00/comm/commands.c)
@@ -461,7 +398,6 @@ class FW6_00CMP(CommandMessageProcessor):
             30: CommandMessageProcessor.HEARTBEAT,
             0: CommandMessageProcessor.FIRMWARE,
             14: CommandMessageProcessor.MOTOR_CONTROLLER_CONFIGURATION,
-            4: CommandMessageProcessor.STATE,
             152: CommandMessageProcessor.BIONIC_BOARDER,
         }
         self.__packet_header = lambda l: int.to_bytes(2) + int.to_bytes(l)
@@ -485,24 +421,6 @@ class FW6_00CMP(CommandMessageProcessor):
         The command ID for the received command is in the third byte of the [command] data buffer.
         """
         return command[2]
-
-    def _publish_state(self):
-        sm = StateMessage()
-        self.__eks_lock.acquire()
-        sm.motor_current = self.__eks.motor_current
-        sm.rpm = self.__eks.erpm
-        self.__eks_lock.release()
-        sm.watt_hours = self.__bdm.get_watt_hours_consumed()
-        msg_data = sm.buffer
-        packet = self.__packet_header(len(msg_data)) + msg_data + self.__packet_footer(msg_data)
-        self.serial.write(packet)
-        Logger().logger.info(
-            "Publishing state message",
-            rpm=sm.rpm,
-            motor_current=sm.motor_current,
-            watt_hours=sm.watt_hours,
-            CMP=self.__class__.__name__,
-        )
 
     def _publish_bionic_boarder(self):
         bb = BionicBoarderMessage()

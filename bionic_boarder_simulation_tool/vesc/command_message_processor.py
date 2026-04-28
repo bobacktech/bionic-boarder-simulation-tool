@@ -22,7 +22,6 @@ class CommandMessageProcessor(ABC):
     # Message request commands
     FIRMWARE = "FIRMWARE"
     MOTOR_CONTROLLER_CONFIGURATION = "MOTOR CONTROLLER CONFIGURATION"
-    STATE = "STATE"
     BIONIC_BOARDER = "BIONIC BOARDER"
 
     # CRC-16-CCITT (XMODEM) table for VESC
@@ -101,7 +100,6 @@ class CommandMessageProcessor(ABC):
         """
         command_bytes = None
         handler = {
-            CommandMessageProcessor.STATE: lambda: self._publish_state(),
             CommandMessageProcessor.BIONIC_BOARDER: lambda: self._publish_bionic_boarder(),
             CommandMessageProcessor.FIRMWARE: lambda: self._publish_firmware(),
             CommandMessageProcessor.MOTOR_CONTROLLER_CONFIGURATION: lambda: self._publish_motor_controller_configuration(),
@@ -129,13 +127,6 @@ class CommandMessageProcessor(ABC):
 
         Returns:
             int: The command ID.
-        """
-        pass
-
-    @abstractmethod
-    def _publish_state(self):
-        """
-        Abstract method to publish the 'state' message.
         """
         pass
 
