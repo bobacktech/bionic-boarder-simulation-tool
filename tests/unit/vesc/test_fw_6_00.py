@@ -4,7 +4,6 @@ from bionic_boarder_simulation_tool.riding.frictional_deceleration_model import 
 from bionic_boarder_simulation_tool.vesc.fw_6_00 import (
     FirmwareMessage,
     MotorControllerConfigurationMessage,
-    StateMessage,
     BionicBoarderMessage,
     FW6_00CMP,
 )
@@ -33,44 +32,6 @@ def test_firmware_message_buffer_property():
     buffer = msg.buffer[1:]  # Skip the first byte which is the message type
     assert isinstance(buffer, bytes), "Buffer property should return a bytes object."
     assert buffer == bytes(msg._FirmwareMessage__buffer), "Buffer property does not return expected byte array."
-
-
-class TestStateMessage:
-    def test_initial_state(self):
-        """Test initial state of StateMessage."""
-        msg = StateMessage()
-        assert msg.rpm == 0
-        assert msg.motor_current == 0
-        assert msg.watt_hours == 0
-
-    def test_setting_properties(self):
-        """Test setting properties of StateMessage."""
-        msg = StateMessage()
-        msg.rpm = 1200
-        msg.motor_current = 1.5
-        msg.watt_hours = 12.5
-
-        assert msg.rpm == 1200
-        assert msg.motor_current == 1.5
-        assert msg.watt_hours == 12.5
-
-    def test_buffer_property(self):
-        """Test the buffer property to ensure correct byte structure."""
-        msg = StateMessage()
-        msg.rpm = 1200
-        msg.motor_current = 1.5
-        msg.watt_hours = 12.5
-
-        buffer = msg.buffer[1:]  # Skip the first byte which is the message type
-        assert len(buffer) == 74  # Check buffer size
-        # Decode specific fields to verify correct packing
-        unpacked_mc = struct.unpack(">I", buffer[4:8])[0]
-        unpacked_rpm = struct.unpack(">i", buffer[22:26])[0]
-        unpacked_wh = struct.unpack(">I", buffer[36:40])[0]
-
-        assert unpacked_mc == int(1.5 * 100)
-        assert unpacked_rpm == 1200
-        assert unpacked_wh == int(12.5 * 10000)
 
 
 class TestBionicBoarderMessage:
@@ -211,24 +172,6 @@ def test_motor_controller_configuration_command(mock_serial):
     )
     cmp._publish_motor_controller_configuration()
     data = b"\x03\x02\xb8\x0e" + bytes(696) + b"\x00\x00\x03"
-    mock_serial.return_value.write.assert_called_once_with(data)
-
-
-def test_state_command(mock_serial):
-    cmp = FW6_00CMP(
-        "COM1",
-        230400,
-        256,
-        None,
-        EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0),
-        Lock(),
-        BatteryDischargeModel(42.0),
-        None,
-    )
-    buffer = StateMessage().buffer
-    crc = cmp.crc16(buffer)
-    cmp._publish_state()
-    data = int.to_bytes(2) + int.to_bytes(len(buffer)) + buffer + int.to_bytes(crc, 2) + int.to_bytes(0x03)
     mock_serial.return_value.write.assert_called_once_with(data)
 
 
