@@ -1,3 +1,4 @@
+from enum import IntEnum
 from . import fw
 from .command_message_processor import CommandMessageProcessor
 import struct
