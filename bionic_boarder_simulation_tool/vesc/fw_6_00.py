@@ -303,7 +303,9 @@ class MotorControllerConfigurationMessage:
         self.foc_sl_erpm: float = 0.0
         self.foc_sample_v0_v7: bool = False
         self.foc_sample_high_current: bool = False
-        self.foc_sat_comp_mode: SAT_COMP_MODE = SAT_COMP_MODE.SAT_COMP_DISABLED
+        self.foc_sat_comp_mode: MotorControllerConfigurationMessage.SAT_COMP_MODE = (
+            MotorControllerConfigurationMessage.SAT_COMP_MODE.SAT_COMP_DISABLED
+        )
         self.foc_sat_comp: float = 0.0
         self.foc_temp_comp: bool = False
         self.foc_temp_comp_base_temp: float = 0.0
@@ -392,23 +394,23 @@ class MotorControllerConfigurationMessage:
         self.m_encoder_cos_amp: float = 0.0
         self.m_encoder_sincos_filter_constant: float = 0.0
         self.m_encoder_sincos_phase_correction: float = 0.0
-        self.m_sensor_port_mode: MotorControllerConfigurationMessage.SENSOR_PORT_MODE = (
-            MotorControllerConfigurationMessage.SENSOR_PORT_MODE.SENSOR_PORT_MODE_HALL
+        self.m_sensor_port_mode: MotorControllerConfigurationMessage.sensor_port_mode = (
+            MotorControllerConfigurationMessage.sensor_port_mode.SENSOR_PORT_MODE_HALL
         )
         self.m_invert_direction: bool = False
-        self.m_drv8301_oc_mode: MotorControllerConfigurationMessage.DRV8301_OC_MODE = (
-            MotorControllerConfigurationMessage.DRV8301_OC_MODE.DRV8301_OC_LIMIT
+        self.m_drv8301_oc_mode: MotorControllerConfigurationMessage.drv8301_oc_mode = (
+            MotorControllerConfigurationMessage.drv8301_oc_mode.DRV8301_OC_LIMIT
         )
         self.m_drv8301_oc_adj: int = 0
         self.m_bldc_f_sw_min: float = 0.0
         self.m_bldc_f_sw_max: float = 0.0
         self.m_dc_f_sw: float = 0.0
         self.m_ntc_motor_beta: float = 0.0
-        self.m_out_aux_mode: MotorControllerConfigurationMessage.OUT_AUX_MODE = (
-            MotorControllerConfigurationMessage.OUT_AUX_MODE.OUT_AUX_MODE_OFF
+        self.m_out_aux_mode: MotorControllerConfigurationMessage.out_aux_mode = (
+            MotorControllerConfigurationMessage.out_aux_mode.OUT_AUX_MODE_OFF
         )
-        self.m_motor_temp_sens_type: MotorControllerConfigurationMessage.TEMP_SENSOR_TYPE = (
-            MotorControllerConfigurationMessage.TEMP_SENSOR_TYPE.TEMP_SENSOR_NTC_10K_25C
+        self.m_motor_temp_sens_type: MotorControllerConfigurationMessage.temp_sensor_type = (
+            MotorControllerConfigurationMessage.temp_sensor_type.TEMP_SENSOR_NTC_10K_25C
         )
         self.m_ptc_motor_coeff: float = 0.0
         self.m_hall_extra_samples: int = 0
@@ -475,7 +477,7 @@ class MotorControllerConfigurationMessage:
         data += struct.pack(">ff", self.sl_cycle_int_rpm_br, self.sl_bemf_coupling_k)
         data += struct.pack(">8B", *[self.hall_table[i] & 0xFF for i in range(8)])
         data += struct.pack(">f", self.hall_sl_erpm)
-        data += struct.pack(">fffff", self.foc_current_kp, self.foc_current_ki, self.foc_f_zv, self.foc_dt_us)
+        data += struct.pack(">ffff", self.foc_current_kp, self.foc_current_ki, self.foc_f_zv, self.foc_dt_us)
         data += struct.pack(">B", int(self.foc_encoder_inverted))
         data += struct.pack(">ff", self.foc_encoder_offset, self.foc_encoder_ratio)
         data += struct.pack(">B", self.foc_sensor_mode)
@@ -495,7 +497,7 @@ class MotorControllerConfigurationMessage:
             int(self.foc_sl_openloop_hyst * 100),
         )
         data += struct.pack(
-            ">hhhhhh",
+            ">hhhhh",
             int(self.foc_sl_openloop_time_lock * 100),
             int(self.foc_sl_openloop_time_ramp * 100),
             int(self.foc_sl_openloop_time * 100),
@@ -973,13 +975,7 @@ class FW6_00CMP(CommandMessageProcessor):
         mcc.l_watt_max = self.__eboard.motor_max_power_watts
         mcc.l_max_vin = self.__eboard.battery_max_voltage
         msg_data = mcc.buffer
-        packet = (
-            int.to_bytes(3)
-            + int.to_bytes(MotorControllerConfigurationMessage.BYTE_LENGTH, 2)
-            + int.to_bytes(14)
-            + msg_data
-            + self.__packet_footer(msg_data)
-        )
+        packet = int.to_bytes(3) + int.to_bytes(len(msg_data), 2) + msg_data + self.__packet_footer(msg_data)
         self.serial.write(packet)
         Logger().logger.info(
             "Publishing motor controller configuration message",
