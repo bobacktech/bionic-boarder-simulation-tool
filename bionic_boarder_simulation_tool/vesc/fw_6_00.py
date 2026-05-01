@@ -522,7 +522,7 @@ class MotorControllerConfigurationMessage:
         data += struct.pack(">f", self.foc_sl_erpm_hfi)
         data += struct.pack(">H", self.foc_hfi_start_samples)
         data += struct.pack(">f", self.foc_hfi_obs_ovr_sec)
-        data += struct.pack(">BB", self.foc_hfi_samples, int(self.foc_offsets_cal_on_boot))
+        data += struct.pack(">BB", self.foc_hfi_sample, int(self.foc_offsets_cal_on_boot))
         data += struct.pack(
             ">fff", self.foc_offsets_current[0], self.foc_offsets_current[1], self.foc_offsets_current[2]
         )
