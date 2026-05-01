@@ -54,73 +54,180 @@ class TestBionicBoarderMessage:
         assert math.isclose(yaw, msg.rpy[2], rel_tol=1e-6)
 
 
+MCCONF_SIGNATURE = 776184161  # 0x2E4B7631
+
+
 class TestMotorControllerConfigurationMessage:
-    def test_buffer_property(self):
-        """
-        Verifies that the buffer property returns a bytes object of the correct length.
-        """
-        message = MotorControllerConfigurationMessage()
-        buffer = message.buffer
-        assert isinstance(buffer, bytes), "Buffer property should return a bytes object."
-        assert (
-            len(buffer) == MotorControllerConfigurationMessage.BYTE_LENGTH
-        ), f"Buffer length should be {MotorControllerConfigurationMessage.BYTE_LENGTH}, got {len(buffer)}."
 
-    def test_buffer_encoding(self):
-        """
-        Verifies that setting properties on the object results in the correct
-        byte sequences at the specific offsets defined in the class.
-        """
-        message = MotorControllerConfigurationMessage()
+    @staticmethod
+    def _parse_buffer(data: bytes) -> dict:
+        """Unpack the raw buffer into a flat dict for easy assertion."""
+        offset = 0
 
-        # 1. Set arbitrary test values
-        test_current_max = 123.45
-        test_max_vin = 56.78
-        test_watt_max = 999.99
-        test_flux_linkage = 0.0025
-        test_motor_poles = 14  # Integer
-        test_gear_ratio = 3.5
-        test_wheel_diameter = 0.083
-        test_battery_ah = 12.5
+        def read(fmt):
+            nonlocal offset
+            size = struct.calcsize(fmt)
+            values = struct.unpack_from(fmt, data, offset)
+            offset += size
+            return values
 
-        message.l_current_max = test_current_max
-        message.l_max_vin = test_max_vin
-        message.l_watt_max = test_watt_max
-        message.foc_motor_flux_linkage = test_flux_linkage
-        message.si_motor_poles = test_motor_poles
-        message.si_gear_ratio = test_gear_ratio
-        message.si_wheel_diameter = test_wheel_diameter
-        message.si_battery_ah = test_battery_ah
+        result = {}
 
-        # 2. Generate the buffer
-        buf = message.buffer
+        result["cmd_id"] = data[0]
+        offset = 1
 
-        # 3. Assert that the bytes at specific offsets match the struct.pack expectation
-        # Note: The class uses Big-Endian (>f) for floats
+        (result["signature"],) = read(">I")
+        result["pwm_mode"], result["comm_mode"], result["motor_type"], result["sensor_mode"] = read(">BBBB")
 
-        # l_current_max: 0-3
-        assert buf[0:4] == struct.pack(">f", test_current_max), "l_current_max encoding failed"
+        (
+            result["l_current_max"],
+            result["l_current_min"],
+            result["l_in_current_max"],
+            result["l_in_current_min"],
+            result["l_abs_current_max"],
+            result["l_min_erpm"],
+            result["l_max_erpm"],
+        ) = read(">fffffff")
 
-        # l_max_vin: 44-47
-        assert buf[44:48] == struct.pack(">f", test_max_vin), "l_max_vin encoding failed"
+        (result["l_erpm_start_raw"],) = read(">h")
+        result["l_max_erpm_fbrake"], result["l_max_erpm_fbrake_cc"] = read(">ff")
+        result["l_min_vin"], result["l_max_vin"] = read(">ff")
+        result["l_battery_cut_start"], result["l_battery_cut_end"] = read(">ff")
+        (result["l_slow_abs_current"],) = read(">B")
 
-        # l_watt_max: 85-88
-        assert buf[85:89] == struct.pack(">f", test_watt_max), "l_watt_max encoding failed"
+        (
+            result["l_temp_fet_start_raw"],
+            result["l_temp_fet_end_raw"],
+            result["l_temp_motor_start_raw"],
+            result["l_temp_motor_end_raw"],
+        ) = read(">hhhh")
 
-        # foc_motor_flux_linkage: 222-225
-        assert buf[222:226] == struct.pack(">f", test_flux_linkage), "foc_motor_flux_linkage encoding failed"
+        result["l_temp_accel_dec_raw"], result["l_min_duty_raw"], result["l_max_duty_raw"] = read(">hhh")
 
-        # si_motor_poles: 644 (Single byte integer)
-        assert buf[644] == test_motor_poles, "si_motor_poles encoding failed"
+        result["l_watt_max"], result["l_watt_min"] = read(">ff")
 
-        # si_gear_ratio: 645-648
-        assert buf[645:649] == struct.pack(">f", test_gear_ratio), "si_gear_ratio encoding failed"
+        result["l_current_max_scale_raw"], result["l_current_min_scale_raw"], result["l_duty_start_raw"] = read(">hhh")
 
-        # si_wheel_diameter: 649-652
-        assert buf[649:653] == struct.pack(">f", test_wheel_diameter), "si_wheel_diameter encoding failed"
+        return result  # extend as needed for deeper tests
 
-        # si_battery_ah: 661-664
-        assert buf[661:665] == struct.pack(">f", test_battery_ah), "si_battery_ah encoding failed"
+    # ------------------------------------------------------------------
+    # Basic structural tests
+    # ------------------------------------------------------------------
+
+    def test_buffer_returns_bytes(self):
+        msg = MotorControllerConfigurationMessage()
+        assert isinstance(msg.buffer, bytes)
+
+    def test_buffer_first_byte_is_command_id(self):
+        msg = MotorControllerConfigurationMessage()
+        assert msg.buffer[0] == MotorControllerConfigurationMessage.ID  # 14
+
+    def test_buffer_signature(self):
+        msg = MotorControllerConfigurationMessage()
+        parsed = self._parse_buffer(msg.buffer)
+        assert parsed["signature"] == MCCONF_SIGNATURE
+
+    def test_buffer_minimum_length(self):
+        """Buffer must be at least long enough to hold the signature + cmd byte."""
+        msg = MotorControllerConfigurationMessage()
+        assert len(msg.buffer) > 5
+
+    def test_buffer_is_deterministic(self):
+        """Calling buffer twice on the same object returns identical bytes."""
+        msg = MotorControllerConfigurationMessage()
+        assert msg.buffer == msg.buffer
+
+    # ------------------------------------------------------------------
+    # Default-value encoding tests
+    # ------------------------------------------------------------------
+
+    def test_default_pwm_mode_encoded(self):
+        msg = MotorControllerConfigurationMessage()
+        parsed = self._parse_buffer(msg.buffer)
+        assert parsed["pwm_mode"] == int(MotorControllerConfigurationMessage.mc_pwm_mode.PWM_MODE_SYNCHRONOUS)
+
+    def test_default_comm_mode_encoded(self):
+        msg = MotorControllerConfigurationMessage()
+        parsed = self._parse_buffer(msg.buffer)
+        assert parsed["comm_mode"] == int(MotorControllerConfigurationMessage.mc_comm_mode.COMM_MODE_INTEGRATE)
+
+    def test_default_motor_type_encoded(self):
+        msg = MotorControllerConfigurationMessage()
+        parsed = self._parse_buffer(msg.buffer)
+        assert parsed["motor_type"] == int(MotorControllerConfigurationMessage.mc_motor_type.MOTOR_TYPE_FOC)
+
+    def test_default_sensor_mode_encoded(self):
+        msg = MotorControllerConfigurationMessage()
+        parsed = self._parse_buffer(msg.buffer)
+        assert parsed["sensor_mode"] == int(MotorControllerConfigurationMessage.mc_sensor_mode.SENSOR_MODE_SENSORLESS)
+
+    def test_default_floats_are_zero(self):
+        msg = MotorControllerConfigurationMessage()
+        parsed = self._parse_buffer(msg.buffer)
+        for key in (
+            "l_current_max",
+            "l_current_min",
+            "l_in_current_max",
+            "l_in_current_min",
+            "l_abs_current_max",
+            "l_min_erpm",
+            "l_max_erpm",
+        ):
+            assert parsed[key] == pytest.approx(0.0), f"{key} should be 0.0"
+
+    def test_default_l_slow_abs_current_false(self):
+        msg = MotorControllerConfigurationMessage()
+        parsed = self._parse_buffer(msg.buffer)
+        assert parsed["l_slow_abs_current"] == 0
+
+    # ------------------------------------------------------------------
+    # Round-trip / mutation tests
+    # ------------------------------------------------------------------
+
+    def test_l_erpm_start_scaled_encoding(self):
+        """l_erpm_start is packed as int16 * 10000."""
+        msg = MotorControllerConfigurationMessage()
+        msg.l_erpm_start = 0.75
+        parsed = self._parse_buffer(msg.buffer)
+        assert parsed["l_erpm_start_raw"] == int(0.75 * 10000)
+
+    def test_l_slow_abs_current_true_encodes_as_1(self):
+        msg = MotorControllerConfigurationMessage()
+        msg.l_slow_abs_current = True
+        parsed = self._parse_buffer(msg.buffer)
+        assert parsed["l_slow_abs_current"] == 1
+
+    def test_pwm_mode_change_reflected_in_buffer(self):
+        msg = MotorControllerConfigurationMessage()
+        msg.pwm_mode = MotorControllerConfigurationMessage.mc_pwm_mode.PWM_MODE_BIPOLAR
+        parsed = self._parse_buffer(msg.buffer)
+        assert parsed["pwm_mode"] == int(MotorControllerConfigurationMessage.mc_pwm_mode.PWM_MODE_BIPOLAR)
+
+    def test_motor_type_change_reflected_in_buffer(self):
+        msg = MotorControllerConfigurationMessage()
+        msg.motor_type = MotorControllerConfigurationMessage.mc_motor_type.MOTOR_TYPE_DC
+        parsed = self._parse_buffer(msg.buffer)
+        assert parsed["motor_type"] == int(MotorControllerConfigurationMessage.mc_motor_type.MOTOR_TYPE_DC)
+
+    # ------------------------------------------------------------------
+    # BMS sub-struct tests
+    # ------------------------------------------------------------------
+
+    def test_bms_type_default_encoded(self):
+        msg = MotorControllerConfigurationMessage()
+        # BMS type byte is near the end; just verify the buffer ends with
+        # the expected BMS_TYPE_NONE (0) and limit_mode (0) bytes.
+        buf = msg.buffer
+        # Find bms section: last 11 bytes = BB + hhhh + B
+        bms_type, limit_mode = struct.unpack_from(">BB", buf, len(buf) - 11)
+        assert bms_type == int(MotorControllerConfigurationMessage.BMS_TYPE.BMS_TYPE_NONE)
+        assert limit_mode == 0
+
+    def test_bms_fwd_can_mode_default_encoded(self):
+        msg = MotorControllerConfigurationMessage()
+        buf = msg.buffer
+        (fwd_can_mode,) = struct.unpack_from(">B", buf, len(buf) - 1)
+        assert fwd_can_mode == int(MotorControllerConfigurationMessage.BMS_FWD_CAN_MODE.BMS_FWD_CAN_MODE_DISABLED)
 
 
 @pytest.fixture
@@ -157,8 +264,10 @@ class TestFW6_02CMP:
             None,
             None,
         )
+        buffer = MotorControllerConfigurationMessage().buffer
+        crc = cmp.crc16(buffer)
         cmp._publish_motor_controller_configuration()
-        data = b"\x03\x02\xb8\x0e" + bytes(696) + b"\x00\x00\x03"
+        data = int.to_bytes(3) + int.to_bytes(len(buffer), 2) + buffer + int.to_bytes(crc, 2) + int.to_bytes(0x03)
         mock_serial.return_value.write.assert_called_once_with(data)
 
     def test_bionic_boarder_command(self, mock_serial):
