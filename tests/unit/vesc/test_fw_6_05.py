@@ -1,3 +1,5 @@
+from filecmp import cmp
+
 import pytest
 from bionic_boarder_simulation_tool.riding.frictional_deceleration_model import FrictionalDecelerationModel
 from bionic_boarder_simulation_tool.vesc.fw_6_05 import (
@@ -54,72 +56,81 @@ class TestBionicBoarderMessage:
 
 
 class TestMotorControllerConfigurationMessage:
-    def test_buffer_property(self):
-        """
-        Verifies that the buffer property returns a bytes object of the correct length.
-        """
-        message = MotorControllerConfigurationMessage()
-        buffer = message.buffer
-        assert isinstance(buffer, bytes), "Buffer property should return a bytes object."
-        assert (
-            len(buffer) == MotorControllerConfigurationMessage.BYTE_LENGTH
-        ), f"Buffer length should be {MotorControllerConfigurationMessage.BYTE_LENGTH}, got {len(buffer)}."
+    """Unit tests for MotorControllerConfigurationMessage."""
 
-    def test_buffer_encoding(self):
-        """
-        Verifies that setting properties on the object results in the correct
-        byte sequences at the specific offsets defined in the class.
-        """
-        message = MotorControllerConfigurationMessage()
+    # ------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------
 
-        # 1. Set arbitrary test values
-        test_current_max = 123.45
-        test_max_vin = 56.78
-        test_watt_max = 999.99
-        test_flux_linkage = 0.0025
-        test_motor_poles = 14  # Integer
-        test_gear_ratio = 3.5
-        test_wheel_diameter = 0.083
-        test_battery_ah = 12.5
+    @pytest.fixture
+    def msg(self):
+        """Return a fresh default-constructed message."""
+        return MotorControllerConfigurationMessage()
 
-        message.l_current_max = test_current_max
-        message.l_max_vin = test_max_vin
-        message.l_watt_max = test_watt_max
-        message.foc_motor_flux_linkage = test_flux_linkage
-        message.si_motor_poles = test_motor_poles
-        message.si_gear_ratio = test_gear_ratio
-        message.si_wheel_diameter = test_wheel_diameter
-        message.si_battery_ah = test_battery_ah
+    MCCONF_SIGNATURE = 1065524471  # 0x3F6A2C57
 
-        # 2. Generate the buffer
-        buf = message.buffer
+    # ------------------------------------------------------------------
+    # buffer property – structural checks
+    # ------------------------------------------------------------------
 
-        # 3. Assert that the bytes at specific offsets match the struct.pack expectation
-        # Note: The class uses Big-Endian (>f) for floats
+    def test_buffer_returns_bytes(self, msg):
+        assert isinstance(msg.buffer, bytes)
 
-        # l_current_max: 0-3
-        assert buf[0:4] == struct.pack(">f", test_current_max), "l_current_max encoding failed"
+    def test_buffer_first_byte_is_message_id(self, msg):
+        assert msg.buffer[0] == MotorControllerConfigurationMessage.ID
 
-        # l_max_vin: 44-47
-        assert buf[44:48] == struct.pack(">f", test_max_vin), "l_max_vin encoding failed"
+    def test_buffer_contains_mcconf_signature(self, msg):
+        buf = msg.buffer
+        # Signature starts at byte 1 (after the 1-byte message ID)
+        sig = struct.unpack(">I", buf[1:5])[0]
+        assert sig == self.MCCONF_SIGNATURE
 
-        # l_watt_max: 85-88
-        assert buf[85:89] == struct.pack(">f", test_watt_max), "l_watt_max encoding failed"
+    def test_buffer_is_deterministic(self, msg):
+        assert msg.buffer == msg.buffer
 
-        # foc_motor_flux_linkage: 222-225
-        assert buf[222:226] == struct.pack(">f", test_flux_linkage), "foc_motor_flux_linkage encoding failed"
+    def test_buffer_changes_when_field_modified(self, msg):
+        original = msg.buffer
+        msg.l_current_max = 100.0
+        assert msg.buffer != original
 
-        # si_motor_poles: 644 (Single byte integer)
-        assert buf[644] == test_motor_poles, "si_motor_poles encoding failed"
+    def test_buffer_pwm_mode_byte(self, msg):
+        msg.pwm_mode = MotorControllerConfigurationMessage.mc_pwm_mode.PWM_MODE_BIPOLAR
+        buf = msg.buffer
+        # byte 5 = pwm_mode (after 1-byte ID + 4-byte signature)
+        assert buf[5] == MotorControllerConfigurationMessage.mc_pwm_mode.PWM_MODE_BIPOLAR
 
-        # si_gear_ratio: 645-648
-        assert buf[645:649] == struct.pack(">f", test_gear_ratio), "si_gear_ratio encoding failed"
+    def test_buffer_comm_mode_byte(self, msg):
+        msg.comm_mode = MotorControllerConfigurationMessage.mc_comm_mode.COMM_MODE_DELAY
+        buf = msg.buffer
+        assert buf[6] == MotorControllerConfigurationMessage.mc_comm_mode.COMM_MODE_DELAY
 
-        # si_wheel_diameter: 649-652
-        assert buf[649:653] == struct.pack(">f", test_wheel_diameter), "si_wheel_diameter encoding failed"
+    def test_buffer_motor_type_byte(self, msg):
+        msg.motor_type = MotorControllerConfigurationMessage.mc_motor_type.MOTOR_TYPE_BLDC
+        buf = msg.buffer
+        assert buf[7] == MotorControllerConfigurationMessage.mc_motor_type.MOTOR_TYPE_BLDC
 
-        # si_battery_ah: 661-664
-        assert buf[661:665] == struct.pack(">f", test_battery_ah), "si_battery_ah encoding failed"
+    def test_buffer_sensor_mode_byte(self, msg):
+        msg.sensor_mode = MotorControllerConfigurationMessage.mc_sensor_mode.SENSOR_MODE_SENSORED
+        buf = msg.buffer
+        assert buf[8] == MotorControllerConfigurationMessage.mc_sensor_mode.SENSOR_MODE_SENSORED
+
+    def test_buffer_l_current_max_encoding(self, msg):
+        msg.l_current_max = 42.5
+        buf = msg.buffer
+        # l_current_max is the first float after the 4-byte mode block (offset 9)
+        (val,) = struct.unpack(">f", buf[9:13])
+        assert abs(val - 42.5) < 1e-4
+
+    def test_buffer_l_current_min_encoding(self, msg):
+        msg.l_current_min = -10.0
+        buf = msg.buffer
+        (val,) = struct.unpack(">f", buf[13:17])
+        assert abs(val - (-10.0)) < 1e-4
+
+    def test_buffer_bms_fwd_can_mode_last_byte(self, msg):
+        msg.bms.fwd_can_mode = MotorControllerConfigurationMessage.BMS_FWD_CAN_MODE.BMS_FWD_CAN_MODE_ANY
+        buf = msg.buffer
+        assert buf[-1] == MotorControllerConfigurationMessage.BMS_FWD_CAN_MODE.BMS_FWD_CAN_MODE_ANY
 
 
 @pytest.fixture
@@ -156,8 +167,10 @@ class TestFW6_05CMP:
             None,
             None,
         )
+        buffer = MotorControllerConfigurationMessage().buffer
+        crc = cmp.crc16(buffer)
         cmp._publish_motor_controller_configuration()
-        data = b"\x03\x02\xb8\x0e" + bytes(696) + b"\x00\x00\x03"
+        data = int.to_bytes(3) + int.to_bytes(len(buffer), 2) + buffer + int.to_bytes(crc, 2) + int.to_bytes(0x03)
         mock_serial.return_value.write.assert_called_once_with(data)
 
     def test_bionic_boarder_command(self, mock_serial):

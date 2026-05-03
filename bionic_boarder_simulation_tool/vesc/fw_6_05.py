@@ -1015,13 +1015,7 @@ class FW6_05CMP(CommandMessageProcessor):
         mcc.l_watt_max = self.__eboard.motor_max_power_watts
         mcc.l_max_vin = self.__eboard.battery_max_voltage
         msg_data = mcc.buffer
-        packet = (
-            int.to_bytes(3)
-            + int.to_bytes(MotorControllerConfigurationMessage.BYTE_LENGTH, 2)
-            + int.to_bytes(14)
-            + msg_data
-            + self.__packet_footer(msg_data)
-        )
+        packet = int.to_bytes(3) + int.to_bytes(len(msg_data), 2) + msg_data + self.__packet_footer(msg_data)
         self.serial.write(packet)
         Logger().logger.info(
             "Publishing motor controller configuration message",
