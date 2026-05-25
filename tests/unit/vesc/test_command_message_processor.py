@@ -14,6 +14,7 @@ class TestCommandMessageProcessor(CommandMessageProcessor):
             5: CommandMessageProcessor.FIRMWARE,
             7: CommandMessageProcessor.BIONIC_BOARDER,
             8: CommandMessageProcessor.MOTOR_CONTROLLER_CONFIGURATION,
+            9: CommandMessageProcessor.APP_CONFIGURATION,
         }
 
     @property
@@ -33,6 +34,9 @@ class TestCommandMessageProcessor(CommandMessageProcessor):
         pass
 
     def _publish_motor_controller_configuration(self):
+        pass
+
+    def _publish_app_configuration(self):
         pass
 
     def _update_current(self, command):
@@ -98,6 +102,14 @@ def test_handle_command_motor_controller_configuration(processor, mocker):
     processor._publish_motor_controller_configuration.assert_called_once()
 
 
+def test_handle_command_app_configuration(processor, mocker):
+    mocker.patch.object(processor, "_publish_app_configuration", autospec=True)
+    mocker.patch.object(processor, "_get_command_id", return_value=9)
+    with pytest.raises(StopIteration):
+        processor.handle_command()
+    processor._publish_app_configuration.assert_called_once()
+
+
 def test_handle_command_bionic_boarder(processor, mocker):
     mocker.patch.object(processor, "_publish_bionic_boarder", autospec=True)
     mocker.patch.object(processor, "_get_command_id", return_value=7)
@@ -113,3 +125,4 @@ def test_command_id_names(processor):
     assert processor._command_id_name[5] == CommandMessageProcessor.FIRMWARE
     assert processor._command_id_name[7] == CommandMessageProcessor.BIONIC_BOARDER
     assert processor._command_id_name[8] == CommandMessageProcessor.MOTOR_CONTROLLER_CONFIGURATION
+    assert processor._command_id_name[9] == CommandMessageProcessor.APP_CONFIGURATION
