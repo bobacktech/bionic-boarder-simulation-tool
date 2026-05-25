@@ -1327,7 +1327,7 @@ class AppConfigurationMessage:
 
     @property
     def buffer(self) -> bytes:
-        APPCONF_SIGNATURE = 0x00000000  # Set to the correct APPCONF_SIGNATURE for your firmware build
+        APPCONF_SIGNATURE = 486554156
         data = b""
 
         # ── Signature ─────────────────────────────────────────────────────────────

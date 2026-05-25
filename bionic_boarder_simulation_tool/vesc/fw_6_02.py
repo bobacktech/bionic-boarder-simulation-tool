@@ -1316,7 +1316,7 @@ class AppConfigurationMessage:
 
     @property
     def buffer(self) -> bytes:
-        APPCONF_SIGNATURE = 0x0000  # Set to the correct APPCONF_SIGNATURE for your FW 6.02 build
+        APPCONF_SIGNATURE = 486554156
         data = b""
 
         # ── Signature ────
