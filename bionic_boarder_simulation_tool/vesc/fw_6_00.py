@@ -1270,24 +1270,14 @@ class AppConfigurationMessage:
             self.accel_offsets = [0.0, 0.0, 0.0]  # float[3]
             self.gyro_offsets = [0.0, 0.0, 0.0]  # float[3]
 
-    class BmsConfig:
-        def __init__(self):
-            self.type = AppConfigurationMessage.BmsType.BMS_TYPE_NONE
-            self.limit_mode = 0  # uint8_t
-            self.t_limit_start = 0.0
-            self.t_limit_end = 0.0
-            self.soc_limit_start = 0.0
-            self.soc_limit_end = 0.0
-            self.fwd_can_mode = AppConfigurationMessage.BmsFwdCanMode.BMS_FWD_CAN_MODE_DISABLED
-
     def __init__(self):
         # ── Settings ──────────────────────────────────────────────────────────
         self.controller_id = 0  # uint8_t
         self.timeout_msec = 0  # uint32_t
         self.timeout_brake_current = 0.0
-        self.can_status_rate_1 = 0  # uint32_t
+        self.can_status_rate_1 = 0  # uint16_t
         self.can_status_msgs_r1 = 0  # uint8_t
-        self.can_status_rate_2 = 0  # uint32_t
+        self.can_status_rate_2 = 0  # uint16_t
         self.can_status_msgs_r2 = 0  # uint8_t
         self.can_baud_rate = AppConfigurationMessage.CanBaud.CAN_BAUD_500K
         self.pairing_done = False
