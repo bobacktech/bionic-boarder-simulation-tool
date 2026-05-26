@@ -895,6 +895,645 @@ class BionicBoarderMessage:
         return self.__q
 
 
+class AppConfigurationMessage:
+
+    ID = 17
+
+    class AppUse(IntEnum):
+        APP_NONE = 0
+        APP_PPM = 1
+        APP_ADC = 2
+        APP_UART = 3
+        APP_PPM_UART = 4
+        APP_ADC_UART = 5
+        APP_NUNCHUK = 6
+        APP_NRF = 7
+        APP_CUSTOM = 8
+        APP_BALANCE = 9
+        APP_PAS = 10
+        APP_ADC_PAS = 11
+
+    class CanBaud(IntEnum):
+        CAN_BAUD_125K = 0
+        CAN_BAUD_250K = 1
+        CAN_BAUD_500K = 2
+        CAN_BAUD_1M = 3
+        CAN_BAUD_10K = 4
+        CAN_BAUD_20K = 5
+        CAN_BAUD_50K = 6
+        CAN_BAUD_75K = 7
+        CAN_BAUD_100K = 8
+
+    class CanMode(IntEnum):
+        CAN_MODE_VESC = 0
+        CAN_MODE_UAVCAN = 1
+        CAN_MODE_COMM_BRIDGE = 2
+        CAN_MODE_UNUSED = 3
+
+    class ShutdownMode(IntEnum):
+        SHUTDOWN_MODE_ALWAYS_OFF = 0
+        SHUTDOWN_MODE_ALWAYS_ON = 1
+        SHUTDOWN_MODE_TOGGLE_BUTTON_ONLY = 2  # renamed from TOGGLE_BUTTON in FW 6.00
+        SHUTDOWN_MODE_OFF_AFTER_10S = 3
+        SHUTDOWN_MODE_OFF_AFTER_1M = 4
+        SHUTDOWN_MODE_OFF_AFTER_5M = 5
+        SHUTDOWN_MODE_OFF_AFTER_10M = 6
+        SHUTDOWN_MODE_OFF_AFTER_30M = 7
+        SHUTDOWN_MODE_OFF_AFTER_1H = 8
+        SHUTDOWN_MODE_OFF_AFTER_5H = 9
+
+    class KillSwMode(IntEnum):
+        KILL_SW_MODE_DISABLED = 0
+        KILL_SW_MODE_PPM_LOW = 1
+        KILL_SW_MODE_PPM_HIGH = 2
+        KILL_SW_MODE_ADC2_LOW = 3
+        KILL_SW_MODE_ADC2_HIGH = 4
+
+    class UavcanRawMode(IntEnum):
+        UAVCAN_RAW_MODE_CURRENT = 0
+        UAVCAN_RAW_MODE_CURRENT_NO_REV_BRAKE = 1
+        UAVCAN_RAW_MODE_DUTY = 2
+        UAVCAN_RAW_MODE_RPM = 3
+
+    class UavcanStatusCurrentMode(IntEnum):
+        UAVCAN_STATUS_CURRENT_MODE_MOTOR = 0
+        UAVCAN_STATUS_CURRENT_MODE_INPUT = 1
+
+    class SafeStartMode(IntEnum):
+        SAFE_START_DISABLED = 0
+        SAFE_START_REGULAR = 1
+        SAFE_START_NO_FAULT = 2
+
+    class ThrExpMode(IntEnum):
+        THR_EXP_EXPO = 0
+        THR_EXP_NATURAL = 1
+        THR_EXP_POLY = 2
+
+    class PpmCtrlType(IntEnum):
+        PPM_CTRL_TYPE_NONE = 0
+        PPM_CTRL_TYPE_CURRENT = 1
+        PPM_CTRL_TYPE_CURRENT_NOREV = 2
+        PPM_CTRL_TYPE_CURRENT_NOREV_BRAKE = 3
+        PPM_CTRL_TYPE_DUTY = 4
+        PPM_CTRL_TYPE_DUTY_NOREV = 5
+        PPM_CTRL_TYPE_PID = 6
+        PPM_CTRL_TYPE_PID_NOREV = 7
+        PPM_CTRL_TYPE_CURRENT_BRAKE_REV_HYST = 8
+        PPM_CTRL_TYPE_CURRENT_SMART_REV = 9
+        PPM_CTRL_TYPE_PID_POSITION_180 = 10
+        PPM_CTRL_TYPE_PID_POSITION_360 = 11
+
+    class AdcCtrlType(IntEnum):
+        ADC_CTRL_TYPE_NONE = 0
+        ADC_CTRL_TYPE_CURRENT = 1
+        ADC_CTRL_TYPE_CURRENT_REV_CENTER = 2
+        ADC_CTRL_TYPE_CURRENT_REV_BUTTON = 3
+        ADC_CTRL_TYPE_CURRENT_REV_BUTTON_BRAKE_ADC = 4
+        ADC_CTRL_TYPE_CURRENT_REV_BUTTON_BRAKE_CENTER = 5
+        ADC_CTRL_TYPE_CURRENT_NOREV_BRAKE_CENTER = 6
+        ADC_CTRL_TYPE_CURRENT_NOREV_BRAKE_BUTTON = 7
+        ADC_CTRL_TYPE_CURRENT_NOREV_BRAKE_ADC = 8
+        ADC_CTRL_TYPE_DUTY = 9
+        ADC_CTRL_TYPE_DUTY_REV_CENTER = 10
+        ADC_CTRL_TYPE_DUTY_REV_BUTTON = 11
+        ADC_CTRL_TYPE_PID = 12
+        ADC_CTRL_TYPE_PID_REV_CENTER = 13
+        ADC_CTRL_TYPE_PID_REV_BUTTON = 14
+
+    class ChukCtrlType(IntEnum):
+        CHUK_CTRL_TYPE_NONE = 0
+        CHUK_CTRL_TYPE_CURRENT = 1
+        CHUK_CTRL_TYPE_CURRENT_NOREV = 2
+        CHUK_CTRL_TYPE_CURRENT_BIDIRECTIONAL = 3
+
+    class PasCtrlType(IntEnum):
+        PAS_CTRL_TYPE_NONE = 0
+        PAS_CTRL_TYPE_CADENCE = 1
+        PAS_CTRL_TYPE_TORQUE = 2
+        PAS_CTRL_TYPE_TORQUE_WITH_CADENCE_TIMEOUT = 3
+
+    class PasSensorType(IntEnum):
+        PAS_SENSOR_TYPE_QUADRATURE = 0
+
+    class NrfSpeed(IntEnum):
+        NRF_SPEED_250K = 0
+        NRF_SPEED_1M = 1
+        NRF_SPEED_2M = 2
+
+    class NrfPower(IntEnum):
+        NRF_POWER_M18DBM = 0
+        NRF_POWER_M12DBM = 1
+        NRF_POWER_M6DBM = 2
+        NRF_POWER_0DBM = 3
+        NRF_POWER_OFF = 4
+
+    class NrfAw(IntEnum):
+        NRF_AW_3 = 0
+        NRF_AW_4 = 1
+        NRF_AW_5 = 2
+
+    class NrfCrc(IntEnum):
+        NRF_CRC_DISABLED = 0
+        NRF_CRC_1B = 1
+        NRF_CRC_2B = 2
+
+    class NrfRetrDelay(IntEnum):
+        NRF_RETR_DELAY_250US = 0
+        NRF_RETR_DELAY_500US = 1
+        NRF_RETR_DELAY_750US = 2
+        NRF_RETR_DELAY_1000US = 3
+        NRF_RETR_DELAY_1250US = 4
+        NRF_RETR_DELAY_1500US = 5
+        NRF_RETR_DELAY_1750US = 6
+        NRF_RETR_DELAY_2000US = 7
+        NRF_RETR_DELAY_2250US = 8
+        NRF_RETR_DELAY_2500US = 9
+        NRF_RETR_DELAY_2750US = 10
+        NRF_RETR_DELAY_3000US = 11
+        NRF_RETR_DELAY_3250US = 12
+        NRF_RETR_DELAY_3500US = 13
+        NRF_RETR_DELAY_3750US = 14
+        NRF_RETR_DELAY_4000US = 15
+
+    class BalancePidMode(IntEnum):
+        BALANCE_PID_MODE_ANGLE = 0
+        BALANCE_PID_MODE_ANGLE_RATE_CASCADE = 1
+
+    class ImuType(IntEnum):
+        IMU_TYPE_OFF = 0
+        IMU_TYPE_INTERNAL = 1
+        IMU_TYPE_EXTERNAL_MPU9X50 = 2
+        IMU_TYPE_EXTERNAL_ICM20948 = 3
+        IMU_TYPE_EXTERNAL_BMI160 = 4
+        IMU_TYPE_EXTERNAL_LSM6DS3 = 5
+
+    class AhrsMode(IntEnum):
+        AHRS_MODE_MADGWICK = 0
+        AHRS_MODE_MAHONY = 1
+        AHRS_MODE_MADGWICK_FUSION = 2
+
+    class ImuFilter(IntEnum):
+        IMU_FILTER_LOW = 0
+        IMU_FILTER_MEDIUM = 1
+        IMU_FILTER_HIGH = 2
+
+    class PpmConfig:
+        def __init__(self):
+            self.ctrl_type = AppConfigurationMessage.PpmCtrlType.PPM_CTRL_TYPE_NONE
+            self.pid_max_erpm = 0.0
+            self.hyst = 0.0
+            self.pulse_start = 0.0
+            self.pulse_end = 0.0
+            self.pulse_center = 0.0
+            self.median_filter = False
+            self.safe_start = AppConfigurationMessage.SafeStartMode.SAFE_START_DISABLED
+            self.throttle_exp = 0.0
+            self.throttle_exp_brake = 0.0
+            self.throttle_exp_mode = AppConfigurationMessage.ThrExpMode.THR_EXP_EXPO
+            self.ramp_time_pos = 0.0
+            self.ramp_time_neg = 0.0
+            self.multi_esc = False
+            self.tc = False
+            self.tc_max_diff = 0.0
+            self.max_erpm_for_dir = 0.0
+            self.smart_rev_max_duty = 0.0
+            self.smart_rev_ramp_time = 0.0
+
+    class AdcConfig:
+        def __init__(self):
+            self.ctrl_type = AppConfigurationMessage.AdcCtrlType.ADC_CTRL_TYPE_NONE
+            self.hyst = 0.0
+            self.voltage_start = 0.0
+            self.voltage_end = 0.0
+            self.voltage_min = 0.0
+            self.voltage_max = 0.0
+            self.voltage_center = 0.0
+            self.voltage2_start = 0.0
+            self.voltage2_end = 0.0
+            self.use_filter = False
+            self.safe_start = AppConfigurationMessage.SafeStartMode.SAFE_START_DISABLED
+            self.buttons = 0  # uint8_t
+            self.voltage_inverted = False
+            self.voltage2_inverted = False
+            self.throttle_exp = 0.0
+            self.throttle_exp_brake = 0.0
+            self.throttle_exp_mode = AppConfigurationMessage.ThrExpMode.THR_EXP_EXPO
+            self.ramp_time_pos = 0.0
+            self.ramp_time_neg = 0.0
+            self.multi_esc = False
+            self.tc = False
+            self.tc_max_diff = 0.0
+            self.update_rate_hz = 0  # uint32_t
+
+    class ChukConfig:
+        def __init__(self):
+            self.ctrl_type = AppConfigurationMessage.ChukCtrlType.CHUK_CTRL_TYPE_NONE
+            self.hyst = 0.0
+            self.ramp_time_pos = 0.0
+            self.ramp_time_neg = 0.0
+            self.stick_erpm_per_s_in_cc = 0.0
+            self.throttle_exp = 0.0
+            self.throttle_exp_brake = 0.0
+            self.throttle_exp_mode = AppConfigurationMessage.ThrExpMode.THR_EXP_EXPO
+            self.multi_esc = False
+            self.tc = False
+            self.tc_max_diff = 0.0
+            self.use_smart_rev = False
+            self.smart_rev_max_duty = 0.0
+            self.smart_rev_ramp_time = 0.0
+
+    class NrfConfig:
+        def __init__(self):
+            self.speed = AppConfigurationMessage.NrfSpeed.NRF_SPEED_250K
+            self.power = AppConfigurationMessage.NrfPower.NRF_POWER_0DBM
+            self.crc_type = AppConfigurationMessage.NrfCrc.NRF_CRC_1B
+            self.retry_delay = AppConfigurationMessage.NrfRetrDelay.NRF_RETR_DELAY_250US
+            self.retries = 0  # unsigned char
+            self.channel = 0  # unsigned char
+            self.address = [0, 0, 0]  # unsigned char[3]
+            self.send_crc_ack = False
+
+    class BalanceConfig:
+        def __init__(self):
+            self.pid_mode = AppConfigurationMessage.BalancePidMode.BALANCE_PID_MODE_ANGLE
+            self.kp = 0.0
+            self.ki = 0.0
+            self.kd = 0.0
+            self.kp2 = 0.0
+            self.ki2 = 0.0
+            self.kd2 = 0.0
+            self.hertz = 0  # uint16_t
+            self.loop_time_filter = 0  # uint16_t
+            self.fault_pitch = 0.0
+            self.fault_roll = 0.0
+            self.fault_duty = 0.0
+            self.fault_adc1 = 0.0
+            self.fault_adc2 = 0.0
+            self.fault_delay_pitch = 0  # uint16_t
+            self.fault_delay_roll = 0  # uint16_t
+            self.fault_delay_duty = 0  # uint16_t
+            self.fault_delay_switch_half = 0  # uint16_t
+            self.fault_delay_switch_full = 0  # uint16_t
+            self.fault_adc_half_erpm = 0  # uint16_t
+            self.fault_is_dual_switch = False
+            self.tiltback_duty_angle = 0.0
+            self.tiltback_duty_speed = 0.0
+            self.tiltback_duty = 0.0
+            self.tiltback_hv_angle = 0.0
+            self.tiltback_hv_speed = 0.0
+            self.tiltback_hv = 0.0
+            self.tiltback_lv_angle = 0.0
+            self.tiltback_lv_speed = 0.0
+            self.tiltback_lv = 0.0
+            self.tiltback_return_speed = 0.0
+            self.tiltback_constant = 0.0
+            self.tiltback_constant_erpm = 0  # uint16_t
+            self.tiltback_variable = 0.0
+            self.tiltback_variable_max = 0.0
+            self.noseangling_speed = 0.0
+            self.startup_pitch_tolerance = 0.0
+            self.startup_roll_tolerance = 0.0
+            self.startup_speed = 0.0
+            self.deadzone = 0.0
+            self.multi_esc = False
+            self.yaw_kp = 0.0
+            self.yaw_ki = 0.0
+            self.yaw_kd = 0.0
+            self.roll_steer_kp = 0.0
+            self.roll_steer_erpm_kp = 0.0
+            self.brake_current = 0.0
+            self.brake_timeout = 0  # uint16_t
+            self.yaw_current_clamp = 0.0
+            self.ki_limit = 0.0
+            self.kd_pt1_lowpass_frequency = 0  # uint16_t
+            self.kd_pt1_highpass_frequency = 0  # uint16_t
+            self.booster_angle = 0.0
+            self.booster_ramp = 0.0
+            self.booster_current = 0.0
+            self.torquetilt_start_current = 0.0
+            self.torquetilt_angle_limit = 0.0
+            self.torquetilt_on_speed = 0.0
+            self.torquetilt_off_speed = 0.0
+            self.torquetilt_strength = 0.0
+            self.torquetilt_filter = 0.0
+            self.turntilt_strength = 0.0
+            self.turntilt_angle_limit = 0.0
+            self.turntilt_start_angle = 0.0
+            self.turntilt_start_erpm = 0  # uint16_t
+            self.turntilt_speed = 0.0
+            self.turntilt_erpm_boost = 0  # uint16_t
+            self.turntilt_erpm_boost_end = 0  # uint16_t
+
+    class PasConfig:
+        def __init__(self):
+            self.ctrl_type = AppConfigurationMessage.PasCtrlType.PAS_CTRL_TYPE_NONE
+            self.sensor_type = AppConfigurationMessage.PasSensorType.PAS_SENSOR_TYPE_QUADRATURE
+            self.current_scaling = 0.0
+            self.pedal_rpm_start = 0.0
+            self.pedal_rpm_end = 0.0
+            self.invert_pedal_direction = False
+            self.magnets = 0  # uint8_t
+            self.use_filter = False
+            self.ramp_time_pos = 0.0
+            self.ramp_time_neg = 0.0
+            self.update_rate_hz = 0  # uint32_t
+
+    class ImuConfig:
+        def __init__(self):
+            self.type = AppConfigurationMessage.ImuType.IMU_TYPE_OFF
+            self.mode = AppConfigurationMessage.AhrsMode.AHRS_MODE_MADGWICK
+            self.filter = AppConfigurationMessage.ImuFilter.IMU_FILTER_MEDIUM
+            self.accel_lowpass_filter_x = 0.0
+            self.accel_lowpass_filter_y = 0.0
+            self.accel_lowpass_filter_z = 0.0
+            self.gyro_lowpass_filter = 0.0
+            self.sample_rate_hz = 0  # int (serialized as uint16)
+            self.use_magnetometer = False
+            self.accel_confidence_decay = 0.0
+            self.mahony_kp = 0.0
+            self.mahony_ki = 0.0
+            self.madgwick_beta = 0.0
+            self.rot_roll = 0.0
+            self.rot_pitch = 0.0
+            self.rot_yaw = 0.0
+            self.accel_offsets = [0.0, 0.0, 0.0]  # float[3]
+            self.gyro_offsets = [0.0, 0.0, 0.0]  # float[3]
+
+    def __init__(self):
+        # ── Settings ────
+        self.controller_id = 0  # uint8_t
+        self.timeout_msec = 0  # uint32_t
+        self.timeout_brake_current = 0.0
+        self.can_status_rate_1 = 0  # uint32_t in struct, serialized as uint16
+        self.can_status_msgs_r1 = 0  # uint8_t
+        self.can_status_rate_2 = 0  # uint32_t in struct, serialized as uint16
+        self.can_status_msgs_r2 = 0  # uint8_t
+        self.can_baud_rate = AppConfigurationMessage.CanBaud.CAN_BAUD_500K
+        self.pairing_done = False
+        self.permanent_uart_enabled = False
+        self.shutdown_mode = AppConfigurationMessage.ShutdownMode.SHUTDOWN_MODE_ALWAYS_OFF
+        self.servo_out_enable = False
+        self.kill_sw_mode = AppConfigurationMessage.KillSwMode.KILL_SW_MODE_DISABLED
+
+        # ── CAN modes ────
+        self.can_mode = AppConfigurationMessage.CanMode.CAN_MODE_VESC
+        self.uavcan_esc_index = 0  # uint8_t
+        self.uavcan_raw_mode = AppConfigurationMessage.UavcanRawMode.UAVCAN_RAW_MODE_CURRENT
+        self.uavcan_raw_rpm_max = 0.0
+        self.uavcan_status_current_mode = (
+            AppConfigurationMessage.UavcanStatusCurrentMode.UAVCAN_STATUS_CURRENT_MODE_MOTOR
+        )
+
+        # ── Application to use ────
+        self.app_to_use = AppConfigurationMessage.AppUse.APP_NONE
+
+        # ── PPM application settings ────
+        self.app_ppm_conf = AppConfigurationMessage.PpmConfig()
+
+        # ── ADC application settings ────
+        self.app_adc_conf = AppConfigurationMessage.AdcConfig()
+
+        # ── UART application settings ────
+        self.app_uart_baudrate = 0  # uint32_t
+
+        # ── Nunchuk application settings ────
+        self.app_chuk_conf = AppConfigurationMessage.ChukConfig()
+
+        # ── NRF application settings ────
+        self.app_nrf_conf = AppConfigurationMessage.NrfConfig()
+
+        # ── Balance application settings ────
+        self.app_balance_conf = AppConfigurationMessage.BalanceConfig()
+
+        # ── Pedal Assist application settings ────
+        self.app_pas_conf = AppConfigurationMessage.PasConfig()
+
+        # ── IMU settings ────
+        self.imu_conf = AppConfigurationMessage.ImuConfig()
+
+        # ── Flash corruption protection ────
+        self.crc = 0  # uint16_t (not serialized)
+
+    @property
+    def buffer(self) -> bytes:
+        APPCONF_SIGNATURE = 486554156
+        data = b""
+
+        # ── Signature ────
+        data += struct.pack(">I", APPCONF_SIGNATURE)
+
+        # ── Settings ────
+        data += struct.pack("B", self.controller_id)
+        data += struct.pack(">I", self.timeout_msec)
+        data += struct.pack(">f", self.timeout_brake_current)
+        data += struct.pack(">H", self.can_status_rate_1)
+        data += struct.pack(">H", self.can_status_rate_2)
+        data += struct.pack("B", self.can_status_msgs_r1)
+        data += struct.pack("B", self.can_status_msgs_r2)
+        data += struct.pack("B", int(self.can_baud_rate))
+        data += struct.pack("B", int(self.pairing_done))
+        data += struct.pack("B", int(self.permanent_uart_enabled))
+        data += struct.pack("B", int(self.shutdown_mode))
+
+        # ── CAN modes ────
+        data += struct.pack("B", int(self.can_mode))
+        data += struct.pack("B", self.uavcan_esc_index)
+        data += struct.pack("B", int(self.uavcan_raw_mode))
+        data += struct.pack(">f", self.uavcan_raw_rpm_max)
+        data += struct.pack("B", int(self.uavcan_status_current_mode))
+        data += struct.pack("B", int(self.servo_out_enable))
+        data += struct.pack("B", int(self.kill_sw_mode))
+
+        # ── Application to use ────
+        data += struct.pack("B", int(self.app_to_use))
+
+        # ── PPM ────
+        data += struct.pack("B", int(self.app_ppm_conf.ctrl_type))
+        data += struct.pack(">f", self.app_ppm_conf.pid_max_erpm)
+        data += struct.pack(">f", self.app_ppm_conf.hyst)
+        data += struct.pack(">f", self.app_ppm_conf.pulse_start)
+        data += struct.pack(">f", self.app_ppm_conf.pulse_end)
+        data += struct.pack(">f", self.app_ppm_conf.pulse_center)
+        data += struct.pack("B", int(self.app_ppm_conf.median_filter))
+        data += struct.pack("B", int(self.app_ppm_conf.safe_start))
+        data += struct.pack(">f", self.app_ppm_conf.throttle_exp)
+        data += struct.pack(">f", self.app_ppm_conf.throttle_exp_brake)
+        data += struct.pack("B", int(self.app_ppm_conf.throttle_exp_mode))
+        data += struct.pack(">f", self.app_ppm_conf.ramp_time_pos)
+        data += struct.pack(">f", self.app_ppm_conf.ramp_time_neg)
+        data += struct.pack("B", int(self.app_ppm_conf.multi_esc))
+        data += struct.pack("B", int(self.app_ppm_conf.tc))
+        data += struct.pack(">f", self.app_ppm_conf.tc_max_diff)
+        data += struct.pack(">h", int(self.app_ppm_conf.max_erpm_for_dir * 1))
+        data += struct.pack(">f", self.app_ppm_conf.smart_rev_max_duty)
+        data += struct.pack(">f", self.app_ppm_conf.smart_rev_ramp_time)
+
+        # ── ADC ────
+        data += struct.pack("B", int(self.app_adc_conf.ctrl_type))
+        data += struct.pack(">f", self.app_adc_conf.hyst)
+        data += struct.pack(">h", int(self.app_adc_conf.voltage_start * 1000))
+        data += struct.pack(">h", int(self.app_adc_conf.voltage_end * 1000))
+        data += struct.pack(">h", int(self.app_adc_conf.voltage_min * 1000))
+        data += struct.pack(">h", int(self.app_adc_conf.voltage_max * 1000))
+        data += struct.pack(">h", int(self.app_adc_conf.voltage_center * 1000))
+        data += struct.pack(">h", int(self.app_adc_conf.voltage2_start * 1000))
+        data += struct.pack(">h", int(self.app_adc_conf.voltage2_end * 1000))
+        data += struct.pack("B", int(self.app_adc_conf.use_filter))
+        data += struct.pack("B", int(self.app_adc_conf.safe_start))
+        data += struct.pack("B", self.app_adc_conf.buttons)
+        data += struct.pack("B", int(self.app_adc_conf.voltage_inverted))
+        data += struct.pack("B", int(self.app_adc_conf.voltage2_inverted))
+        data += struct.pack(">f", self.app_adc_conf.throttle_exp)
+        data += struct.pack(">f", self.app_adc_conf.throttle_exp_brake)
+        data += struct.pack("B", int(self.app_adc_conf.throttle_exp_mode))
+        data += struct.pack(">f", self.app_adc_conf.ramp_time_pos)
+        data += struct.pack(">f", self.app_adc_conf.ramp_time_neg)
+        data += struct.pack("B", int(self.app_adc_conf.multi_esc))
+        data += struct.pack("B", int(self.app_adc_conf.tc))
+        data += struct.pack(">f", self.app_adc_conf.tc_max_diff)
+        data += struct.pack(">H", self.app_adc_conf.update_rate_hz)
+
+        # ── UART ────
+        data += struct.pack(">I", self.app_uart_baudrate)
+
+        # ── Nunchuk ────
+        data += struct.pack("B", int(self.app_chuk_conf.ctrl_type))
+        data += struct.pack(">f", self.app_chuk_conf.hyst)
+        data += struct.pack(">f", self.app_chuk_conf.ramp_time_pos)
+        data += struct.pack(">f", self.app_chuk_conf.ramp_time_neg)
+        data += struct.pack(">f", self.app_chuk_conf.stick_erpm_per_s_in_cc)
+        data += struct.pack(">f", self.app_chuk_conf.throttle_exp)
+        data += struct.pack(">f", self.app_chuk_conf.throttle_exp_brake)
+        data += struct.pack("B", int(self.app_chuk_conf.throttle_exp_mode))
+        data += struct.pack("B", int(self.app_chuk_conf.multi_esc))
+        data += struct.pack("B", int(self.app_chuk_conf.tc))
+        data += struct.pack(">f", self.app_chuk_conf.tc_max_diff)
+        data += struct.pack("B", int(self.app_chuk_conf.use_smart_rev))
+        data += struct.pack(">f", self.app_chuk_conf.smart_rev_max_duty)
+        data += struct.pack(">f", self.app_chuk_conf.smart_rev_ramp_time)
+
+        # ── NRF ────
+        data += struct.pack("B", int(self.app_nrf_conf.speed))
+        data += struct.pack("B", int(self.app_nrf_conf.power))
+        data += struct.pack("B", int(self.app_nrf_conf.crc_type))
+        data += struct.pack("B", int(self.app_nrf_conf.retry_delay))
+        data += struct.pack("B", self.app_nrf_conf.retries)
+        data += struct.pack("B", self.app_nrf_conf.channel)
+        data += struct.pack("B", self.app_nrf_conf.address[0])
+        data += struct.pack("B", self.app_nrf_conf.address[1])
+        data += struct.pack("B", self.app_nrf_conf.address[2])
+        data += struct.pack("B", int(self.app_nrf_conf.send_crc_ack))
+
+        # ── Balance ────
+        data += struct.pack("B", int(self.app_balance_conf.pid_mode))
+        data += struct.pack(">f", self.app_balance_conf.kp)
+        data += struct.pack(">f", self.app_balance_conf.ki)
+        data += struct.pack(">f", self.app_balance_conf.kd)
+        data += struct.pack(">f", self.app_balance_conf.kp2)
+        data += struct.pack(">f", self.app_balance_conf.ki2)
+        data += struct.pack(">f", self.app_balance_conf.kd2)
+        data += struct.pack(">H", self.app_balance_conf.hertz)
+        data += struct.pack(">H", self.app_balance_conf.loop_time_filter)
+        data += struct.pack(">f", self.app_balance_conf.fault_pitch)
+        data += struct.pack(">f", self.app_balance_conf.fault_roll)
+        data += struct.pack(">f", self.app_balance_conf.fault_duty)
+        data += struct.pack(">f", self.app_balance_conf.fault_adc1)
+        data += struct.pack(">f", self.app_balance_conf.fault_adc2)
+        data += struct.pack(">H", self.app_balance_conf.fault_delay_pitch)
+        data += struct.pack(">H", self.app_balance_conf.fault_delay_roll)
+        data += struct.pack(">H", self.app_balance_conf.fault_delay_duty)
+        data += struct.pack(">H", self.app_balance_conf.fault_delay_switch_half)
+        data += struct.pack(">H", self.app_balance_conf.fault_delay_switch_full)
+        data += struct.pack(">H", self.app_balance_conf.fault_adc_half_erpm)
+        data += struct.pack("B", int(self.app_balance_conf.fault_is_dual_switch))
+        data += struct.pack(">h", int(self.app_balance_conf.tiltback_duty_angle * 100))
+        data += struct.pack(">h", int(self.app_balance_conf.tiltback_duty_speed * 100))
+        data += struct.pack(">h", int(self.app_balance_conf.tiltback_duty * 1000))
+        data += struct.pack(">h", int(self.app_balance_conf.tiltback_hv_angle * 100))
+        data += struct.pack(">h", int(self.app_balance_conf.tiltback_hv_speed * 100))
+        data += struct.pack(">f", self.app_balance_conf.tiltback_hv)
+        data += struct.pack(">h", int(self.app_balance_conf.tiltback_lv_angle * 100))
+        data += struct.pack(">h", int(self.app_balance_conf.tiltback_lv_speed * 100))
+        data += struct.pack(">f", self.app_balance_conf.tiltback_lv)
+        data += struct.pack(">h", int(self.app_balance_conf.tiltback_return_speed * 100))
+        data += struct.pack(">f", self.app_balance_conf.tiltback_constant)
+        data += struct.pack(">H", self.app_balance_conf.tiltback_constant_erpm)
+        data += struct.pack(">f", self.app_balance_conf.tiltback_variable)
+        data += struct.pack(">f", self.app_balance_conf.tiltback_variable_max)
+        data += struct.pack(">h", int(self.app_balance_conf.noseangling_speed * 100))
+        data += struct.pack(">f", self.app_balance_conf.startup_pitch_tolerance)
+        data += struct.pack(">f", self.app_balance_conf.startup_roll_tolerance)
+        data += struct.pack(">f", self.app_balance_conf.startup_speed)
+        data += struct.pack(">f", self.app_balance_conf.deadzone)
+        data += struct.pack("B", int(self.app_balance_conf.multi_esc))
+        data += struct.pack(">f", self.app_balance_conf.yaw_kp)
+        data += struct.pack(">f", self.app_balance_conf.yaw_ki)
+        data += struct.pack(">f", self.app_balance_conf.yaw_kd)
+        data += struct.pack(">f", self.app_balance_conf.roll_steer_kp)
+        data += struct.pack(">f", self.app_balance_conf.roll_steer_erpm_kp)
+        data += struct.pack(">f", self.app_balance_conf.brake_current)
+        data += struct.pack(">H", self.app_balance_conf.brake_timeout)
+        data += struct.pack(">f", self.app_balance_conf.yaw_current_clamp)
+        data += struct.pack(">f", self.app_balance_conf.ki_limit)
+        data += struct.pack(">H", self.app_balance_conf.kd_pt1_lowpass_frequency)
+        data += struct.pack(">H", self.app_balance_conf.kd_pt1_highpass_frequency)
+        data += struct.pack(">f", self.app_balance_conf.booster_angle)
+        data += struct.pack(">f", self.app_balance_conf.booster_ramp)
+        data += struct.pack(">f", self.app_balance_conf.booster_current)
+        data += struct.pack(">f", self.app_balance_conf.torquetilt_start_current)
+        data += struct.pack(">f", self.app_balance_conf.torquetilt_angle_limit)
+        data += struct.pack(">f", self.app_balance_conf.torquetilt_on_speed)
+        data += struct.pack(">f", self.app_balance_conf.torquetilt_off_speed)
+        data += struct.pack(">f", self.app_balance_conf.torquetilt_strength)
+        data += struct.pack(">f", self.app_balance_conf.torquetilt_filter)
+        data += struct.pack(">f", self.app_balance_conf.turntilt_strength)
+        data += struct.pack(">f", self.app_balance_conf.turntilt_angle_limit)
+        data += struct.pack(">f", self.app_balance_conf.turntilt_start_angle)
+        data += struct.pack(">H", self.app_balance_conf.turntilt_start_erpm)
+        data += struct.pack(">f", self.app_balance_conf.turntilt_speed)
+        data += struct.pack(">H", self.app_balance_conf.turntilt_erpm_boost)
+        data += struct.pack(">H", self.app_balance_conf.turntilt_erpm_boost_end)
+
+        # ── PAS ────
+        data += struct.pack("B", int(self.app_pas_conf.ctrl_type))
+        data += struct.pack("B", int(self.app_pas_conf.sensor_type))
+        data += struct.pack(">h", int(self.app_pas_conf.current_scaling * 1000))
+        data += struct.pack(">h", int(self.app_pas_conf.pedal_rpm_start * 10))
+        data += struct.pack(">h", int(self.app_pas_conf.pedal_rpm_end * 10))
+        data += struct.pack("B", int(self.app_pas_conf.invert_pedal_direction))
+        data += struct.pack(">H", self.app_pas_conf.magnets)
+        data += struct.pack("B", int(self.app_pas_conf.use_filter))
+        data += struct.pack(">h", int(self.app_pas_conf.ramp_time_pos * 100))
+        data += struct.pack(">h", int(self.app_pas_conf.ramp_time_neg * 100))
+        data += struct.pack(">H", self.app_pas_conf.update_rate_hz)
+
+        # ── IMU ────
+        data += struct.pack("B", int(self.imu_conf.type))
+        data += struct.pack("B", int(self.imu_conf.mode))
+        data += struct.pack("B", int(self.imu_conf.filter))
+        data += struct.pack(">h", int(self.imu_conf.accel_lowpass_filter_x * 1))
+        data += struct.pack(">h", int(self.imu_conf.accel_lowpass_filter_y * 1))
+        data += struct.pack(">h", int(self.imu_conf.accel_lowpass_filter_z * 1))
+        data += struct.pack(">h", int(self.imu_conf.gyro_lowpass_filter * 1))
+        data += struct.pack(">H", self.imu_conf.sample_rate_hz)
+        data += struct.pack("B", int(self.imu_conf.use_magnetometer))
+        data += struct.pack(">f", self.imu_conf.accel_confidence_decay)
+        data += struct.pack(">f", self.imu_conf.mahony_kp)
+        data += struct.pack(">f", self.imu_conf.mahony_ki)
+        data += struct.pack(">f", self.imu_conf.madgwick_beta)
+        data += struct.pack(">f", self.imu_conf.rot_roll)
+        data += struct.pack(">f", self.imu_conf.rot_pitch)
+        data += struct.pack(">f", self.imu_conf.rot_yaw)
+        data += struct.pack(">f", self.imu_conf.accel_offsets[0])
+        data += struct.pack(">f", self.imu_conf.accel_offsets[1])
+        data += struct.pack(">f", self.imu_conf.accel_offsets[2])
+        data += struct.pack(">f", self.imu_conf.gyro_offsets[0])
+        data += struct.pack(">f", self.imu_conf.gyro_offsets[1])
+        data += struct.pack(">f", self.imu_conf.gyro_offsets[2])
+
+        return AppConfigurationMessage.ID.to_bytes(1) + data
+
+
 class FW6_02CMP(CommandMessageProcessor):
     def __init__(
         self,
@@ -914,6 +1553,7 @@ class FW6_02CMP(CommandMessageProcessor):
             30: CommandMessageProcessor.HEARTBEAT,
             0: CommandMessageProcessor.FIRMWARE,
             14: CommandMessageProcessor.MOTOR_CONTROLLER_CONFIGURATION,
+            17: CommandMessageProcessor.APP_CONFIGURATION,
             152: CommandMessageProcessor.BIONIC_BOARDER,
         }
         self.__packet_header = lambda l: int.to_bytes(2) + int.to_bytes(l)
@@ -987,6 +1627,13 @@ class FW6_02CMP(CommandMessageProcessor):
             max_vin=mcc.l_max_vin,
             CMP=self.__class__.__name__,
         )
+
+    def _publish_app_configuration(self):
+        app_conf = AppConfigurationMessage()
+        msg_data = app_conf.buffer
+        packet = int.to_bytes(3) + int.to_bytes(len(msg_data), 2) + msg_data + self.__packet_footer(msg_data)
+        self.serial.write(packet)
+        Logger().logger.info("Publishing application configuration message", CMP=self.__class__.__name__)
 
     def _update_current(self, command):
         motor_current_commanded = int.from_bytes(command[3:7], byteorder="big") / 1000.0

@@ -3,6 +3,7 @@ from filecmp import cmp
 import pytest
 from bionic_boarder_simulation_tool.riding.frictional_deceleration_model import FrictionalDecelerationModel
 from bionic_boarder_simulation_tool.vesc.fw_6_05 import (
+    AppConfigurationMessage,
     FirmwareMessage,
     MotorControllerConfigurationMessage,
     BionicBoarderMessage,
@@ -170,6 +171,23 @@ class TestFW6_05CMP:
         buffer = MotorControllerConfigurationMessage().buffer
         crc = cmp.crc16(buffer)
         cmp._publish_motor_controller_configuration()
+        data = int.to_bytes(3) + int.to_bytes(len(buffer), 2) + buffer + int.to_bytes(crc, 2) + int.to_bytes(0x03)
+        mock_serial.return_value.write.assert_called_once_with(data)
+
+    def test_app_configuration_command(self, mock_serial):
+        cmp = FW6_05CMP(
+            "COM1",
+            230400,
+            256,
+            EBoard(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+            None,
+            None,
+            None,
+            None,
+        )
+        buffer = AppConfigurationMessage().buffer
+        crc = cmp.crc16(buffer)
+        cmp._publish_app_configuration()
         data = int.to_bytes(3) + int.to_bytes(len(buffer), 2) + buffer + int.to_bytes(crc, 2) + int.to_bytes(0x03)
         mock_serial.return_value.write.assert_called_once_with(data)
 

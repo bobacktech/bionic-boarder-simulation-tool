@@ -22,6 +22,7 @@ class CommandMessageProcessor(ABC):
     # Message request commands
     FIRMWARE = "FIRMWARE"
     MOTOR_CONTROLLER_CONFIGURATION = "MOTOR CONTROLLER CONFIGURATION"
+    APP_CONFIGURATION = "APP CONFIGURATION"
     BIONIC_BOARDER = "BIONIC BOARDER"
 
     # CRC-16-CCITT (XMODEM) table for VESC
@@ -103,6 +104,7 @@ class CommandMessageProcessor(ABC):
             CommandMessageProcessor.BIONIC_BOARDER: lambda: self._publish_bionic_boarder(),
             CommandMessageProcessor.FIRMWARE: lambda: self._publish_firmware(),
             CommandMessageProcessor.MOTOR_CONTROLLER_CONFIGURATION: lambda: self._publish_motor_controller_configuration(),
+            CommandMessageProcessor.APP_CONFIGURATION: lambda: self._publish_app_configuration(),
             CommandMessageProcessor.CURRENT: lambda: self._update_current(command_bytes),
             CommandMessageProcessor.RPM: lambda: self._update_rpm(command_bytes),
             CommandMessageProcessor.HEARTBEAT: lambda: self.heartbeat(),
@@ -148,6 +150,13 @@ class CommandMessageProcessor(ABC):
     def _publish_motor_controller_configuration(self):
         """
         Abstract method to publish the 'motor controller configuration' message.
+        """
+        pass
+
+    @abstractmethod
+    def _publish_app_configuration(self):
+        """
+        Abstract method to publish the 'app configuration' message.
         """
         pass
 
