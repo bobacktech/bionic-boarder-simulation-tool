@@ -1564,6 +1564,7 @@ class FW6_00CMP(CommandMessageProcessor):
             30: CommandMessageProcessor.HEARTBEAT,
             0: CommandMessageProcessor.FIRMWARE,
             14: CommandMessageProcessor.MOTOR_CONTROLLER_CONFIGURATION,
+            17: CommandMessageProcessor.APP_CONFIGURATION,
             152: CommandMessageProcessor.BIONIC_BOARDER,
         }
         self.__packet_header = lambda l: int.to_bytes(2) + int.to_bytes(l)
@@ -1636,6 +1637,13 @@ class FW6_00CMP(CommandMessageProcessor):
             max_vin=mcc.l_max_vin,
             CMP=self.__class__.__name__,
         )
+
+    def _publish_app_configuration(self):
+        app_conf = AppConfigurationMessage()
+        msg_data = app_conf.buffer
+        packet = int.to_bytes(3) + int.to_bytes(len(msg_data), 2) + msg_data + self.__packet_footer(msg_data)
+        self.serial.write(packet)
+        Logger().logger.info("Publishing application configuration message", CMP=self.__class__.__name__)
 
     def _update_current(self, command):
         motor_current_commanded = int.from_bytes(command[3:7], byteorder="big") / 1000.0
