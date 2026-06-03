@@ -49,6 +49,15 @@ class AppInputArguments:
     # VESC
     vesc_fw: str
     heartbeat_timeout_sec: float
+    imu_rotation_roll_deg: float
+    imu_rotation_pitch_deg: float
+    imu_rotation_yaw_deg: float
+    accel_offset_x_g: float
+    accel_offset_y_g: float
+    accel_offset_z_g: float
+    gyro_offset_x_deg_per_s: float
+    gyro_offset_y_deg_per_s: float
+    gyro_offset_z_deg_per_s: float
 
 
 if __name__ == "__main__":

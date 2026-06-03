@@ -11,7 +11,7 @@
     "motor_max_power_watts": 3500.0,
     "motor_pole_pairs": 7,
     "com_port": "/dev/ttyUSB0",
-    "baud_rate": 230400,
+    "baud_rate": 460800,
     "fixed_time_step_ms": 10,
     "push_period_sec": 30.0,
     "theta_slope_period_sec": 5.0,
@@ -19,6 +19,15 @@
     "mu_rolling": 0.03,
     "c_drag": 0.8,
     "control_time_step_sec": 0.01,
-    "vesc_fw": "6.00",
-    "heartbeat_timeout_sec": 1.5
+    "vesc_fw": "6.05",
+    "heartbeat_timeout_sec": 5.0,
+    "imu_rotation_roll_deg": -0.796,
+    "imu_rotation_pitch_deg": 4.524,
+    "imu_rotation_yaw_deg": -90.0,
+    "accel_offset_x_g": -0.013,
+    "accel_offset_y_g": -0.037,
+    "accel_offset_z_g": -0.021,
+    "gyro_offset_x_deg_per_s": -1.001,
+    "gyro_offset_y_deg_per_s": -0.176,
+    "gyro_offset_z_deg_per_s": -1.584
   }
