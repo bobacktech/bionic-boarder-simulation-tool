@@ -97,7 +97,7 @@ class CommandMessageProcessor(ABC):
     @abstractmethod
     def create_app_configuration_message(
         self,
-        heartbeat_timeout_sec,
+        heartbeat_timeout_msec,
         baud_rate,
         imu_rotation_roll_deg,
         imu_rotation_pitch_deg,
@@ -113,7 +113,7 @@ class CommandMessageProcessor(ABC):
         Populate the application configuration message class data for a specific VESC firmware version.
 
         Args:
-            heartbeat_timeout_sec (float): Heartbeat timeout duration in seconds.
+            heartbeat_timeout_msec (int): Heartbeat timeout duration in milliseconds.
             baud_rate (int): Baud rate for serial connection.
             imu_rotation_roll_deg (float): IMU rotation roll angle in degrees.
             imu_rotation_pitch_deg (float): IMU rotation pitch angle in degrees.

@@ -1630,7 +1630,7 @@ class FW6_02CMP(CommandMessageProcessor):
 
     def create_app_configuration_message(
         self,
-        heartbeat_timeout_sec,
+        heartbeat_timeout_msec,
         baud_rate,
         imu_rotation_roll_deg,
         imu_rotation_pitch_deg,
@@ -1643,7 +1643,7 @@ class FW6_02CMP(CommandMessageProcessor):
         gyro_offset_z_deg_per_s,
     ):
         self.__app_conf = AppConfigurationMessage()
-        self.__app_conf.timeout_msec = heartbeat_timeout_sec
+        self.__app_conf.timeout_msec = heartbeat_timeout_msec
         self.__app_conf.app_uart_baudrate = baud_rate
         self.__app_conf.imu_conf.rot_roll = imu_rotation_roll_deg
         self.__app_conf.imu_conf.rot_pitch = imu_rotation_pitch_deg

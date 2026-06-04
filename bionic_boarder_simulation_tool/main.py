@@ -157,7 +157,7 @@ if __name__ == "__main__":
 
     vesc_command_message_processor.set_heartbeat_timeout_sec(app_input_arguments.heartbeat_timeout_sec)
     vesc_command_message_processor.create_app_configuration_message(
-        app_input_arguments.heartbeat_timeout_sec,
+        int(app_input_arguments.heartbeat_timeout_sec * 1000),
         app_input_arguments.baud_rate,
         app_input_arguments.imu_rotation_roll_deg,
         app_input_arguments.imu_rotation_pitch_deg,
