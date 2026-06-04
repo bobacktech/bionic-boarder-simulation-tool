@@ -19,7 +19,7 @@
     "mu_rolling": 0.03,
     "c_drag": 0.8,
     "control_time_step_sec": 0.01,
-    "vesc_fw": "6.05",
+    "vesc_fw": "6.02",
     "heartbeat_timeout_sec": 5.0,
     "imu_rotation_roll_deg": -0.796,
     "imu_rotation_pitch_deg": 4.524,
