@@ -156,6 +156,19 @@ if __name__ == "__main__":
         sys.exit(1)
 
     vesc_command_message_processor.set_heartbeat_timeout_sec(app_input_arguments.heartbeat_timeout_sec)
+    vesc_command_message_processor.create_app_configuration_message(
+        app_input_arguments.heartbeat_timeout_sec,
+        app_input_arguments.baud_rate,
+        app_input_arguments.imu_rotation_roll_deg,
+        app_input_arguments.imu_rotation_pitch_deg,
+        app_input_arguments.imu_rotation_yaw_deg,
+        app_input_arguments.accel_offset_x_g,
+        app_input_arguments.accel_offset_y_g,
+        app_input_arguments.accel_offset_z_g,
+        app_input_arguments.gyro_offset_x_deg_per_s,
+        app_input_arguments.gyro_offset_y_deg_per_s,
+        app_input_arguments.gyro_offset_z_deg_per_s,
+    )
 
     # Launch simulation threads
     kinematic_loop_thread = threading.Thread(target=kinematic_loop.loop)

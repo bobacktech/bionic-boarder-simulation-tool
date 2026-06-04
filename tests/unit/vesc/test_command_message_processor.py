@@ -36,6 +36,22 @@ class TestCommandMessageProcessor(CommandMessageProcessor):
     def _publish_motor_controller_configuration(self):
         pass
 
+    def create_app_configuration_message(
+        self,
+        heartbeat_timeout_sec,
+        baud_rate,
+        imu_rotation_roll_deg,
+        imu_rotation_pitch_deg,
+        imu_rotation_yaw_deg,
+        accel_offset_x_g,
+        accel_offset_y_g,
+        accel_offset_z_g,
+        gyro_offset_x_deg_per_s,
+        gyro_offset_y_deg_per_s,
+        gyro_offset_z_deg_per_s,
+    ):
+        pass
+
     def _publish_app_configuration(self):
         pass
 
