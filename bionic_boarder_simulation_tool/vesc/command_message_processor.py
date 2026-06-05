@@ -94,6 +94,39 @@ class CommandMessageProcessor(ABC):
         """
         self.__heartbeat_timeout_sec = timeout_sec
 
+    @abstractmethod
+    def create_app_configuration_message(
+        self,
+        heartbeat_timeout_msec,
+        baud_rate,
+        imu_rotation_roll_deg,
+        imu_rotation_pitch_deg,
+        imu_rotation_yaw_deg,
+        accel_offset_x_g,
+        accel_offset_y_g,
+        accel_offset_z_g,
+        gyro_offset_x_deg_per_s,
+        gyro_offset_y_deg_per_s,
+        gyro_offset_z_deg_per_s,
+    ):
+        """
+        Populate the application configuration message class data for a specific VESC firmware version.
+
+        Args:
+            heartbeat_timeout_msec (int): Heartbeat timeout duration in milliseconds.
+            baud_rate (int): Baud rate for serial connection.
+            imu_rotation_roll_deg (float): IMU rotation roll angle in degrees.
+            imu_rotation_pitch_deg (float): IMU rotation pitch angle in degrees.
+            imu_rotation_yaw_deg (float): IMU rotation yaw angle in degrees.
+            accel_offset_x_g (float): Accelerometer X-axis offset in g.
+            accel_offset_y_g (float): Accelerometer Y-axis offset in g.
+            accel_offset_z_g (float): Accelerometer Z-axis offset in g.
+            gyro_offset_x_deg_per_s (float): Gyroscope X-axis offset in degrees per second.
+            gyro_offset_y_deg_per_s (float): Gyroscope Y-axis offset in degrees per second.
+            gyro_offset_z_deg_per_s (float): Gyroscope Z-axis offset in degrees per second.
+        """
+        pass
+
     def handle_command(self):
         """
         Continuously reads command bytes from the serial port and handles them using

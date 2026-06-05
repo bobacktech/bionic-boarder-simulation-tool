@@ -284,6 +284,7 @@ class TestFW6_02CMP:
         )
         buffer = AppConfigurationMessage().buffer
         crc = cmp.crc16(buffer)
+        cmp.create_app_configuration_message(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
         cmp._publish_app_configuration()
         data = int.to_bytes(3) + int.to_bytes(len(buffer), 2) + buffer + int.to_bytes(crc, 2) + int.to_bytes(0x03)
         mock_serial.return_value.write.assert_called_once_with(data)

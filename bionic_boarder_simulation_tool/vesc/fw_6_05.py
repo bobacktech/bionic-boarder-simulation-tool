@@ -1532,9 +1532,35 @@ class FW6_05CMP(CommandMessageProcessor):
             CMP=self.__class__.__name__,
         )
 
+    def create_app_configuration_message(
+        self,
+        heartbeat_timeout_msec,
+        baud_rate,
+        imu_rotation_roll_deg,
+        imu_rotation_pitch_deg,
+        imu_rotation_yaw_deg,
+        accel_offset_x_g,
+        accel_offset_y_g,
+        accel_offset_z_g,
+        gyro_offset_x_deg_per_s,
+        gyro_offset_y_deg_per_s,
+        gyro_offset_z_deg_per_s,
+    ):
+        self.__app_conf = AppConfigurationMessage()
+        self.__app_conf.timeout_msec = heartbeat_timeout_msec
+        self.__app_conf.app_uart_baudrate = baud_rate
+        self.__app_conf.imu_conf.rot_roll = imu_rotation_roll_deg
+        self.__app_conf.imu_conf.rot_pitch = imu_rotation_pitch_deg
+        self.__app_conf.imu_conf.rot_yaw = imu_rotation_yaw_deg
+        self.__app_conf.imu_conf.accel_offsets[0] = accel_offset_x_g
+        self.__app_conf.imu_conf.accel_offsets[1] = accel_offset_y_g
+        self.__app_conf.imu_conf.accel_offsets[2] = accel_offset_z_g
+        self.__app_conf.imu_conf.gyro_offsets[0] = gyro_offset_x_deg_per_s
+        self.__app_conf.imu_conf.gyro_offsets[1] = gyro_offset_y_deg_per_s
+        self.__app_conf.imu_conf.gyro_offsets[2] = gyro_offset_z_deg_per_s
+
     def _publish_app_configuration(self):
-        app_conf = AppConfigurationMessage()
-        msg_data = app_conf.buffer
+        msg_data = self.__app_conf.buffer
         packet = int.to_bytes(3) + int.to_bytes(len(msg_data), 2) + msg_data + self.__packet_footer(msg_data)
         self.serial.write(packet)
         Logger().logger.info("Publishing application configuration message", CMP=self.__class__.__name__)
