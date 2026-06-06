@@ -12,13 +12,13 @@ The motor controller is emulated with a simplified ERPM (Electrical RPM) control
 
 The simulation supports the following VESC communication commands:
 
+*  **COMM_BIONIC_BOARDER** - Custom Command
 *  **COMM_FW_VERSION**
 *  **COMM_GET_MCCONF**
-*  **COMM_GET_VALUES_SETUP**
+*  **COMM_GET_APPCONF**
 *  **COMM_SET_CURRENT**
 *  **COMM_SET_RPM**
 *  **COMM_ALIVE**
-*  **COMM_BIONIC_BOARDER** - Custom Command
 
 Communication with the simulated VESC is done over a serial connection. A serial device must be available on the PC for the simulation to execute.
 
