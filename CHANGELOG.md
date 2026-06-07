@@ -1,3 +1,13 @@
+## [1.3.0] - 06/07/2026
+- Added support for handling the VESC COMM_GET_APPCONF command and response.
+- Specified the entire contents for the VESC COMM_GET_MCCONF response for all supported VESC firmware versions. 
+- Removed the VESC COMM_GET_VALUES command and response from the simulation.
+- Changed the contents of the custom VESC Bionic Boarder Message to match what is in the latest custom VESC BLDC firmware.
+- Computed the CRC value for the VESC message byte buffer, which is then sent as part of the whole response over serial.
+- Replaced the the custom float to bytes serialize method with struct.pack to serialize Float32 data items.
+- Specified the correct byte length for the VESC COMM_FW_VERSION message.
+- Corrected the custom VESC Bionic Boarder command ID value.
+
 ## [1.2.1] - 02/20/2026
 - This is primarily a bug fix release.
 - The heartbeat timeout value in the VESC command message processor is now set from the application input arguments at startup. 
