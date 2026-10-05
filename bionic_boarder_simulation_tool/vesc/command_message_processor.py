@@ -16,7 +16,6 @@ class CommandMessageProcessor(ABC):
 
     # State change commands
     CURRENT = "CURRENT"
-    RPM = "RPM"
     HEARTBEAT = "HEARTBEAT"
 
     # Message request commands
@@ -139,7 +138,6 @@ class CommandMessageProcessor(ABC):
             CommandMessageProcessor.MOTOR_CONTROLLER_CONFIGURATION: lambda: self._publish_motor_controller_configuration(),
             CommandMessageProcessor.APP_CONFIGURATION: lambda: self._publish_app_configuration(),
             CommandMessageProcessor.CURRENT: lambda: self._update_current(command_bytes),
-            CommandMessageProcessor.RPM: lambda: self._update_rpm(command_bytes),
             CommandMessageProcessor.HEARTBEAT: lambda: self.heartbeat(),
         }
         while True:
@@ -200,16 +198,6 @@ class CommandMessageProcessor(ABC):
 
         Args:
             command: The command containing the information to update the current.
-        """
-        pass
-
-    @abstractmethod
-    def _update_rpm(self, command):
-        """
-        Abstract method to update the RPM in the state data based on the provided command.
-
-        Args:
-            command: The command containing the information to update the RPM.
         """
         pass
 

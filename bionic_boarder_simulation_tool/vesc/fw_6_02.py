@@ -1549,7 +1549,6 @@ class FW6_02CMP(CommandMessageProcessor):
         super().__init__(com_port, baud_rate, command_byte_size)
         self.__cmd_id_name = {
             6: CommandMessageProcessor.CURRENT,
-            8: CommandMessageProcessor.RPM,
             30: CommandMessageProcessor.HEARTBEAT,
             0: CommandMessageProcessor.FIRMWARE,
             14: CommandMessageProcessor.MOTOR_CONTROLLER_CONFIGURATION,
@@ -1671,12 +1670,3 @@ class FW6_02CMP(CommandMessageProcessor):
         Logger().logger.info(
             "Processing set current command", motor_current=motor_current_commanded, CMP=self.__class__.__name__
         )
-
-    def _update_rpm(self, command):
-        erpm_commanded = int.from_bytes(command[3:7], byteorder="big")
-        self.__mc.target_erpm = erpm_commanded
-        try:
-            self.__mc.erpm_sem.release()
-        except ValueError as e:
-            pass
-        Logger().logger.info("Processing set ERPM command", erpm=erpm_commanded, CMP=self.__class__.__name__)
