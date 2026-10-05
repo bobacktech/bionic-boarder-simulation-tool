@@ -9,7 +9,6 @@ class TestCommandMessageProcessor(CommandMessageProcessor):
         super().__init__(com_port, baud_rate, command_byte_size)
         self.__cmd_id_name = {
             2: CommandMessageProcessor.CURRENT,
-            3: CommandMessageProcessor.RPM,
             4: CommandMessageProcessor.HEARTBEAT,
             5: CommandMessageProcessor.FIRMWARE,
             7: CommandMessageProcessor.BIONIC_BOARDER,
@@ -58,9 +57,6 @@ class TestCommandMessageProcessor(CommandMessageProcessor):
     def _update_current(self, command):
         pass
 
-    def _update_rpm(self, command):
-        pass
-
 
 @pytest.fixture
 def mock_serial(mocker):
@@ -84,15 +80,6 @@ def test_handle_command_current(processor, mocker):
     with pytest.raises(StopIteration):
         processor.handle_command()
     processor._update_current.assert_called_once()
-
-
-def test_handle_command_rpm(processor, mocker):
-    mocker.patch.object(processor, "_update_rpm", autospec=True)
-    mocker.patch.object(processor, "_get_command_id", return_value=3)
-    with pytest.raises(StopIteration):
-        processor.handle_command()
-    processor._update_rpm.assert_called_once()
-
 
 def test_handle_command_heartbeat(processor, mocker):
     mocker.patch.object(processor, "heartbeat", autospec=True)
@@ -136,7 +123,6 @@ def test_handle_command_bionic_boarder(processor, mocker):
 
 def test_command_id_names(processor):
     assert processor._command_id_name[2] == CommandMessageProcessor.CURRENT
-    assert processor._command_id_name[3] == CommandMessageProcessor.RPM
     assert processor._command_id_name[4] == CommandMessageProcessor.HEARTBEAT
     assert processor._command_id_name[5] == CommandMessageProcessor.FIRMWARE
     assert processor._command_id_name[7] == CommandMessageProcessor.BIONIC_BOARDER
