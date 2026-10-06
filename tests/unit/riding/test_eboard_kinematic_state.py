@@ -14,6 +14,10 @@ def test_state():
         pitch=5.0,
         roll=6.0,
         yaw=7.0,
+        w=1.0,
+        x=0.0,
+        y=0.0,
+        z=0.0,
         erpm=8,
         input_current=9.0,
     )
@@ -45,6 +49,22 @@ def test_roll(test_state):
 
 def test_yaw(test_state):
     assert test_state.yaw == 7.0
+
+    
+def test_w(test_state):
+    assert test_state.w == 1.0
+
+
+def test_x(test_state):
+    assert test_state.x == 0.0
+
+
+def test_y(test_state):
+    assert test_state.y == 0.0
+
+
+def test_z(test_state):
+    assert test_state.z == 0.0        
 
 
 def test_erpm(test_state):

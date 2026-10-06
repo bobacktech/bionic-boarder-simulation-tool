@@ -28,7 +28,13 @@ class EboardKinematicState:
     pitch: float = 0.0
     roll: float = 0.0
     yaw: float = 0.0
-
+    
+    """Quaternion - w-scalar part,x-axis,y-axis,z-axis corresponds to q[0], q[1], q[2], q[3] in the VESC BLDC"""
+    w: float = 0.0
+    x: float = 0.0
+    y: float = 0.0
+    z: float = 0.0
+    
     """Electric Motor State"""
     erpm: int = 0
     input_current: float = 0.0
