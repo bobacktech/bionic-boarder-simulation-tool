@@ -1595,6 +1595,10 @@ class FW6_00CMP(CommandMessageProcessor):
             bb.rpm = self.__eks.erpm
             bb.acc[0] = self.__eks.acceleration_x
             bb.rpy[1] = self.__eks.pitch * (math.pi / 180.0)
+            bb.q[0] = self.__eks.w
+            bb.q[1] = self.__eks.x
+            bb.q[2] = self.__eks.y
+            bb.q[3] = self.__eks.z
         msg_data = bb.buffer
         packet = self.__packet_header(len(msg_data)) + msg_data + self.__packet_footer(msg_data)
         self.serial.write(packet)
