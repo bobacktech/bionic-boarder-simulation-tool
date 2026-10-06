@@ -1503,6 +1503,7 @@ class FW6_05CMP(CommandMessageProcessor):
             rpm=bb.rpm,
             imu_acc=bb.acc,
             imu_rpy=bb.rpy,
+            imu_q=bb.q,
             CMP=self.__class__.__name__,
         )
 
