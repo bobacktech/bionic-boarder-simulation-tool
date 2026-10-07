@@ -85,6 +85,12 @@ class KinematicLoop:
         self.__current_theta_slope_deg = self.__initial_theta_slope_deg
         theta_slope_time_step_sec = 0
         push_period_time_step_sec = 0
+        with self.__eks_lock:
+            angle = math.radians(self.__current_theta_slope_deg) / 2.0
+            self.__eks.w = math.cos(angle)
+            self.__eks.x = 0.0
+            self.__eks.y = math.sin(angle)
+            self.__eks.z = 0.0
         Logger().logger.info("Kinematic loop has started")
         while True:
             if not self.__loop_active:
@@ -100,22 +106,29 @@ class KinematicLoop:
                 continue
             start_time = time.perf_counter()
             if theta_slope_time_step_sec >= self.__theta_slope_period_sec:
+                log_msg = None
                 if self.__current_theta_slope_deg == 0.0:
                     self.__current_theta_slope_deg = random.uniform(
                         -self.__slope_range_bound_deg,
                         self.__slope_range_bound_deg,
                     )
-                    Logger().logger.info(
-                        "Calculated new theta slope value", theta_slope_deg=self.__current_theta_slope_deg
-                    )
+                    log_msg = "Calculated new theta slope value"
                 else:
                     self.__current_theta_slope_deg = 0.0
-                    Logger().logger.info(
-                        "Theta slope value is set to 0.0", theta_slope_deg=self.__current_theta_slope_deg
-                    )
+                    log_msg = "Theta slope value is set to 0.0"                    
                 theta_slope_time_step_sec = 0
+                angle = math.radians(self.__current_theta_slope_deg) / 2.0
+                w = math.cos(angle)
+                y = math.sin(angle)
                 with self.__eks_lock:
-                    self.__eks.pitch = self.__current_theta_slope_deg
+                    self.__eks.pitch = self.__current_theta_slope_deg                    
+                    self.__eks.w = w
+                    self.__eks.x = 0.0
+                    self.__eks.y = y
+                    self.__eks.z = 0.0
+                Logger().logger.info(
+                    log_msg, theta_slope_deg=self.__current_theta_slope_deg, quat_w=w, quat_x=0.0, quat_y=y, quat_z=0.0
+                )
             theta_slope_time_step_sec += self.__fixed_time_step_ms / 1000.0
             if push_period_time_step_sec >= self.__push_period_sec:
                 force_1g_N = self.__eb.total_weight_with_rider_kg * 9.81
