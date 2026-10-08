@@ -89,7 +89,7 @@ class KinematicLoop:
             angle = math.radians(self.__current_theta_slope_deg) / 2.0
             self.__eks.w = math.cos(angle)
             self.__eks.x = 0.0
-            self.__eks.y = math.sin(angle)
+            self.__eks.y = -math.sin(angle)
             self.__eks.z = 0.0
         Logger().logger.info("Kinematic loop has started")
         while True:
@@ -119,7 +119,7 @@ class KinematicLoop:
                 theta_slope_time_step_sec = 0
                 angle = math.radians(self.__current_theta_slope_deg) / 2.0
                 w = math.cos(angle)
-                y = math.sin(angle)
+                y = -math.sin(angle)
                 with self.__eks_lock:
                     self.__eks.pitch = self.__current_theta_slope_deg                    
                     self.__eks.w = w
