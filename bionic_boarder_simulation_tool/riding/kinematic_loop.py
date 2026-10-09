@@ -86,6 +86,7 @@ class KinematicLoop:
         theta_slope_time_step_sec = 0
         push_period_time_step_sec = 0
         with self.__eks_lock:
+            self.__eks.acceleration_z = 9.81 * math.cos(math.radians(self.__current_theta_slope_deg)) 
             angle = math.radians(self.__current_theta_slope_deg) / 2.0
             self.__eks.w = math.cos(angle)
             self.__eks.x = 0.0
@@ -121,6 +122,7 @@ class KinematicLoop:
                 w = math.cos(angle)
                 y = -math.sin(angle)
                 with self.__eks_lock:
+                    self.__eks.acceleration_z = 9.81 * math.cos(math.radians(self.__current_theta_slope_deg)) 
                     self.__eks.pitch = self.__current_theta_slope_deg                    
                     self.__eks.w = w
                     self.__eks.x = 0.0
