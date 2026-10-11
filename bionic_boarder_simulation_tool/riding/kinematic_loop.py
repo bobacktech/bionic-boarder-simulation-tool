@@ -1,3 +1,5 @@
+
+
 import math
 from .eboard import EBoard
 from .eboard_kinematic_state import EboardKinematicState
@@ -154,14 +156,15 @@ class KinematicLoop:
             else:
                 self.__eks.velocity = max(0, self.__eks.velocity - delta_velocity_friction_m_per_s)
                 self.__eks.acceleration_x = -accel_friction_ms2
-            accel_gravity_x_m_per_s2 = 9.81 * math.sin(math.radians(abs(self.__current_theta_slope_deg)))
+            accel_gravity_x_m_per_s2 = 9.81 * math.sin(math.radians(self.__current_theta_slope_deg))
+            self.__eks.acceleration_x = accel_gravity_x_m_per_s2
             delta_velocity_gravity_x_m_per_s = accel_gravity_x_m_per_s2 * self.__fixed_time_step_ms / 1000.0
             if self.__current_theta_slope_deg >= 0.0:
                 self.__eks.velocity -= delta_velocity_gravity_x_m_per_s
-                self.__eks.acceleration_x -= accel_gravity_x_m_per_s2
+                self.__eks.acceleration_x -= accel_friction_ms2
             else:
                 self.__eks.velocity += delta_velocity_gravity_x_m_per_s
-                self.__eks.acceleration_x += accel_gravity_x_m_per_s2
+                self.__eks.acceleration_x += accel_friction_ms2
             if self.__pm.push_active:
                 accel_x_m_per_s2, delta_velocity_push_m_per_s = self.__pm.step(self.__fixed_time_step_ms)
                 self.__eks.acceleration_x += accel_x_m_per_s2
@@ -176,3 +179,4 @@ class KinematicLoop:
 
     def stop(self) -> None:
         self.__loop_active = False
+
