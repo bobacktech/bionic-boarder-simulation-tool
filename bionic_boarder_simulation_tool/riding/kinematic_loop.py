@@ -88,7 +88,8 @@ class KinematicLoop:
         theta_slope_time_step_sec = 0
         push_period_time_step_sec = 0
         with self.__eks_lock:
-            self.__eks.acceleration_z = 9.81 * math.cos(math.radians(self.__current_theta_slope_deg)) 
+            self.__eks.acceleration_z = 9.81 * math.cos(math.radians(self.__current_theta_slope_deg))
+            self.__eks.pitch = self.__current_theta_slope_deg 
             angle = math.radians(self.__current_theta_slope_deg) / 2.0
             self.__eks.w = math.cos(angle)
             self.__eks.x = 0.0
@@ -146,33 +147,36 @@ class KinematicLoop:
                 self.__pm.setup(force_push_x_N, push_duration_ms)
                 push_period_time_step_sec = 0
             push_period_time_step_sec += self.__fixed_time_step_ms / 1000.0
+            
             self.__eks_lock.acquire()
             accel_friction_ms2, delta_velocity_friction_m_per_s = self.__fdm.decelerate(
                 self.__eks.velocity, self.fixed_time_step_ms
             )
+            accel_gravity_x_m_per_s2 = 9.81 * math.sin(math.radians(self.__current_theta_slope_deg))
+            delta_velocity_gravity_x_m_per_s = abs(accel_gravity_x_m_per_s2) * self.__fixed_time_step_ms / 1000.0
+
             if self.__eks.velocity < 0.0:
                 self.__eks.velocity = min(0, self.__eks.velocity + delta_velocity_friction_m_per_s)
-                self.__eks.acceleration_x = accel_friction_ms2
             else:
                 self.__eks.velocity = max(0, self.__eks.velocity - delta_velocity_friction_m_per_s)
-                self.__eks.acceleration_x = -accel_friction_ms2
-            accel_gravity_x_m_per_s2 = 9.81 * math.sin(math.radians(self.__current_theta_slope_deg))
-            self.__eks.acceleration_x = accel_gravity_x_m_per_s2
-            delta_velocity_gravity_x_m_per_s = accel_gravity_x_m_per_s2 * self.__fixed_time_step_ms / 1000.0
+            
             if self.__current_theta_slope_deg >= 0.0:
                 self.__eks.velocity -= delta_velocity_gravity_x_m_per_s
-                self.__eks.acceleration_x -= accel_friction_ms2
+                self.__eks.acceleration_x = accel_friction_ms2
             else:
                 self.__eks.velocity += delta_velocity_gravity_x_m_per_s
-                self.__eks.acceleration_x += accel_friction_ms2
+                self.__eks.acceleration_x = -accel_friction_ms2
+            
             if self.__pm.push_active:
                 accel_x_m_per_s2, delta_velocity_push_m_per_s = self.__pm.step(self.__fixed_time_step_ms)
                 self.__eks.acceleration_x += accel_x_m_per_s2
                 self.__eks.velocity += delta_velocity_push_m_per_s
+            
             wheel_rpm = (self.__eks.velocity / (self.__eb.wheel_diameter_m * math.pi)) * 60
             motor_rpm = wheel_rpm * self.__eb.gear_ratio
             self.__eks.erpm = int(self.__eb.motor_pole_pairs * motor_rpm)
             self.__eks_lock.release()
+            
             elapsed_time = time.perf_counter() - start_time
             sleep_time = max(0, self.__fixed_time_step_ms / 1000.0 - elapsed_time)
             time.sleep(sleep_time)
