@@ -1594,6 +1594,8 @@ class FW6_00CMP(CommandMessageProcessor):
             bb.motor_current = self.__eks.motor_current
             bb.rpm = self.__eks.erpm
             bb.acc[0] = self.__eks.acceleration_x
+            bb.acc[1] = self.__eks.acceleration_y
+            bb.acc[2] = self.__eks.acceleration_z
             bb.rpy[1] = self.__eks.pitch * (math.pi / 180.0)
             bb.q[0] = self.__eks.w
             bb.q[1] = self.__eks.x

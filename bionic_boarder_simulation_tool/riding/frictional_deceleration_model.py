@@ -40,7 +40,7 @@ class FrictionalDecelerationModel:
             delta velocity in m/s due to friction and drag
         """
         force_drag = (
-            self.__c_drag * self.AIR_DENSITY * (current_velocity_m_per_s**2) * self.eboard.frontal_area_of_rider_m2
+            (self.__c_drag * self.AIR_DENSITY * (current_velocity_m_per_s**2) * self.eboard.frontal_area_of_rider_m2) / 2.0
         )
         force_total = self.__force_friction + force_drag
         acceleration_ms2 = force_total / self.eboard.total_weight_with_rider_kg

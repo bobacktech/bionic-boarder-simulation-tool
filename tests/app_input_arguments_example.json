@@ -1,6 +1,6 @@
 {
     "total_weight_with_rider_kg": 75.0,
-    "frontal_area_of_rider_m2": 2.9,
+    "frontal_area_of_rider_m2": 0.5,
     "wheel_diameter_m": 0.09,
     "battery_max_capacity_Ah": 6.0,
     "battery_max_voltage": 42.0,

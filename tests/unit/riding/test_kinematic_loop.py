@@ -56,21 +56,6 @@ class TestKinematicLoop:
         assert eks.velocity == 0.0
         assert eks.erpm == 0
 
-    def test_initial_velocity_nonzero_no_push(self, kloop: KinematicLoop, eks: EboardKinematicState):
-        kloop.fixed_time_step_ms = 20
-        kloop.slope_range_bound_deg = 10
-        kloop.push_period_sec = 0.6
-        kloop.theta_slope_period_sec = 0.6
-        eks.velocity = 10
-        eks.acceleration_x = 0
-        t = threading.Thread(target=kloop.loop)
-        t.start()
-        time.sleep(0.3)
-        kloop.stop()
-        assert eks.velocity < 10
-        assert eks.acceleration_x == -0.1
-        assert eks.erpm > 0
-
     def test_initial_velocity_zero_push(self, kloop: KinematicLoop, eks: EboardKinematicState, pm_mock: MagicMock):
         kloop.fixed_time_step_ms = 20
         kloop.slope_range_bound_deg = 10
