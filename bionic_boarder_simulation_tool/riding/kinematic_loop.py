@@ -154,11 +154,6 @@ class KinematicLoop:
             )
             accel_gravity_x_m_per_s2 = 9.81 * math.sin(math.radians(self.__current_theta_slope_deg))
             delta_velocity_gravity_x_m_per_s = abs(accel_gravity_x_m_per_s2) * self.__fixed_time_step_ms / 1000.0
-
-            if self.__eks.velocity < 0.0:
-                self.__eks.velocity = min(0, self.__eks.velocity + delta_velocity_friction_m_per_s)
-            else:
-                self.__eks.velocity = max(0, self.__eks.velocity - delta_velocity_friction_m_per_s)
             
             if self.__current_theta_slope_deg >= 0.0:
                 self.__eks.velocity -= delta_velocity_gravity_x_m_per_s
@@ -166,6 +161,12 @@ class KinematicLoop:
             else:
                 self.__eks.velocity += delta_velocity_gravity_x_m_per_s
                 self.__eks.acceleration_x = -accel_friction_ms2
+            
+            if self.__eks.velocity <= 0.0:
+                self.__eks.velocity = 0.0
+                self.__eks.acceleration_x = accel_gravity_x_m_per_s2
+            else:
+                self.__eks.velocity = max(0, self.__eks.velocity - delta_velocity_friction_m_per_s)
             
             if self.__pm.push_active:
                 accel_x_m_per_s2, delta_velocity_push_m_per_s = self.__pm.step(self.__fixed_time_step_ms)
