@@ -96,7 +96,7 @@ class TestKinematicLoop:
         assert eks.velocity > 10
         assert eks.erpm > temp_erpm
 
-    def test_initial_velocity_zero_no_push_negative_velocity(self, kloop: KinematicLoop, eks: EboardKinematicState):
+    def test_initial_velocity_zero_no_push_zero_velocity(self, kloop: KinematicLoop, eks: EboardKinematicState):
         kloop.fixed_time_step_ms = 20
         kloop.slope_range_bound_deg = 10
         kloop.push_period_sec = 1.0
@@ -108,8 +108,8 @@ class TestKinematicLoop:
         t.start()
         time.sleep(0.2)
         kloop.stop()
-        assert eks.velocity < 0
-        assert eks.erpm < 0
+        assert eks.velocity == 0
+        assert eks.erpm == 0
 
     def test_current_slope_angle_accessible_loop_running(self, kloop: KinematicLoop):
         kloop.fixed_time_step_ms = 20
