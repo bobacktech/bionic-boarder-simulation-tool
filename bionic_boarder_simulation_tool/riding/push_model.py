@@ -1,3 +1,5 @@
+
+
 from .eboard import EBoard
 from bionic_boarder_simulation_tool.logger import Logger
 
@@ -28,7 +30,7 @@ class PushModel:
         self.__eboard = eboard
         self.__push_active = False
 
-    def setup(self, force_rider_N: float, push_duration_ms: int) -> None:
+    def setup(self, accel_push_x_m_per_s2: float, push_duration_ms: int) -> None:
         """
         Computes the rider acceleration, the slowdown acceleration, and the initial
         slowdown duration based on the provided force and push duration.
@@ -39,7 +41,7 @@ class PushModel:
         Returns:
             None
         """
-        self.__rider_accel_ms2 = force_rider_N / self.__eboard.total_weight_with_rider_kg
+        self.__rider_accel_ms2 = accel_push_x_m_per_s2
         self.__push_duration_s = push_duration_ms / 1000
         self.__initial_slowdown_duration_s = PushModel.SLOWDOWN_DURATION_FACTOR * self.__push_duration_s
         self.__rider_slowdown_accel_ms2 = -(PushModel.SLOWDOWN_DURATION_FACTOR * self.__rider_accel_ms2)
@@ -90,9 +92,8 @@ class PushModel:
             )
             delta_velocity_mps = acceleration_ms2 * t_sec
         else:
-            fraction = (self.__elapsed_time_s - self.__initial_slowdown_duration_s) / self.__push_duration_s
-            acceleration_ms2 = 2 * (self.__rider_accel_ms2 * fraction)
-            delta_velocity_mps = acceleration_ms2 * t_sec
+            delta_velocity_mps = self.__rider_accel_ms2 * t_sec
+            acceleration_ms2 = self.__rider_accel_ms2
         self.__elapsed_time_s += t_sec
         if self.__elapsed_time_s > (self.__push_duration_s + self.__initial_slowdown_duration_s):
             self.__push_active = False
@@ -101,3 +102,4 @@ class PushModel:
                 push_active=self.__push_active,
             )
         return acceleration_ms2, delta_velocity_mps
+
