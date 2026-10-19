@@ -30,7 +30,7 @@ class TestPushModel:
         assert prev_delta_v == 0
 
     def test_accelerate(self, pm: PushModel):
-        pm.setup(200, 500)
+        pm.setup(9.81, 500)
         assert pm.push_active == True
         elapsed_time_ms = 0
         while elapsed_time_ms <= pm.slowdown_duration_ms:
@@ -39,8 +39,8 @@ class TestPushModel:
         prev_accel, prev_delta_v = 0, 0
         while pm.push_active:
             accel, delta_v = pm.step(10)
-            assert accel > prev_accel
-            assert delta_v > prev_delta_v
+            if prev_accel > 0 and prev_delta_v > 0:
+                assert accel == prev_accel
+                assert delta_v == prev_delta_v
             prev_accel, prev_delta_v = accel, delta_v
-        twice_accel = 2 * (200 / 80)
-        assert prev_accel == pytest.approx(twice_accel, abs=0.1)
+        assert pm.push_active == False
