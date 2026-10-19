@@ -1,5 +1,6 @@
 
 
+
 import math
 from .eboard import EBoard
 from .eboard_kinematic_state import EboardKinematicState
@@ -135,16 +136,22 @@ class KinematicLoop:
                     log_msg, theta_slope_deg=self.__current_theta_slope_deg, quat_w=w, quat_x=0.0, quat_y=y, quat_z=0.0
                 )
             theta_slope_time_step_sec += self.__fixed_time_step_ms / 1000.0
-            if push_period_time_step_sec >= self.__push_period_sec:
-                force_1g_N = self.__eb.total_weight_with_rider_kg * 9.81
-                force_push_x_N = random.uniform(force_1g_N, 2 * force_1g_N)
-                push_duration_ms = random.randint(400, 600)
+            
+            accel_gravity_x_m_per_s2 = 9.81 * math.sin(math.radians(self.__current_theta_slope_deg))
+            delta_velocity_gravity_x_m_per_s = abs(accel_gravity_x_m_per_s2) * self.__fixed_time_step_ms / 1000.0
+
+            if push_period_time_step_sec >= self.__push_period_sec:                
+                if self.__current_theta_slope_deg > 0.0:
+                    accel_push_x_m_per_s2 = random.uniform(accel_gravity_x_m_per_s2, 2 * 9.81)
+                else:                    
+                    accel_push_x_m_per_s2 = random.uniform(0, 9.81)
+                push_duration_ms = random.randint(400, 600)                
                 Logger().logger.info(
                     "Land paddle board push initiated",
-                    force_x_of_the_push=force_push_x_N,
+                    accel_x_of_the_push=accel_push_x_m_per_s2,
                     duration_of_the_push_ms=push_duration_ms,
-                )
-                self.__pm.setup(force_push_x_N, push_duration_ms)
+                )                
+                self.__pm.setup(accel_push_x_m_per_s2, push_duration_ms)
                 push_period_time_step_sec = 0
             push_period_time_step_sec += self.__fixed_time_step_ms / 1000.0
             
@@ -152,27 +159,25 @@ class KinematicLoop:
             accel_friction_ms2, delta_velocity_friction_m_per_s = self.__fdm.decelerate(
                 self.__eks.velocity, self.fixed_time_step_ms
             )
-            accel_gravity_x_m_per_s2 = 9.81 * math.sin(math.radians(self.__current_theta_slope_deg))
-            delta_velocity_gravity_x_m_per_s = abs(accel_gravity_x_m_per_s2) * self.__fixed_time_step_ms / 1000.0
             
             if self.__current_theta_slope_deg >= 0.0:
                 self.__eks.velocity -= delta_velocity_gravity_x_m_per_s
-                self.__eks.acceleration_x = accel_friction_ms2
             else:
-                self.__eks.velocity += delta_velocity_gravity_x_m_per_s
-                self.__eks.acceleration_x = -accel_friction_ms2
-            
-            if self.__eks.velocity <= 0.0:
-                self.__eks.velocity = 0.0
-                self.__eks.acceleration_x = accel_gravity_x_m_per_s2
-            else:
-                self.__eks.velocity = max(0, self.__eks.velocity - delta_velocity_friction_m_per_s)
-            
+                self.__eks.velocity += delta_velocity_gravity_x_m_per_s 
+            self.__eks.acceleration_x = -accel_friction_ms2
+                           
             if self.__pm.push_active:
                 accel_x_m_per_s2, delta_velocity_push_m_per_s = self.__pm.step(self.__fixed_time_step_ms)
                 self.__eks.acceleration_x += accel_x_m_per_s2
                 self.__eks.velocity += delta_velocity_push_m_per_s
             
+            if self.__eks.velocity > 0.0:
+                self.__eks.velocity = self.__eks.velocity - delta_velocity_friction_m_per_s
+
+            if self.__eks.velocity <= 0.0:
+                self.__eks.velocity = 0.0
+                self.__eks.acceleration_x = accel_gravity_x_m_per_s2
+                        
             wheel_rpm = (self.__eks.velocity / (self.__eb.wheel_diameter_m * math.pi)) * 60
             motor_rpm = wheel_rpm * self.__eb.gear_ratio
             self.__eks.erpm = int(self.__eb.motor_pole_pairs * motor_rpm)
