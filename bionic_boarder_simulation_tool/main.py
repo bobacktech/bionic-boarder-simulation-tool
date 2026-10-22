@@ -44,7 +44,7 @@ class AppInputArguments:
     c_drag: float
 
     # Motor Controller
-    control_time_step_sec: float
+    control_time_step_ms: float
 
     # VESC
     vesc_fw: str
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     motor_controller = motor_controller.MotorController(
         eboard, eboard_kinematic_state, eboard_kinematic_state_lock, frictional_deceleration_model
     )
-    motor_controller.control_time_step_ms = int(app_input_arguments.control_time_step_sec * 1000)
+    motor_controller.control_time_step_ms = app_input_arguments.control_time_step_ms
     kinematic_loop = kinematic_loop.KinematicLoop(
         eboard, eboard_kinematic_state, eboard_kinematic_state_lock, frictional_deceleration_model, push_model
     )

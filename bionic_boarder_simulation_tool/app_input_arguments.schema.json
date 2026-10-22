@@ -78,7 +78,7 @@
         "type": "number",
         "description": "Friction model"
       },
-      "control_time_step_sec": {
+      "control_time_step_ms": {
         "type": "number",
         "description": "Motor Controller"
       },
@@ -155,7 +155,7 @@
       "slope_range_bound_deg",
       "mu_rolling",
       "c_drag",
-      "control_time_step_sec",
+      "control_time_step_ms",
       "vesc_fw",
       "heartbeat_timeout_sec",
       "imu_rotation_roll_deg",
