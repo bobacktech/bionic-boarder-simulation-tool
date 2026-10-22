@@ -58,6 +58,8 @@ class AppInputArguments:
     gyro_offset_x_deg_per_s: float
     gyro_offset_y_deg_per_s: float
     gyro_offset_z_deg_per_s: float
+    motor_current_max_A: float    
+    battery_current_max_A: float
 
 
 if __name__ == "__main__":
@@ -101,6 +103,17 @@ if __name__ == "__main__":
         app_input_arguments.motor_max_amps,
         app_input_arguments.motor_max_power_watts,
         app_input_arguments.motor_pole_pairs,
+        app_input_arguments.imu_rotation_roll_deg,
+        app_input_arguments.imu_rotation_pitch_deg,
+        app_input_arguments.imu_rotation_yaw_deg,
+        app_input_arguments.accel_offset_x_g,
+        app_input_arguments.accel_offset_y_g,
+        app_input_arguments.accel_offset_z_g,
+        app_input_arguments.gyro_offset_x_deg_per_s,
+        app_input_arguments.gyro_offset_y_deg_per_s,
+        app_input_arguments.gyro_offset_z_deg_per_s,
+        app_input_arguments.motor_current_max_A,
+        app_input_arguments.battery_current_max_A,
     )
     frictional_deceleration_model = frictional_deceleration_model.FrictionalDecelerationModel(
         app_input_arguments.mu_rolling, app_input_arguments.c_drag, eboard

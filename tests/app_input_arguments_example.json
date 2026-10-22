@@ -2,7 +2,7 @@
     "total_weight_with_rider_kg": 75.0,
     "frontal_area_of_rider_m2": 0.5,
     "wheel_diameter_m": 0.09,
-    "battery_max_capacity_Ah": 6.0,
+    "battery_max_capacity_Ah": 9.0,
     "battery_max_voltage": 42.0,
     "gear_ratio": 2.25,
     "motor_kv": 190,
@@ -29,5 +29,7 @@
     "accel_offset_z_g": -0.021,
     "gyro_offset_x_deg_per_s": -1.001,
     "gyro_offset_y_deg_per_s": -0.176,
-    "gyro_offset_z_deg_per_s": -1.584
+    "gyro_offset_z_deg_per_s": -1.584,
+    "motor_current_max_A": 55.0,
+    "battery_current_max_A": 35.0
   }

@@ -125,7 +125,15 @@
       "gyro_offset_z_deg_per_s": {
         "type": "number",
         "description": "VESC"
-      }
+      },
+      "motor_current_max_A": {
+        "type": "number",
+        "description": "VESC"
+      },
+      "battery_current_max_A": {
+        "type": "number",
+        "description": "VESC"
+      }      
     },
     "required": [
       "total_weight_with_rider_kg",
@@ -158,7 +166,9 @@
       "accel_offset_z_g",
       "gyro_offset_x_deg_per_s",
       "gyro_offset_y_deg_per_s",
-      "gyro_offset_z_deg_per_s"
+      "gyro_offset_z_deg_per_s",
+      "motor_current_max_A",
+      "battery_current_max_A"
     ],
     "additionalProperties": false
   }
