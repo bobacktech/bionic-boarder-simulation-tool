@@ -38,6 +38,8 @@ class KinematicLoop:
         self.__current_theta_slope_deg = 0.0
         self.__loop_active = False
         self.__slope_range_bound_deg = None
+        self.__apply_current = False
+        self.__drive_acceleration = 0.0
 
     @property
     def slope_range_bound_deg(self) -> float:
@@ -100,15 +102,6 @@ class KinematicLoop:
         while True:
             if not self.__loop_active:
                 break
-            if self.__eks.motor_current > 0:
-                """
-                This means that the electric motor is controlling the land paddle board because a current is
-                being injected into the motor. In this case, the land paddle board's kinematics will not be
-                adjusted due to frictional forces, gravity, and/or a user's push. Instead, just skip to
-                next iteration of the loop after the fixed time step.
-                """
-                time.sleep(self.__fixed_time_step_ms / 1000.0)
-                continue
             start_time = time.perf_counter()
             if theta_slope_time_step_sec >= self.__theta_slope_period_sec:
                 log_msg = None
@@ -171,6 +164,11 @@ class KinematicLoop:
                 self.__eks.acceleration_x += accel_x_m_per_s2
                 self.__eks.velocity += delta_velocity_push_m_per_s
             
+            if self.__apply_current:
+                self.__eks.acceleration_x += self.__drive_acceleration
+                delta_velocity_drive_m_per_s = self.__drive_acceleration * self.__fixed_time_step_ms / 1000.0
+                self.__eks.velocity += delta_velocity_drive_m_per_s
+            
             if self.__eks.velocity > 0.0:
                 self.__eks.velocity = self.__eks.velocity - delta_velocity_friction_m_per_s
 
@@ -189,4 +187,28 @@ class KinematicLoop:
 
     def stop(self) -> None:
         self.__loop_active = False
+        
+    def apply_current(self, current: float) -> None:
+        if not (current >=0 and current <= self.__eb.motor_current_max_A): 
+            # Log error
+            Logger().logger.error("Commanded current is not within VESC limits. Commanded current will be ignored." 
+                                  f"(requested: {current}, max: {self.__eb.motor_current_max_A})")
+            return
+        
+        with self.__eks_lock:
+            self.__eks.motor_current = current
+        if current == 0.0:
+            self.__apply_current = False
+            Logger().logger.info("Current control has set motor current to 0")
+        else:
+            self.__apply_current = True
+            
+            # Convert the target current value to wheel torque using VESC FOC appropriate formula for computing Kt.
+            kt = 8.27/self.__eb.motor_kv
+            motor_torque = kt * current
+            wheel_torque = motor_torque * self.__eb.gear_ratio
+            
+            # Compute the drive force from the torque.
+            drive_force = wheel_torque/(self.__eb.wheel_diameter_m/2.0)
+            self.__drive_acceleration = drive_force/self.__eb.total_weight_with_rider_kg
 
