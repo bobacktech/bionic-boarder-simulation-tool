@@ -5,7 +5,7 @@ from bionic_boarder_simulation_tool.riding.eboard import EBoard
 
 @pytest.fixture
 def pm():
-    eboard = EBoard(80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    eboard = EBoard(80, 0, 0.0508, 0, 0, 2, 190, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100.0, 0)
     pm = PushModel(eboard)
     return pm
 

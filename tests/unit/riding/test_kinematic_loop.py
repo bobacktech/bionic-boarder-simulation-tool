@@ -12,7 +12,7 @@ import time
 
 @pytest.fixture
 def eboard():
-    return EBoard(80, 0, 0.0508, 0, 0, 2, 0, 0, 0, 0, 7)
+    return EBoard(80, 0, 0.0508, 0, 0, 2, 190, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100.0, 0)
 
 
 @pytest.fixture
@@ -134,17 +134,18 @@ class TestKinematicLoop:
         time.sleep(0.1)
         kloop.stop()
         assert eks.pitch != 0
-
-    def test_eks_input_current_is_greater_than_zero(self, kloop: KinematicLoop, eks: EboardKinematicState):
+    
+    def test_velocity_with_no_push_and_no_slope_increases_when_current_is_applied(self, kloop: KinematicLoop, eks: EboardKinematicState):
         kloop.fixed_time_step_ms = 10
         kloop.slope_range_bound_deg = 10
-        kloop.push_period_sec = 0.1
-        kloop.theta_slope_period_sec = 0.1
-        eks.motor_current = 20.0
-        eks.velocity = 2.5
+        kloop.push_period_sec = 10000
+        kloop.theta_slope_period_sec = 10000
+        kloop.initial_theta_slope_deg = 0.0
+        kloop.apply_current(70.0)
+        eks.velocity = 0.0
         t = threading.Thread(target=kloop.loop)
         t.start()
         time.sleep(0.3)
         kloop.stop()
-        assert eks.velocity == 2.5
-        assert eks.motor_current > 0
+        assert eks.velocity > 0.0
+        
