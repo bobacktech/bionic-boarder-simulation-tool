@@ -78,7 +78,7 @@
         "type": "number",
         "description": "Friction model"
       },
-      "control_time_step_sec": {
+      "control_time_step_ms": {
         "type": "number",
         "description": "Motor Controller"
       },
@@ -125,7 +125,15 @@
       "gyro_offset_z_deg_per_s": {
         "type": "number",
         "description": "VESC"
-      }
+      },
+      "motor_current_max_A": {
+        "type": "number",
+        "description": "VESC"
+      },
+      "battery_current_max_A": {
+        "type": "number",
+        "description": "VESC"
+      }      
     },
     "required": [
       "total_weight_with_rider_kg",
@@ -147,7 +155,7 @@
       "slope_range_bound_deg",
       "mu_rolling",
       "c_drag",
-      "control_time_step_sec",
+      "control_time_step_ms",
       "vesc_fw",
       "heartbeat_timeout_sec",
       "imu_rotation_roll_deg",
@@ -158,7 +166,9 @@
       "accel_offset_z_g",
       "gyro_offset_x_deg_per_s",
       "gyro_offset_y_deg_per_s",
-      "gyro_offset_z_deg_per_s"
+      "gyro_offset_z_deg_per_s",
+      "motor_current_max_A",
+      "battery_current_max_A"
     ],
     "additionalProperties": false
   }

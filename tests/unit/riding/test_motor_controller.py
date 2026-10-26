@@ -26,6 +26,17 @@ class TestMotorController:
             motor_max_amps=50.0,
             motor_max_power_watts=500.0,
             motor_pole_pairs=7,
+            imu_rotation_roll_deg=0.0,
+            imu_rotation_pitch_deg=0.0,
+			imu_rotation_yaw_deg=0.0,
+            accel_offset_x_g=0.0,
+			accel_offset_y_g=0.0,
+			accel_offset_z_g=0.0,
+			gyro_offset_x_deg_per_s=0.0,
+			gyro_offset_y_deg_per_s=0.0,
+			gyro_offset_z_deg_per_s=0.0,
+			motor_current_max_A=50.0,
+			battery_current_max_A=50.0                
         )
         fdm = FrictionalDecelerationModel(0.3, 0.5, eboard)
         mc = MotorController(eboard, eks, Lock(), fdm)
@@ -43,6 +54,17 @@ class TestMotorController:
             motor_max_amps=50.0,
             motor_max_power_watts=500.0,
             motor_pole_pairs=7,
+            imu_rotation_roll_deg=0.0,
+            imu_rotation_pitch_deg=0.0,
+            imu_rotation_yaw_deg=0.0,
+            accel_offset_x_g=0.0,
+            accel_offset_y_g=0.0,
+            accel_offset_z_g=0.0,
+            gyro_offset_x_deg_per_s=0.0,
+            gyro_offset_y_deg_per_s=0.0,
+            gyro_offset_z_deg_per_s=0.0,
+            motor_current_max_A=50.0,
+            battery_current_max_A=50.0         
         )
         mc = MotorController(eboard, eks, Lock(), fdm)
         erpm_per_sec_2 = mc.erpm_per_sec
@@ -61,6 +83,17 @@ class TestMotorController:
             motor_max_amps=50.0,
             motor_max_power_watts=500.0,
             motor_pole_pairs=7,
+            imu_rotation_roll_deg=0.0,
+            imu_rotation_pitch_deg=0.0,
+            imu_rotation_yaw_deg=0.0,
+            accel_offset_x_g=0.0,
+            accel_offset_y_g=0.0,
+            accel_offset_z_g=0.0,
+            gyro_offset_x_deg_per_s=0.0,
+            gyro_offset_y_deg_per_s=0.0,
+            gyro_offset_z_deg_per_s=0.0,
+            motor_current_max_A=50.0,
+            battery_current_max_A=50.0                     
         )
         fdm = FrictionalDecelerationModel(0.3, 0.5, eboard)
         mc = MotorController(eboard, eks, Lock(), fdm)
@@ -83,6 +116,17 @@ class TestMotorController:
             motor_max_amps=50.0,
             motor_max_power_watts=500.0,
             motor_pole_pairs=7,
+            imu_rotation_roll_deg=0.0,
+            imu_rotation_pitch_deg=0.0,
+            imu_rotation_yaw_deg=0.0,
+            accel_offset_x_g=0.0,
+            accel_offset_y_g=0.0,
+            accel_offset_z_g=0.0,
+            gyro_offset_x_deg_per_s=0.0,
+            gyro_offset_y_deg_per_s=0.0,
+            gyro_offset_z_deg_per_s=0.0,
+            motor_current_max_A=50.0,
+            battery_current_max_A=50.0                     
         )
         fdm = FrictionalDecelerationModel(0.3, 0.5, eboard)
         mc = MotorController(eboard, eks, Lock(), fdm)
@@ -107,6 +151,17 @@ class TestMotorController:
             motor_max_amps=50.0,
             motor_max_power_watts=500.0,
             motor_pole_pairs=7,
+            imu_rotation_roll_deg=0.0,
+            imu_rotation_pitch_deg=0.0,
+            imu_rotation_yaw_deg=0.0,
+            accel_offset_x_g=0.0,
+            accel_offset_y_g=0.0,
+            accel_offset_z_g=0.0,
+            gyro_offset_x_deg_per_s=0.0,
+            gyro_offset_y_deg_per_s=0.0,
+            gyro_offset_z_deg_per_s=0.0,
+            motor_current_max_A=50.0,
+            battery_current_max_A=50.0                     
         )
         eks_lock = Lock()
         fdm = FrictionalDecelerationModel(0.3, 0.5, eboard)
