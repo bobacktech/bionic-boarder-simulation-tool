@@ -119,10 +119,6 @@ if __name__ == "__main__":
         app_input_arguments.mu_rolling, app_input_arguments.c_drag, eboard
     )
     push_model = push_model.PushModel(eboard)
-    motor_controller = motor_controller.MotorController(
-        eboard, eboard_kinematic_state, eboard_kinematic_state_lock, frictional_deceleration_model
-    )
-    motor_controller.control_time_step_ms = app_input_arguments.control_time_step_ms
     kinematic_loop = kinematic_loop.KinematicLoop(
         eboard, eboard_kinematic_state, eboard_kinematic_state_lock, frictional_deceleration_model, push_model
     )
@@ -140,7 +136,6 @@ if __name__ == "__main__":
             eboard_kinematic_state,
             eboard_kinematic_state_lock,
             battery_discharge_model,
-            motor_controller,
         )
     elif app_input_arguments.vesc_fw == "6.02":
         vesc_command_message_processor = fw_6_02.FW6_02CMP(
@@ -151,7 +146,6 @@ if __name__ == "__main__":
             eboard_kinematic_state,
             eboard_kinematic_state_lock,
             battery_discharge_model,
-            motor_controller,
         )
     elif app_input_arguments.vesc_fw == "6.05":
         vesc_command_message_processor = fw_6_05.FW6_05CMP(
@@ -162,7 +156,6 @@ if __name__ == "__main__":
             eboard_kinematic_state,
             eboard_kinematic_state_lock,
             battery_discharge_model,
-            motor_controller,
         )
     else:
         logger.error(f"There is no VESC firmware version matching {app_input_arguments.vesc_fw}")
@@ -189,7 +182,6 @@ if __name__ == "__main__":
     vesc_command_message_processor_thread = threading.Thread(target=vesc_command_message_processor.handle_command)
     vesc_command_message_processor_thread.daemon = True
     vesc_command_message_processor_thread.start()
-    motor_controller.start()
     kinematic_loop_thread.start()
     logger.info("VESC CMP, motor controller, and kinematic loop threads are running.")
     if args.enable_data_recording:
@@ -201,5 +193,4 @@ if __name__ == "__main__":
     kinematic_loop_thread.join()
     vesc_command_message_processor_thread.join()
     recorder.stop_recording()
-    motor_controller.stop()
     sys.exit(0)

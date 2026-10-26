@@ -11,7 +11,6 @@ from bionic_boarder_simulation_tool.vesc.fw_6_05 import (
 )
 from bionic_boarder_simulation_tool.riding.battery_discharge_model import BatteryDischargeModel
 from bionic_boarder_simulation_tool.riding.eboard_kinematic_state import EboardKinematicState
-from bionic_boarder_simulation_tool.riding.motor_controller import MotorController
 from bionic_boarder_simulation_tool.riding.eboard import EBoard
 from math import ldexp
 from threading import Lock
@@ -149,7 +148,6 @@ class TestFW6_05CMP:
             None,
             None,
             None,
-            None,
         )
         buffer = FirmwareMessage().buffer
         crc = cmp.crc16(buffer)
@@ -163,7 +161,6 @@ class TestFW6_05CMP:
             230400,
             8,
             EBoard(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-            None,
             None,
             None,
             None,
@@ -183,7 +180,6 @@ class TestFW6_05CMP:
             None,
             None,
             None,
-            None,
         )
         buffer = AppConfigurationMessage().buffer
         crc = cmp.crc16(buffer)
@@ -200,7 +196,6 @@ class TestFW6_05CMP:
             None,
             EboardKinematicState(0, 0, 0, 0, 0, 0, 0, 0, 0),
             Lock(),
-            None,
             None,
         )
         buffer = BionicBoarderMessage().buffer

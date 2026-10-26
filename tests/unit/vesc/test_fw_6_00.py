@@ -14,7 +14,6 @@ import math
 from threading import Lock
 from bionic_boarder_simulation_tool.riding.battery_discharge_model import BatteryDischargeModel
 from bionic_boarder_simulation_tool.riding.eboard_kinematic_state import EboardKinematicState
-from bionic_boarder_simulation_tool.riding.motor_controller import MotorController
 from bionic_boarder_simulation_tool.riding.eboard import EBoard
 
 
@@ -258,7 +257,6 @@ def test_firmware_command(mock_serial):
         None,
         None,
         None,
-        None,
     )
     buffer = FirmwareMessage().buffer
     crc = cmp.crc16(buffer)
@@ -276,7 +274,6 @@ def test_motor_controller_configuration_command(mock_serial):
         None,
         None,
         None,
-        None,
     )
     buffer = MotorControllerConfigurationMessage().buffer
     crc = cmp.crc16(buffer)
@@ -291,7 +288,6 @@ def test_app_configuration_command(mock_serial):
         230400,
         256,
         EBoard(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-        None,
         None,
         None,
         None,
