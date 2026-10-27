@@ -1676,11 +1676,8 @@ class FW6_00CMP(CommandMessageProcessor):
 
     def _update_current(self, command):
         motor_current_commanded = int.from_bytes(command[3:7], byteorder="big") / 1000.0
-        # TBD
-        try:
-            pass
-        except ValueError as e:
-            pass
+        with self.__eks_lock:
+            self.__eks.motor_current = motor_current_commanded
         Logger().logger.info(
             "Processing set current command", motor_current=motor_current_commanded, CMP=self.__class__.__name__
         )
