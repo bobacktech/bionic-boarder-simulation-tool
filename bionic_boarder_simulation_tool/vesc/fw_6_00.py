@@ -6,7 +6,6 @@ from threading import Lock
 import math
 from bionic_boarder_simulation_tool.riding.battery_discharge_model import BatteryDischargeModel
 from bionic_boarder_simulation_tool.riding.eboard_kinematic_state import EboardKinematicState
-from bionic_boarder_simulation_tool.riding.motor_controller import MotorController
 from bionic_boarder_simulation_tool.logger import Logger
 from bionic_boarder_simulation_tool.riding.eboard import EBoard
 
@@ -1555,7 +1554,6 @@ class FW6_00CMP(CommandMessageProcessor):
         eks: EboardKinematicState,
         eks_lock: Lock,
         bdm: BatteryDischargeModel,
-        mc: MotorController,
     ):
         super().__init__(com_port, baud_rate, command_byte_size)
         self.__cmd_id_name = {
@@ -1572,7 +1570,6 @@ class FW6_00CMP(CommandMessageProcessor):
         self.__eks = eks
         self.__eks_lock = eks_lock
         self.__bdm = bdm
-        self.__mc = mc
         self.__eboard = eboard
 
     @property
@@ -1679,11 +1676,8 @@ class FW6_00CMP(CommandMessageProcessor):
 
     def _update_current(self, command):
         motor_current_commanded = int.from_bytes(command[3:7], byteorder="big") / 1000.0
-        self.__mc.target_current = motor_current_commanded
-        try:
-            self.__mc.current_sem.release()
-        except ValueError as e:
-            pass
+        with self.__eks_lock:
+            self.__eks.motor_current = motor_current_commanded
         Logger().logger.info(
             "Processing set current command", motor_current=motor_current_commanded, CMP=self.__class__.__name__
         )

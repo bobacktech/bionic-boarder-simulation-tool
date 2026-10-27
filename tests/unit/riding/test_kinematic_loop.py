@@ -141,7 +141,7 @@ class TestKinematicLoop:
         kloop.push_period_sec = 10000
         kloop.theta_slope_period_sec = 10000
         kloop.initial_theta_slope_deg = 0.0
-        kloop.apply_current(70.0)
+        eks.motor_current = 70.0
         eks.velocity = 0.0
         t = threading.Thread(target=kloop.loop)
         t.start()

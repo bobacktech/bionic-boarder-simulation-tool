@@ -4,6 +4,5 @@ __all__ = [
     "eboard",
     "frictional_deceleration_model",
     "kinematic_loop",
-    "motor_controller",
     "push_model",
 ]
