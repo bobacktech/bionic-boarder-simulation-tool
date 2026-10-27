@@ -1,6 +1,3 @@
-
-
-
 import math
 from .eboard import EBoard
 from .eboard_kinematic_state import EboardKinematicState
@@ -40,6 +37,7 @@ class KinematicLoop:
         self.__slope_range_bound_deg = None
         self.__apply_current = False
         self.__drive_acceleration = 0.0
+        self.__last_commanded_motor_current = 0.0
 
     @property
     def slope_range_bound_deg(self) -> float:
@@ -164,11 +162,20 @@ class KinematicLoop:
                 self.__eks.acceleration_x += accel_x_m_per_s2
                 self.__eks.velocity += delta_velocity_push_m_per_s
             
-            if self.__apply_current:
+            if self.__eks.motor_current > 0.0 and self.__eks.motor_current <= self.__eb.motor_current_max_A:
+                if self.__eks.motor_current != self.__last_commanded_motor_current:
+                    kt = 8.27/self.__eb.motor_kv
+                    motor_torque = kt * self.__eks.motor_current
+                    wheel_torque = motor_torque * self.__eb.gear_ratio
+                    drive_force = wheel_torque/(self.__eb.wheel_diameter_m/2.0)
+                    self.__drive_acceleration = drive_force/self.__eb.total_weight_with_rider_kg
+                    self.__last_commanded_motor_current = self.__eks.motor_current
                 self.__eks.acceleration_x += self.__drive_acceleration
                 delta_velocity_drive_m_per_s = self.__drive_acceleration * self.__fixed_time_step_ms / 1000.0
                 self.__eks.velocity += delta_velocity_drive_m_per_s
-            
+            elif self.__last_commanded_motor_current != 0.0:
+                self.__last_commanded_motor_current = 0.0
+                                
             if self.__eks.velocity > 0.0:
                 self.__eks.velocity = self.__eks.velocity - delta_velocity_friction_m_per_s
 
@@ -187,28 +194,3 @@ class KinematicLoop:
 
     def stop(self) -> None:
         self.__loop_active = False
-        
-    def apply_current(self, current: float) -> None:
-        if not (current >=0 and current <= self.__eb.motor_current_max_A): 
-            # Log error
-            Logger().logger.error("Commanded current is not within VESC limits. Commanded current will be ignored." 
-                                  f"(requested: {current}, max: {self.__eb.motor_current_max_A})")
-            return
-        
-        with self.__eks_lock:
-            self.__eks.motor_current = current
-        if current == 0.0:
-            self.__apply_current = False
-            Logger().logger.info("Current control has set motor current to 0")
-        else:
-            self.__apply_current = True
-            
-            # Convert the target current value to wheel torque using VESC FOC appropriate formula for computing Kt.
-            kt = 8.27/self.__eb.motor_kv
-            motor_torque = kt * current
-            wheel_torque = motor_torque * self.__eb.gear_ratio
-            
-            # Compute the drive force from the torque.
-            drive_force = wheel_torque/(self.__eb.wheel_diameter_m/2.0)
-            self.__drive_acceleration = drive_force/self.__eb.total_weight_with_rider_kg
-
