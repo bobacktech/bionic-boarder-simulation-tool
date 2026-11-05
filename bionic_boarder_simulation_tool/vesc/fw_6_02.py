@@ -1593,7 +1593,7 @@ class FW6_02CMP(CommandMessageProcessor):
         self.serial.write(packet)
         Logger().logger.info(
             "Publishing Bionic Boarder message",
-            motor_current=bb.motor_current,
+            motor_current=bb.avg_motor_current,
             duty_cycle=bb.duty_cycle,
             rpm=bb.rpm,
             imu_acc=bb.acc,
