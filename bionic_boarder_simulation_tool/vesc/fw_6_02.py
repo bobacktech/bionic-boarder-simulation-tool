@@ -1578,7 +1578,7 @@ class FW6_02CMP(CommandMessageProcessor):
     def _publish_bionic_boarder(self):
         bb = BionicBoarderMessage()
         with self.__eks_lock:
-            bb.motor_current = self.__eks.motor_current
+            bb.avg_motor_current = self.__eks.motor_current
             bb.rpm = self.__eks.erpm
             bb.acc[0] = self.__eks.acceleration_x
             bb.acc[1] = self.__eks.acceleration_y
