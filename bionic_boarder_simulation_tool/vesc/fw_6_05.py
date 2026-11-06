@@ -1569,7 +1569,7 @@ class FW6_05CMP(CommandMessageProcessor):
         Logger().logger.info("Publishing application configuration message", CMP=self.__class__.__name__)
 
     def _update_current(self, command):
-        motor_current_commanded = int.from_bytes(command[3:7], byteorder="big") / 1000.0
+        motor_current_commanded = int.from_bytes(command[3:7], byteorder="big") / 100.0
         with self.__eks_lock:
             self.__eks.motor_current = motor_current_commanded
         Logger().logger.info(
