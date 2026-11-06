@@ -15,9 +15,9 @@ class VescBionicBoarderMsgRequester:
         await self.client.start_notify(characteristic, self.on_data_received)
 
     def on_data_received(self, sender: BleakGATTCharacteristic, data: bytearray):
-        if len(data) == 37:
-            id = data[2]
-            assert id == 152
+        if len(data) == 135:
+            msg_id = data[2]
+            assert msg_id == 152
             temp: Tuple[int, bytearray] = (int(time.time() * 1000), data)
             self.response_buffer.append(temp)
             self.response_received = True
