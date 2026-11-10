@@ -12,7 +12,7 @@ if __name__ == "__main__":
         print(f"File {args.sim_data_file} does not exist.")
         sys.exit(1)
     # Define the format string used for packing the data
-    format_string = "d f f f f f f f i f f"
+    format_string = "d f f f f f f f f f f f i f f"
     # Calculate the size of each data packet
     packet_size = struct.calcsize(format_string)
     # Define the keys for the dictionary
@@ -25,6 +25,10 @@ if __name__ == "__main__":
         "pitch",
         "roll",
         "yaw",
+        "w",
+        "x",
+        "y",
+        "z",
         "erpm",
         "motor_current",
         "input_current",
@@ -44,21 +48,27 @@ if __name__ == "__main__":
     velocities = [packet["velocity"] for packet in data_packets]
     accelerations_x = [packet["acceleration_x"] for packet in data_packets]
     pitches = [packet["pitch"] for packet in data_packets]
+    w = [packet["w"] for packet in data_packets]
+    x = [packet["x"] for packet in data_packets]
+    y = [packet["y"] for packet in data_packets]
+    z = [packet["z"] for packet in data_packets]
     erpms = [packet["erpm"] for packet in data_packets]
     input_currents = [packet["motor_current"] for packet in data_packets]
 
     # Create figure and subplots
-    fig, (ax1, ax2, ax3, ax4, ax5, ax6) = plt.subplots(6, 1, figsize=(10, 15), sharex=True)
+    fig, (ax1, ax2, ax3, ax4, ax5, ax6, ax7) = plt.subplots(7, 1, figsize=(10, 15), sharex=True)
     fig.suptitle("Vehicle Telemetry Data")
 
     # Plot 1: Velocity vs Time
     ax1.plot(timestamps, velocities, "b-")
+    ax1.set_xlabel("Time (ms)")
     ax1.set_ylabel("Velocity (m/s)")
     ax1.grid(True)
 
     # Plot 2: Acceleration X vs Time
     ax2.plot(timestamps, accelerations_x, "r-")
-    ax2.set_ylabel("Acceleration X (m/s²)")
+    ax2.set_xlabel("Time (ms)")
+    ax2.set_ylabel("Measured IMU Acceleration X (m/s²)")
     ax2.grid(True)
 
     # Plot 3: Pitch vs Time
@@ -66,23 +76,33 @@ if __name__ == "__main__":
     ax3.set_xlabel("Time (ms)")
     ax3.set_ylabel("Pitch (deg)")
     ax3.grid(True)
-
-    # Plot 4: ERPM vs Time
-    ax4.plot(timestamps, erpms, "m-")
-    ax4.set_ylabel("ERPM")
+    
+    # Plot 4: Quaternion Components vs Time
+    ax4.plot(timestamps, w, "m-", label="w")
+    ax4.plot(timestamps, x, "c-", label="x")
+    ax4.plot(timestamps, y, "y-", label="y")
+    ax4.plot(timestamps, z, "k-", label="z")
+    ax4.set_xlabel("Time (ms)")
+    ax4.set_ylabel("Quaternion Components")
+    ax4.legend()
     ax4.grid(True)
 
-    # Plot 5: Motor Current vs Time
-    ax5.plot(timestamps, input_currents, "c-")
-    ax5.set_xlabel("Time (ms)")
-    ax5.set_ylabel("Motor Current (A)")
+    # Plot 5: ERPM vs Time
+    ax5.plot(timestamps, erpms, "m-")
+    ax5.set_ylabel("ERPM")
     ax5.grid(True)
 
-    # Plot 6: Input Current vs Time
+    # Plot 6: Motor Current vs Time
     ax6.plot(timestamps, input_currents, "c-")
     ax6.set_xlabel("Time (ms)")
-    ax6.set_ylabel("Input Current (A)")
+    ax6.set_ylabel("Motor Current (A)")
     ax6.grid(True)
+
+    # Plot 7: Input Current vs Time
+    ax7.plot(timestamps, input_currents, "c-")
+    ax7.set_xlabel("Time (ms)")
+    ax7.set_ylabel("Input Current (A)")
+    ax7.grid(True)
 
     # Adjust layout to prevent overlap
     plt.tight_layout()
