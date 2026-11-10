@@ -59,4 +59,27 @@ async def test_current_motor_control(activate_sim_and_ble_client):
     latest_current = (struct.unpack(">i", bb_data[7:11])[0])/100.0
     assert latest_current == 0.0
     
+@pytest.mark.skip(reason="Skip is the default behavior. Remove this line to enable the test.")
+@pytest.mark.asyncio
+async def test_constant_current_extended_time_motor_control(activate_sim_and_ble_client):
+    client = activate_sim_and_ble_client
+    bb_requester = bionic_boarder_msg_requester.VescBionicBoarderMsgRequester(client)
+    await bb_requester.set_up_response_handler()
+    target_current = 25.0 
+    scaled_current = int(target_current * 100)
+    set_current_command = bytearray([6]) + bytearray(scaled_current.to_bytes(4, "big"))
+    data = packetize(set_current_command)
+    await client.write_gatt_char(UART_RX_CHAR_UUID, data, response=False)
+    time.sleep(45)
+    await bb_requester.send_command()
+    while bb_requester.response_received == False:
+        await asyncio.sleep(0.1)
+    bb_data = bb_requester.response_buffer.pop(0)[1]    
+    latest_current = (struct.unpack(">i", bb_data[7:11])[0])/100.0
+    assert latest_current == target_current
+    zero_current_command = bytearray([6]) + bytearray((0).to_bytes(4, "big"))
+    data = packetize(zero_current_command)
+    await client.write_gatt_char(UART_RX_CHAR_UUID, data, response=False)
+    time.sleep(2)    
+    
         
