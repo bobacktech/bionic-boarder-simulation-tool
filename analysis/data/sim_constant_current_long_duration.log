@@ -1,0 +1,22 @@
+{"event": "Kinematic loop has started", "level": "info", "timestamp": 4.76837158203125e-07}
+{"event": "VESC CMP, motor controller, and kinematic loop threads are running.", "level": "info", "timestamp": 5.9604644775390625e-05}
+{"event": "Sim data recorder thread is running.", "level": "info", "timestamp": 0.00024437904357910156}
+{"command": "CURRENT", "event": "VESC received command", "level": "info", "timestamp": 2.523676872253418}
+{"motor_current": 25.0, "CMP": "FW6_02CMP", "event": "Processing set current command", "level": "info", "timestamp": 2.5237786769866943}
+{"theta_slope_deg": -10.966712138369495, "quat_w": 0.9954239987345912, "quat_x": 0.0, "quat_y": 0.09555659445185691, "quat_z": 0.0, "event": "Calculated new theta slope value", "level": "info", "timestamp": 5.046515464782715}
+{"theta_slope_deg": 0.0, "quat_w": 1.0, "quat_x": 0.0, "quat_y": -0.0, "quat_z": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 10.097076892852783}
+{"theta_slope_deg": 2.2109776359936077, "quat_w": 0.9998138684583174, "quat_x": 0.0, "quat_y": -0.019293222603140044, "quat_z": 0.0, "event": "Calculated new theta slope value", "level": "info", "timestamp": 15.15097713470459}
+{"theta_slope_deg": 0.0, "quat_w": 1.0, "quat_x": 0.0, "quat_y": -0.0, "quat_z": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 20.20317840576172}
+{"theta_slope_deg": -12.065664729282659, "quat_w": 0.9944618338429403, "quat_x": 0.0, "quat_y": 0.10509833980485259, "quat_z": 0.0, "event": "Calculated new theta slope value", "level": "info", "timestamp": 25.256175994873047}
+{"accel_x_of_the_push": 0.10996192523675094, "duration_of_the_push_ms": 401, "event": "Land paddle board push initiated", "level": "info", "timestamp": 30.253843069076538}
+{"push_active": true, "initial_slowdown_duration_ms": 40.1, "rider_accel_ms2": 0.10996192523675094, "event": "Land paddle board push setup", "level": "info", "timestamp": 30.253947257995605}
+{"theta_slope_deg": 0.0, "quat_w": 1.0, "quat_x": 0.0, "quat_y": -0.0, "quat_z": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 30.314151525497437}
+{"push_active": false, "event": "Land paddle board push finished", "level": "info", "timestamp": 30.696268558502197}
+{"theta_slope_deg": -14.884270549933726, "quat_w": 0.9915761780488441, "quat_x": 0.0, "quat_y": 0.12952483594294556, "quat_z": 0.0, "event": "Calculated new theta slope value", "level": "info", "timestamp": 35.37907266616821}
+{"theta_slope_deg": 0.0, "quat_w": 1.0, "quat_x": 0.0, "quat_y": -0.0, "quat_z": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 40.44353151321411}
+{"theta_slope_deg": -1.9742816848978961, "quat_w": 0.9998515868992671, "quat_x": 0.0, "quat_y": 0.017228005543804558, "quat_z": 0.0, "event": "Calculated new theta slope value", "level": "info", "timestamp": 45.490381956100464}
+{"command": "BIONIC BOARDER", "event": "VESC received command", "level": "info", "timestamp": 47.76170468330383}
+{"motor_current": 25.0, "duty_cycle": 0.0, "rpm": 60365, "imu_acc": [-0.6348482104791402, 0.0, 9.80417670208616], "imu_rpy": [0.0, -0.034457715763289494, 0.0], "imu_q": [0.9998515868992671, 0.0, 0.017228005543804558, 0.0], "CMP": "FW6_02CMP", "event": "Publishing Bionic Boarder message", "level": "info", "timestamp": 47.761900901794434}
+{"command": "CURRENT", "event": "VESC received command", "level": "info", "timestamp": 47.959670305252075}
+{"motor_current": 0.0, "CMP": "FW6_02CMP", "event": "Processing set current command", "level": "info", "timestamp": 47.95976281166077}
+{"theta_slope_deg": 0.0, "quat_w": 1.0, "quat_x": 0.0, "quat_y": -0.0, "quat_z": 0.0, "event": "Theta slope value is set to 0.0", "level": "info", "timestamp": 50.54380536079407}
