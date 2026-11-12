@@ -53,7 +53,8 @@ if __name__ == "__main__":
     y = [packet["y"] for packet in data_packets]
     z = [packet["z"] for packet in data_packets]
     erpms = [packet["erpm"] for packet in data_packets]
-    input_currents = [packet["motor_current"] for packet in data_packets]
+    motor_currents = [packet["motor_current"] for packet in data_packets]
+    input_currents = [packet["input_current"] for packet in data_packets]
 
     # Create figure and subplots
     fig, (ax1, ax2, ax3, ax4, ax5, ax6, ax7) = plt.subplots(7, 1, figsize=(10, 15), sharex=True)
@@ -93,7 +94,7 @@ if __name__ == "__main__":
     ax5.grid(True)
 
     # Plot 6: Motor Current vs Time
-    ax6.plot(timestamps, input_currents, "c-")
+    ax6.plot(timestamps, motor_currents, "c-")
     ax6.set_xlabel("Time (ms)")
     ax6.set_ylabel("Motor Current (A)")
     ax6.grid(True)
