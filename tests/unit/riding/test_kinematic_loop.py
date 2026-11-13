@@ -8,6 +8,7 @@ from bionic_boarder_simulation_tool.riding.eboard_kinematic_state import EboardK
 from threading import Lock
 import threading
 import time
+from collections import deque
 
 
 @pytest.fixture
@@ -37,7 +38,7 @@ def pm_mock():
 
 @pytest.fixture
 def kloop(eboard: EBoard, eks: EboardKinematicState, fdm_mock: MagicMock, pm_mock: MagicMock) -> KinematicLoop:
-    return KinematicLoop(eboard, eks, Lock(), fdm_mock, pm_mock)
+    return KinematicLoop(eboard, eks, deque(), Lock(), fdm_mock, pm_mock)
 
 
 class TestKinematicLoop:
