@@ -7,6 +7,8 @@ import time
 from threading import Lock
 import random
 from bionic_boarder_simulation_tool.logger import Logger
+from dataclasses import replace
+from bionic_boarder_simulation_tool.mission_elapsed_time import MissionElapsedTime
 
 
 class KinematicLoop:
@@ -19,6 +21,7 @@ class KinematicLoop:
         self,
         eb: EBoard,
         eks: EboardKinematicState,
+        eks_buffer: list[tuple[float, EboardKinematicState]],
         eks_lock: Lock,
         fdm: FrictionalDecelerationModel,
         pm: PushModel,
@@ -26,6 +29,7 @@ class KinematicLoop:
         self.__fixed_time_step_ms = 0
         self.__eb = eb
         self.__eks = eks
+        self.__eks_buffer = eks_buffer
         self.__eks_lock = eks_lock
         self.__fdm = fdm
         self.__pm = pm
@@ -186,6 +190,7 @@ class KinematicLoop:
             wheel_rpm = (self.__eks.velocity / (self.__eb.wheel_diameter_m * math.pi)) * 60
             motor_rpm = wheel_rpm * self.__eb.gear_ratio
             self.__eks.erpm = int(self.__eb.motor_pole_pairs * motor_rpm)
+            self.__eks_buffer.append((MissionElapsedTime().elapsed_time_sec, replace(self.__eks)))
             self.__eks_lock.release()
             
             elapsed_time = time.perf_counter() - start_time

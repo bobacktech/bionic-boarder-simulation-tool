@@ -11,6 +11,8 @@ from bionic_boarder_simulation_tool.vesc import fw_6_02
 from bionic_boarder_simulation_tool.vesc import fw_6_05
 from bionic_boarder_simulation_tool.logger import Logger
 from bionic_boarder_simulation_tool.riding.eboard_state_recorder import EboardStateRecorder
+from bionic_boarder_simulation_tool.riding.eboard_kinematic_state import EboardKinematicState
+from collections import deque
 
 
 @dataclass(frozen=True)
@@ -88,8 +90,9 @@ if __name__ == "__main__":
             logger.error("App inputs data file did not validate against the app input schema.")
             sys.exit(1)
     app_input_arguments = AppInputArguments(**app_input_json)
-    eboard_kinematic_state = eboard_kinematic_state.EboardKinematicState()
+    eboard_kinematic_state = EboardKinematicState()
     eboard_kinematic_state_lock = threading.Lock()
+    eboard_kinematic_state_data_buffer: deque[tuple[float, EboardKinematicState]] = deque()
     battery_discharge_model = battery_discharge_model.BatteryDischargeModel(app_input_arguments.battery_max_voltage)
     eboard = eboard.EBoard(
         app_input_arguments.total_weight_with_rider_kg,
@@ -120,7 +123,7 @@ if __name__ == "__main__":
     )
     push_model = push_model.PushModel(eboard)
     kinematic_loop = kinematic_loop.KinematicLoop(
-        eboard, eboard_kinematic_state, eboard_kinematic_state_lock, frictional_deceleration_model, push_model
+        eboard, eboard_kinematic_state, eboard_kinematic_state_data_buffer, eboard_kinematic_state_lock, frictional_deceleration_model, push_model
     )
     kinematic_loop.fixed_time_step_ms = app_input_arguments.fixed_time_step_ms
     kinematic_loop.theta_slope_period_sec = app_input_arguments.theta_slope_period_sec
