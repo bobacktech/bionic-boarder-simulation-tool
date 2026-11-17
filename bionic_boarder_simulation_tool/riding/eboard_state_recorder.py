@@ -1,19 +1,18 @@
 from datetime import datetime
 from .eboard_kinematic_state import EboardKinematicState
-from threading import Lock, Thread
+from threading import Thread
 import time
 import struct
-from bionic_boarder_simulation_tool.mission_elapsed_time import MissionElapsedTime
-
+from collections import deque
 
 class EboardStateRecorder:
 
-    def __init__(self, eks_lock: Lock, eks: EboardKinematicState, recording_period_ms: int):
-        self.__eks: EboardKinematicState = eks
-        self.__eks_lock: Lock = eks_lock
+    def __init__(self, data: deque[tuple[float, EboardKinematicState]], recording_start_delay_s: float, time_step_ms: int):
+        self.__data = data
+        self.__time_delay_s = recording_start_delay_s
+        self.__time_step_s = time_step_ms/1000.0
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         self.__record_file_name = f"sim_data_recording_{timestamp}.bin"
-        self.__recording_period_s: float = recording_period_ms / 1000.0
         self.__recording_thread = Thread(target=self.record, daemon=True)
         self.__stop_recording = False
 
@@ -29,30 +28,30 @@ class EboardStateRecorder:
 
     def record(self) -> None:
         f = open(self.__record_file_name, "wb")
+        time.sleep(self.__time_delay_s)
         while True:
-            eks_bytes = None
-            with self.__eks_lock:
-                timestamp = MissionElapsedTime().elapsed_time_sec
-                eks_bytes = struct.pack(
-                    "d f f f f f f f f f f f i f f",
-                    timestamp,
-                    self.__eks.velocity,
-                    self.__eks.acceleration_x,
-                    self.__eks.acceleration_y,
-                    self.__eks.acceleration_z,
-                    self.__eks.pitch,
-                    self.__eks.roll,
-                    self.__eks.yaw,
-                    self.__eks.w,
-                    self.__eks.x,
-                    self.__eks.y,
-                    self.__eks.z,
-                    self.__eks.erpm,
-                    self.__eks.motor_current,
-                    self.__eks.input_current,
+            item = self.__data.popleft()
+            timestamp, eks = item
+            eks_bytes = struct.pack(
+                "d f f f f f f f f f f f i f f",
+                timestamp,
+                eks.velocity,
+                eks.acceleration_x,
+                eks.acceleration_y,
+                eks.acceleration_z,
+                eks.pitch,
+                eks.roll,
+                eks.yaw,
+                eks.w,
+                eks.x,
+                eks.y,
+                eks.z,
+                eks.erpm,
+                eks.motor_current,
+                eks.input_current,
                 )
             f.write(eks_bytes)
             if self.__stop_recording:
                 f.close()
                 break
-            time.sleep(self.__recording_period_s)
+            time.sleep(self.__time_step_s)
