@@ -70,6 +70,10 @@
         "type": "number",
         "description": "Kinematic loop"
       },
+      "kinematic_state_recording_start_delay_s": {
+        "type": "number",
+        "description": "Kinematic loop"
+      },      
       "mu_rolling": {
         "type": "number",
         "description": "Friction model"
@@ -153,6 +157,7 @@
       "push_period_sec",
       "theta_slope_period_sec",
       "slope_range_bound_deg",
+      "kinematic_state_recording_start_delay_s",
       "mu_rolling",
       "c_drag",
       "control_time_step_ms",

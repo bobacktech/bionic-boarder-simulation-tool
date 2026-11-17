@@ -16,6 +16,7 @@
     "push_period_sec": 30.0,
     "theta_slope_period_sec": 5.0,
     "slope_range_bound_deg": 15.0,
+    "kinematic_state_recording_start_delay_s": 5.0,
     "mu_rolling": 0.03,
     "c_drag": 0.8,
     "control_time_step_ms": 10,
