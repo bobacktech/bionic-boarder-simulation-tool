@@ -40,6 +40,7 @@ class AppInputArguments:
     push_period_sec: float
     theta_slope_period_sec: float
     slope_range_bound_deg: float
+    kinematic_state_recording_start_delay_s: float
 
     # Friction model
     mu_rolling: float
@@ -188,8 +189,7 @@ if __name__ == "__main__":
     kinematic_loop_thread.start()
     logger.info("VESC CMP, motor controller, and kinematic loop threads are running.")
     if args.enable_data_recording:
-        recording_period_ms = app_input_arguments.fixed_time_step_ms * 2
-        recorder = EboardStateRecorder(eboard_kinematic_state_lock, eboard_kinematic_state, recording_period_ms)
+        recorder = EboardStateRecorder(eboard_kinematic_state_data_buffer, app_input_arguments.kinematic_state_recording_start_delay_s, app_input_arguments.fixed_time_step_ms)
         recorder.start_recording()
         logger.info("Sim data recorder thread is running.")
 
