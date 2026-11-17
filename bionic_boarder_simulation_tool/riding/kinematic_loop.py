@@ -92,6 +92,7 @@ class KinematicLoop:
         self.__current_theta_slope_deg = self.__initial_theta_slope_deg
         theta_slope_time_step_sec = 0
         push_period_time_step_sec = 0
+        time_step_sec = self.__fixed_time_step_ms / 1000.0
         with self.__eks_lock:
             self.__eks.acceleration_z = 9.81 * math.cos(math.radians(self.__current_theta_slope_deg))
             self.__eks.pitch = self.__current_theta_slope_deg 
@@ -101,10 +102,8 @@ class KinematicLoop:
             self.__eks.y = -math.sin(angle)
             self.__eks.z = 0.0
         Logger().logger.info("Kinematic loop has started")
-        while True:
-            if not self.__loop_active:
-                break
-            start_time = time.perf_counter()
+        next_deadline = time.perf_counter()
+        while self.__loop_active:
             if theta_slope_time_step_sec >= self.__theta_slope_period_sec:
                 log_msg = None
                 if self.__current_theta_slope_deg == 0.0:
@@ -130,12 +129,12 @@ class KinematicLoop:
                 Logger().logger.info(
                     log_msg, theta_slope_deg=self.__current_theta_slope_deg, quat_w=w, quat_x=0.0, quat_y=y, quat_z=0.0
                 )
-            theta_slope_time_step_sec += self.__fixed_time_step_ms / 1000.0
+            theta_slope_time_step_sec += time_step_sec
             
             accel_gravity_x_m_per_s2 = 9.81 * math.sin(math.radians(self.__current_theta_slope_deg))
             delta_velocity_gravity_x_m_per_s = abs(accel_gravity_x_m_per_s2) * self.__fixed_time_step_ms / 1000.0
 
-            if push_period_time_step_sec >= self.__push_period_sec:                
+            if push_period_time_step_sec >= self.__push_period_sec: 
                 if self.__current_theta_slope_deg > 0.0:
                     accel_push_x_m_per_s2 = random.uniform(accel_gravity_x_m_per_s2, 2 * 9.81)
                 else:                    
@@ -148,7 +147,7 @@ class KinematicLoop:
                 )                
                 self.__pm.setup(accel_push_x_m_per_s2, push_duration_ms)
                 push_period_time_step_sec = 0
-            push_period_time_step_sec += self.__fixed_time_step_ms / 1000.0
+            push_period_time_step_sec += time_step_sec
             
             self.__eks_lock.acquire()
             accel_friction_ms2, delta_velocity_friction_m_per_s = self.__fdm.decelerate(
@@ -193,9 +192,15 @@ class KinematicLoop:
             self.__eks_buffer.append((MissionElapsedTime().elapsed_time_sec, replace(self.__eks)))
             self.__eks_lock.release()
             
-            elapsed_time = time.perf_counter() - start_time
-            sleep_time = max(0, self.__fixed_time_step_ms / 1000.0 - elapsed_time)
-            time.sleep(sleep_time)
+            # Next deadline is the previous deadline plus the time step. 
+            # This ensures a fixed time step is maintained, even if the processing of the loop takes longer than expected.
+            next_deadline += time_step_sec
+            sleep_time = next_deadline - time.perf_counter()
+            if (sleep_time > 0):
+                time.sleep(sleep_time)
+            else:
+                # fell behind; reset next_deadline to now
+                next_deadline = time.perf_counter()
 
     def stop(self) -> None:
         self.__loop_active = False
