@@ -1,0 +1,9 @@
+{"event": "Kinematic loop has started", "level": "info", "timestamp": 4.76837158203125e-07}
+{"event": "VESC CMP, motor controller, and kinematic loop threads are running.", "level": "info", "timestamp": 6.246566772460938e-05}
+{"event": "Sim data recorder thread is running.", "level": "info", "timestamp": 0.00026988983154296875}
+{"command": "CURRENT", "event": "VESC received command", "level": "info", "timestamp": 2.759794235229492}
+{"motor_current": 25.0, "CMP": "FW6_02CMP", "event": "Processing set current command", "level": "info", "timestamp": 2.759909152984619}
+{"command": "BIONIC BOARDER", "event": "VESC received command", "level": "info", "timestamp": 47.71014451980591}
+{"motor_current": 25.0, "duty_cycle": 0.0, "rpm": 35856, "imu_acc": [0.055192324287697936, 0.0, 9.81], "imu_rpy": [0.0, 0.0, 0.0], "imu_q": [1.0, 0.0, -0.0, 0.0], "CMP": "FW6_02CMP", "event": "Publishing Bionic Boarder message", "level": "info", "timestamp": 47.710341691970825}
+{"command": "CURRENT", "event": "VESC received command", "level": "info", "timestamp": 47.80613398551941}
+{"motor_current": 0.0, "CMP": "FW6_02CMP", "event": "Processing set current command", "level": "info", "timestamp": 47.806193113327026}
