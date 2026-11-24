@@ -4,20 +4,19 @@ This simulation tool's purpose is to support the ongoing development of the [Bio
 
 The simulation models a rider operating a land paddle board, where propulsion is achieved using a stick paddle across a dynamically varying terrain.  At the start of the simulation, the rider is stationary. The terrain slope changes randomly at periodic intervals, and the rider applies paddle strokes at regular intervals as well. Movement of the board is driven by a combination of gravitational force and rider input.
 
-Key parameters computed over time include the board’s velocity and acceleration along its longitudinal (nose-to-tail) axis, as well as the pitch angle relative to that axis.
+Key parameters computed over time include the board’s velocity and acceleration along its longitudinal (nose-to-tail) axis, the pitch angle relative to the transverse axis, and the quaternion.
 
 The simulated board is also equipped with an electric motor controlled by a [VESC speed controller](https://github.com/vedderb/bldc). The VESC includes an integrated IMU (Inertial Measurement Unit) that provides real-time orientation and acceleration data. In the simulation, the IMU is oriented such that the x-axis aligns with the board’s longitudinal axis, the y-axis spans the width of the board, and the z-axis points vertically through the board.
 
-The motor controller is emulated with a simplified ERPM (Electrical RPM) control scheme, allowing external applications to control the board’s speed in response to rider input. This enables testing and development of control strategies for the Bionic Boarder system.
+The electric motor can be operated using a simplified motor current control scheme that processes a VESC "set current" command. This allows external applications to control the board’s speed in response to rider input. This enables testing and development of control strategies for the Bionic Boarder system.
 
 The simulation supports the following VESC communication commands:
 
-*  **COMM_BIONIC_BOARDER** - Custom Command
+*  **COMM_BIONIC_BOARDER** - Custom Command - See: [bionic-boarder-vesc-bldc](https://github.com/bobacktech/bionic-boarder-vesc-bldc/tree/bionic_boarder_release_6_02)
 *  **COMM_FW_VERSION**
 *  **COMM_GET_MCCONF**
 *  **COMM_GET_APPCONF**
 *  **COMM_SET_CURRENT**
-*  **COMM_SET_RPM**
 *  **COMM_ALIVE**
 
 Communication with the simulated VESC is done over a serial connection. A serial device must be available on the PC for the simulation to execute.
