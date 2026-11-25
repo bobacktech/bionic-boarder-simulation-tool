@@ -1,3 +1,12 @@
+## [2.0.0] - 11/TBD/2026
+- Fixed a timing drift issue in the kinematic loop.
+- Updated the electric longboard state recording to include the calculated quaternion values. 
+- Implemented a motor current control scheme that responds to a VESC COMM_SET_CURRENT command. 
+- Reworked how the rider push model accelerates the longboard.
+- Prevented the longboard in the riding simulation from having a negative velocity.
+- Calculated the quaternion within the riding kinematic loop.
+- Removed support for the VESC COMM_SET_RPM command.
+
 ## [1.3.0] - 06/07/2026
 - Added support for handling the VESC COMM_GET_APPCONF command and response.
 - Specified the entire contents for the VESC COMM_GET_MCCONF response for all supported VESC firmware versions. 
