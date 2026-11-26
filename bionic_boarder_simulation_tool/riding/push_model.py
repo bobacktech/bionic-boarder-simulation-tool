@@ -72,12 +72,11 @@ class PushModel:
 
     def step(self, time_step_ms: int) -> tuple[float, float]:
         """
-        To emulate reality, the rider's acceleration is not all applied at once for the
-        entire push. Instead, the acceleration is increased over time linearly such that it
-        would be equivalent to the rider's acceleration being constant throughout the push duration.
+        For the initial slowdown phase, the acceleration is decreased linearly. The acceleration is
+        not applied all at once per time step. This is done to emulate how a rider paddle the longboard.
 
-        For the initial slowdown phase, the acceleration is decreased linearly following the same
-        approach as above.
+        However, after the slowdown phase, the rider's push acceleration, that is set in the setup method,
+        is applied at each time step.
 
         Args:
             time_step_ms (int): The time step in milliseconds
